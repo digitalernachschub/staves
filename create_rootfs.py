@@ -1,3 +1,5 @@
+"""Installs Gentoo portage packages into a specified directory."""
+
 import os
 import shutil
 import subprocess
