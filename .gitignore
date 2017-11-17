@@ -1,0 +1,4 @@
+.cache/
+.hypothesis/
+__pycache__/
+venv/
