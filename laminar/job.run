@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+setup_test_env() {
+    echo "Setting up test environment…"
+    python3.6 -m venv venv
+    . venv/bin/activate
+    pip install pip-tools
+    pip-sync requirements.txt dev-requirements.txt
+}
+
+run_unit_tests() {
+    PYTHONPATH=. pytest
+}
+
+setup_test_env
+run_unit_tests
