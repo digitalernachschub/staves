@@ -15,3 +15,7 @@ run_unit_tests() {
 
 setup_test_env
 run_unit_tests
+
+package_wheel create_rootfs
+wheel_path=${__package_wheel}
+publish ${wheel_path}
