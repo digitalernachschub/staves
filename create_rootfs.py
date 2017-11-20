@@ -26,7 +26,9 @@ def create_rootfs(rootfs_path, *packages):
     shutil.copyfile(os.path.join('/etc', 'locale.gen'), os.path.join(rootfs_path, 'etc', 'locale.gen'))
 
     # Copy libgcc (e.g. for pthreads)
-    shutil.copy(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu', '5.4.0', 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
+    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
+        if 'libgcc_s.so.1' in files:
+            shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
 
 
 if __name__ == '__main__':
