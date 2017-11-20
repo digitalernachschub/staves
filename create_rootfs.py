@@ -14,6 +14,7 @@ def create_rootfs(rootfs_path, *packages):
 
     os.environ['FEATURES'] = '-binpkg-logs'
     os.environ['PKGDIR'] = os.path.join('/tmp', 'ameto_ci')
+    subprocess.run(['emerge', '--onlydeps', '--onlydeps-with-rdeps=n', '--buildpkg', '--usepkg', *packages])
     subprocess.run(['emerge', f'--root={rootfs_path}', '--root-deps=rdeps', '--oneshot', '--buildpkg', '--usepkg', *packages])
 
     shutil.copyfile(os.path.join('/etc', 'locale.gen'), os.path.join(rootfs_path, 'etc', 'locale.gen'))
