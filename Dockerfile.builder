@@ -1,6 +1,6 @@
 FROM gentoo/portage as portage
 
-FROM gentoo/stage3-amd64
+FROM gentoo/stage3-amd64-nomultilib
 
 COPY --from=portage /usr/portage /usr/portage
 
