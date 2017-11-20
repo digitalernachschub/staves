@@ -19,3 +19,5 @@ run_unit_tests
 package_wheel create_rootfs
 wheel_path=${__package_wheel}
 publish ${wheel_path}
+
+docker build -t gentoo-builder -f Dockerfile.builder .
