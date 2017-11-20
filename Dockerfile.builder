@@ -6,7 +6,7 @@ COPY --from=portage /usr/portage /usr/portage
 
 ENV MAKEOPTS="-j9 -l8"
 ENV EMERGE_DEFAULT_OPTS="--quiet"
-ENV ACCEPT_KEYWORDS="~amd64"
+RUN echo "dev-lang/python:3.6" >> /etc/portage/package.accept_keywords/python
 ENV USE="-bindist"
 RUN emerge -N openssh openssl
 
