@@ -23,10 +23,6 @@ def create_rootfs(rootfs_path, *packages):
         print(emerge_call.stderr)
         return
 
-    shutil.copyfile(os.path.join('/etc', 'locale.gen'), os.path.join(rootfs_path, 'etc', 'locale.gen'))
-    os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
-    shutil.copyfile(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale', 'locale-archive'))
-
     # Copy libgcc (e.g. for pthreads)
     for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
         if 'libgcc_s.so.1' in files:
