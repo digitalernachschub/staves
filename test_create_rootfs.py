@@ -19,12 +19,3 @@ def test_copies_libgcc(tmpdir, monkeypatch):
     create_rootfs(rootfs_path, 'virtual/libintl')
 
     assert os.path.exists(os.path.join(rootfs_path, 'usr', 'lib64', 'libgcc_s.so.1'))
-
-
-def test_creates_locale_gen(tmpdir, monkeypatch):
-    unprivileged_test_root = tmpdir.join('test_root')
-    monkeypatch.setenv('ROOT', unprivileged_test_root)
-    rootfs_path = tmpdir.join('rootfs')
-    create_rootfs(rootfs_path, 'virtual/libintl')
-
-    assert os.path.exists(os.path.join(rootfs_path, 'etc', 'locale.gen'))
