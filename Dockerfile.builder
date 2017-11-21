@@ -4,6 +4,7 @@ FROM gentoo/stage3-amd64-nomultilib
 
 COPY --from=portage /usr/portage /usr/portage
 
+ENV LANG en_US.UTF-8
 ENV MAKEOPTS="-j9 -l8"
 ENV EMERGE_DEFAULT_OPTS="--quiet"
 RUN echo "dev-lang/python:3.6" >> /etc/portage/package.accept_keywords
