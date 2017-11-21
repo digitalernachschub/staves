@@ -6,6 +6,7 @@ COPY --from=portage /usr/portage /usr/portage
 
 ENV LANG en_US.UTF-8
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+RUN locale-gen
 ENV MAKEOPTS="-j9 -l8"
 ENV EMERGE_DEFAULT_OPTS="--quiet"
 RUN echo "dev-lang/python:3.6" >> /etc/portage/package.accept_keywords
