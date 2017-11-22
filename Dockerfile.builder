@@ -5,7 +5,7 @@ FROM ameto/gentoo-stage3-amd64-musl-hardened
 COPY --from=portage /usr/portage /usr/portage
 
 ENV LANG en_US.UTF-8
-RUN echo 'MAKEOPTS="-j9 -l8"' >> /etc/portage/make.conf
+RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf
 RUN echo 'EMERGE_DEFAULT_OPTS="--quiet"' >> /etc/portage/make.conf
 
 RUN emerge app-portage/flaggie
