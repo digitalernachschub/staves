@@ -29,6 +29,5 @@ RUN layman -a musl
 RUN flaggie "dev-lang/python:3.6" "+~amd64"
 RUN emerge dev-lang/python:3.6
 RUN emerge -N @world --exclude gcc
-RUN eselect python set --python3 python3.6
 COPY create_rootfs.py create_rootfs.py
 CMD ["python3.6", "create_rootfs.py"]
