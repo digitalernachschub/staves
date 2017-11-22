@@ -8,17 +8,19 @@ ENV LANG en_US.UTF-8
 ENV MAKEOPTS="-j9 -l8"
 ENV EMERGE_DEFAULT_OPTS="--quiet"
 
-RUN echo "dev-libs/openssl -bindist" >> /etc/portage/package.use
-# We do not need openssh and it requires dev-libs/openssl[bindist], unless we also re-compile it with USE="-bindist"
+RUN emerge app-portage/flaggie
+
+# We do not need openssh and it requires dev-libs/openssl[bindist], unless we also re-compile openssh with USE="-bindist"
 RUN emerge -C net-misc/openssh
+RUN flaggie "dev-libs/openssl" "-bindist"
 RUN emerge -1N openssl
 
-RUN echo "dev-vcs/git -gpg -perl" >> /etc/portage/package.accept_keywords
+RUN flaggie "dev-vcs/git" "-gpg -perl"
 RUN emerge app-portage/layman
 RUN layman -f
 RUN layman -a musl
 
-RUN echo "dev-lang/python:3.6" >> /etc/portage/package.accept_keywords
+RUN flaggie "dev-lang/python:3.6" "+~amd64"
 RUN emerge dev-lang/python:3.6
 ENV PYTHON_TARGETS="python3_6"
 RUN emerge -N @world --exclude gcc
