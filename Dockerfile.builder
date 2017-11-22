@@ -19,6 +19,7 @@ RUN emerge app-portage/flaggie
 
 RUN flaggie "net-misc/openssh" "-bindist"
 RUN flaggie "dev-libs/openssl" "-bindist"
+RUN emerge --oneshot --newuse "net-misc/openssh" "dev-libs/openssl"
 RUN emerge --newuse @world --exclude gcc
 
 RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python"
