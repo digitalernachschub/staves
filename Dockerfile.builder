@@ -15,7 +15,7 @@ RUN emerge --rage-clean net-misc/openssh
 RUN flaggie "dev-libs/openssl" "-bindist"
 RUN emerge -1N openssl
 
-RUN flaggie "dev-vcs/git" "-gpg -perl"
+RUN flaggie "dev-vcs/git" "-curl -gpg -perl"
 RUN emerge app-portage/layman
 RUN layman -f
 RUN layman -a musl
