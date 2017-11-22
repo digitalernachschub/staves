@@ -11,7 +11,7 @@ RUN echo 'EMERGE_DEFAULT_OPTS="--quiet"' >> /etc/portage/make.conf
 RUN emerge app-portage/flaggie
 
 # We do not need openssh and it requires dev-libs/openssl[bindist], unless we also re-compile openssh with USE="-bindist"
-RUN emerge -C net-misc/openssh
+RUN emerge --rage-clean net-misc/openssh
 RUN flaggie "dev-libs/openssl" "-bindist"
 RUN emerge -1N openssl
 
