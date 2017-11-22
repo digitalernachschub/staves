@@ -17,8 +17,7 @@ RUN echo "sys-libs/musl no-sandbox" >> /etc/portage/package.env
 
 RUN emerge app-portage/flaggie
 
-# We do not need openssh and it requires dev-libs/openssl[bindist], unless we also re-compile openssh with USE="-bindist"
-RUN emerge --rage-clean net-misc/openssh
+RUN flaggie "net-misc/openssh" "-bindist"
 RUN flaggie "dev-libs/openssl" "-bindist"
 RUN emerge --newuse @world --exclude gcc
 
