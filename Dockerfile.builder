@@ -20,9 +20,9 @@ RUN emerge app-portage/layman
 RUN layman -f
 RUN layman -a musl
 
+RUN echo 'PYTHON_TARGETS="python3_6"' >> /etc/portage/make.conf
 RUN flaggie "dev-lang/python:3.6" "+~amd64"
 RUN emerge dev-lang/python:3.6
-ENV PYTHON_TARGETS="python3_6"
 RUN emerge -N @world --exclude gcc
 RUN eselect python set --python3 python3.6
 COPY create_rootfs.py create_rootfs.py
