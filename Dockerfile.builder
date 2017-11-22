@@ -9,8 +9,9 @@ ENV MAKEOPTS="-j9 -l8"
 ENV EMERGE_DEFAULT_OPTS="--quiet"
 
 RUN echo "dev-libs/openssl -bindist" >> /etc/portage/package.use
-RUN echo "net-misc/openssh -bindist" >> /etc/portage/package.use
-RUN emerge -1N openssh openssl
+# We do not need openssh and it requires dev-libs/openssl[bindist], unless we also re-compile it with USE="-bindist"
+RUN emerge -C net-misc/openssh
+RUN emerge -1N openssl
 
 RUN echo "dev-vcs/git -gpg -perl" >> /etc/portage/package.accept_keywords
 RUN emerge app-portage/layman
