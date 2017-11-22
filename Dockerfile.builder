@@ -20,7 +20,7 @@ RUN emerge app-portage/flaggie
 # We do not need openssh and it requires dev-libs/openssl[bindist], unless we also re-compile openssh with USE="-bindist"
 RUN emerge --rage-clean net-misc/openssh
 RUN flaggie "dev-libs/openssl" "-bindist"
-RUN emerge -1N openssl
+RUN emerge --newuse @world --exclude gcc
 
 RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python"
 RUN emerge app-portage/layman
@@ -29,6 +29,5 @@ RUN layman -a musl
 
 RUN flaggie "dev-lang/python:3.6" "+~amd64"
 RUN emerge dev-lang/python:3.6
-RUN emerge -N @world --exclude gcc
 COPY create_rootfs.py create_rootfs.py
 CMD ["python3.6", "create_rootfs.py"]
