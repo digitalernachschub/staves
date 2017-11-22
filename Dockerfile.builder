@@ -8,6 +8,7 @@ ENV LANG en_US.UTF-8
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf
 RUN echo 'EMERGE_DEFAULT_OPTS="--quiet"' >> /etc/portage/make.conf
 RUN echo 'PORTAGE_ELOG_SYSTEM="echo:warn,error"' >> /etc/portage/make.conf
+RUN echo 'FEATURES="nodoc noinfo noman"' >> /etc/portage/make.conf
 
 # Sandbox uses ptrace which is not permitted by default in Docker
 RUN echo 'FEATURES="-sandbox -usersandbox"' >> /etc/portage/env/no-sandbox
