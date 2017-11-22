@@ -26,7 +26,6 @@ RUN emerge app-portage/layman
 RUN layman -f
 RUN layman -a musl
 
-RUN echo 'PYTHON_TARGETS="python3_6"' >> /etc/portage/make.conf
 RUN flaggie "dev-lang/python:3.6" "+~amd64"
 RUN emerge dev-lang/python:3.6
 RUN emerge -N @world --exclude gcc
