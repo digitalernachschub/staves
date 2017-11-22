@@ -9,6 +9,10 @@ RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf
 RUN echo 'EMERGE_DEFAULT_OPTS="--quiet"' >> /etc/portage/make.conf
 RUN echo 'PORTAGE_ELOG_SYSTEM="echo:warn,error"' >> /etc/portage/make.conf
 
+# Sandbox uses ptrace which is not permitted by default in Docker
+RUN echo 'FEATURES="-sandbox -usersandbox"' >> /etc/portage/env/no-sandbox
+RUN echo "sys-libs/musl no-sandbox" >> /etc/portage/package.env
+
 RUN emerge app-portage/flaggie
 
 # We do not need openssh and it requires dev-libs/openssl[bindist], unless we also re-compile openssh with USE="-bindist"
