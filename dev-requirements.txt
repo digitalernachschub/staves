@@ -7,16 +7,7 @@
 --index-url https://dev.digitalernachschub.de/pypi/ameto/dev
 
 attrs==17.3.0             # via hypothesis
-certifi==2017.11.5        # via requests
-chardet==3.0.4            # via requests
 coverage==4.4.2           # via hypothesis
-docutils==0.14            # via flit
-flit==0.12.3
 hypothesis==3.37.0
-idna==2.6                 # via requests
 py==1.5.2                 # via pytest
 pytest==3.2.5
-pytoml==0.1.14            # via flit
-requests-download==0.1.1  # via flit
-requests==2.18.4          # via flit, requests-download
-urllib3==1.22             # via requests
