@@ -11,6 +11,7 @@ RUN echo 'PORTAGE_ELOG_SYSTEM="echo:warn,error"' >> /etc/portage/make.conf
 RUN echo 'FEATURES="nodoc noinfo noman"' >> /etc/portage/make.conf
 
 # Sandbox uses ptrace which is not permitted by default in Docker
+RUN mkdir /etc/portage/env
 RUN echo 'FEATURES="-sandbox -usersandbox"' >> /etc/portage/env/no-sandbox
 RUN echo "sys-libs/musl no-sandbox" >> /etc/portage/package.env
 
