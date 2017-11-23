@@ -4,6 +4,8 @@ from create_rootfs import create_rootfs
 
 
 def test_creates_lib_symlink(tmpdir, monkeypatch):
+    package_dir = tmpdir.join('packages')
+    monkeypatch.setenv('PKGDIR', package_dir)
     unprivileged_test_root = tmpdir.join('test_root')
     monkeypatch.setenv('ROOT', unprivileged_test_root)
     rootfs_path = tmpdir.join('rootfs')
@@ -13,6 +15,8 @@ def test_creates_lib_symlink(tmpdir, monkeypatch):
 
 
 def test_copies_libgcc(tmpdir, monkeypatch):
+    package_dir = tmpdir.join('packages')
+    monkeypatch.setenv('PKGDIR', package_dir)
     unprivileged_test_root = tmpdir.join('test_root')
     monkeypatch.setenv('ROOT', unprivileged_test_root)
     rootfs_path = tmpdir.join('rootfs')
