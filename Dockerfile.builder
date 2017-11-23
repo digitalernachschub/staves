@@ -25,10 +25,8 @@ RUN emerge --newuse @world --exclude gcc
 RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python"
 RUN emerge app-portage/layman
 RUN sed --in-place 's/check_official : .*/check_official : No/' /etc/layman/layman.cfg
-COPY overlays /etc/layman/overlays
 RUN layman -f
 RUN layman -a musl
-RUN layman -a ameto
 
 RUN flaggie "dev-lang/python:3.6" "+~amd64"
 RUN emerge dev-lang/python:3.6
