@@ -13,7 +13,6 @@ def create_rootfs(rootfs_path, *packages):
     os.symlink('lib64', os.path.join(rootfs_path, 'usr', 'lib'))
 
     os.environ['FEATURES'] = '-binpkg-logs'
-    os.environ['PKGDIR'] = os.path.join('/tmp', 'ameto_ci')
     emerge_bdeps_call = subprocess.run(['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--buildpkg', '--usepkg', *packages], stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
         print(emerge_bdeps_call.stderr)
