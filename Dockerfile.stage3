@@ -1,0 +1,3 @@
+FROM scratch
+COPY gentoo .
+CMD ["/bin/bash"]
