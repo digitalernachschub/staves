@@ -1,6 +1,6 @@
 FROM gentoo/portage as portage
 
-FROM ameto/gentoo-stage3-amd64-musl-hardened
+FROM staves/gentoo-stage3-amd64-musl-hardened
 
 COPY --from=portage /usr/portage /usr/portage
 
