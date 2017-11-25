@@ -5,10 +5,10 @@ FROM staves/gentoo-stage3-amd64-musl-hardened
 COPY --from=portage /usr/portage /usr/portage
 
 ENV LANG en_US.UTF-8
-RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf
-RUN echo 'EMERGE_DEFAULT_OPTS="--nospinner --quiet"' >> /etc/portage/make.conf
-RUN echo 'PORTAGE_ELOG_SYSTEM="echo:warn,error"' >> /etc/portage/make.conf
-RUN echo 'FEATURES="-news nodoc noinfo noman"' >> /etc/portage/make.conf
+RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
+  echo 'EMERGE_DEFAULT_OPTS="--nospinner --quiet"' >> /etc/portage/make.conf && \
+  echo 'PORTAGE_ELOG_SYSTEM="echo:warn,error"' >> /etc/portage/make.conf && \
+  echo 'FEATURES="-news nodoc noinfo noman"' >> /etc/portage/make.conf
 
 # Sandbox uses ptrace which is not permitted by default in Docker
 RUN mkdir /etc/portage/env
