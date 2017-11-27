@@ -17,7 +17,7 @@ RUN mkdir /etc/portage/env && \
 
 RUN emerge app-portage/flaggie
 
-RUN flaggie "net-misc/openssh" "-bindist"
+RUN flaggie "net-misc/openssh" "-bindist" && \
   flaggie "dev-libs/openssl" "-bindist" && \
   emerge --oneshot --newuse "net-misc/openssh" "dev-libs/openssl" && \
   emerge --update --newuse @world
