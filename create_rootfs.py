@@ -43,5 +43,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
     parser.add_argument('rootfs_path', help='Path to install the packages to')
     parser.add_argument('packages', metavar='package', nargs='+', help='Package to install')
+    parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
     args = parser.parse_args()
-    create_rootfs(args.rootfs_path, *args.packages)
+    create_rootfs(args.rootfs_path, *args.packages, uid=args.uid)
