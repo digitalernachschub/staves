@@ -23,3 +23,24 @@ def test_copies_libgcc(tmpdir, monkeypatch):
     create_rootfs(rootfs_path, 'virtual/libintl')
 
     assert os.path.exists(os.path.join(rootfs_path, 'usr', 'lib64', 'libgcc_s.so.1'))
+
+
+def test_sets_uid_and_gid(tmpdir, monkeypatch):
+    package_dir = tmpdir.join('packages')
+    monkeypatch.setenv('PKGDIR', package_dir)
+    unprivileged_test_root = tmpdir.join('test_root')
+    monkeypatch.setenv('ROOT', unprivileged_test_root)
+    rootfs_path = tmpdir.join('rootfs')
+    uid = 42
+    gid = 43
+    create_rootfs(rootfs_path, 'virtual/libintl', uid=uid, gid=gid)
+
+    for base_path, dirs, files in os.walk(rootfs_path):
+        for d in dirs:
+            stat = os.stat(os.path.join(base_path, d))
+            assert stat.st_uid == uid
+            assert stat.st_gid == gid
+        for f in files:
+            stat = os.stat(os.path.join(base_path, f))
+            assert stat.st_uid == uid
+            assert stat.st_gid == gid
