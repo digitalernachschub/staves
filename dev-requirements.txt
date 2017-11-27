@@ -9,4 +9,5 @@ attrs==17.3.0             # via hypothesis
 coverage==4.4.2           # via hypothesis
 hypothesis==3.37.0
 py==1.5.2                 # via pytest
+pytest-mock==1.6.3
 pytest==3.2.5
