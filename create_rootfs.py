@@ -1,5 +1,6 @@
 """Installs Gentoo portage packages into a specified directory."""
 
+import argparse
 import os
 import shutil
 import subprocess
@@ -39,7 +40,8 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
 
 
 if __name__ == '__main__':
-    import sys
-    rootfs_path = sys.argv[1]
-    packages = sys.argv[2:]
-    create_rootfs(rootfs_path, *packages)
+    parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
+    parser.add_argument('rootfs_path', help='Path to install the packages to')
+    parser.add_argument('packages', metavar='package', nargs='+', help='Package to install')
+    args = parser.parse_args()
+    create_rootfs(args.rootfs_path, *args.packages)
