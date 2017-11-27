@@ -25,7 +25,7 @@ def test_copies_libgcc(tmpdir, monkeypatch):
     assert os.path.exists(os.path.join(rootfs_path, 'usr', 'lib64', 'libgcc_s.so.1'))
 
 
-def test_sets_uid_and_gid(tmpdir, monkeypatch):
+def test_sets_uid_and_gid(tmpdir, monkeypatch, mocker):
     package_dir = tmpdir.join('packages')
     monkeypatch.setenv('PKGDIR', package_dir)
     unprivileged_test_root = tmpdir.join('test_root')
@@ -33,14 +33,11 @@ def test_sets_uid_and_gid(tmpdir, monkeypatch):
     rootfs_path = tmpdir.join('rootfs')
     uid = 42
     gid = 43
+    mocker.patch('os.chown')
     create_rootfs(rootfs_path, 'virtual/libintl', uid=uid, gid=gid)
 
     for base_path, dirs, files in os.walk(rootfs_path):
         for d in dirs:
-            stat = os.stat(os.path.join(base_path, d))
-            assert stat.st_uid == uid
-            assert stat.st_gid == gid
+            os.chown.assert_any_call(os.path.join(base_path, d), uid, gid)
         for f in files:
-            stat = os.stat(os.path.join(base_path, f))
-            assert stat.st_uid == uid
-            assert stat.st_gid == gid
+            os.chown.assert_any_call(os.path.join(base_path, f), uid, gid)
