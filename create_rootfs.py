@@ -13,11 +13,13 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     os.makedirs(lib_path, exist_ok=True)
     os.symlink('lib64', os.path.join(rootfs_path, 'usr', 'lib'))
 
+    print('Installing build-time dependencies to builder')
     os.environ['FEATURES'] = '-binpkg-logs'
     emerge_bdeps_call = subprocess.run(['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--buildpkg', '--usepkg', *packages], stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
         print(emerge_bdeps_call.stderr)
         return
+    print('Installing runtime dependencies to rootfs')
     emerge_call = subprocess.run(['emerge', '--verbose', f'--root={rootfs_path}', '--root-deps=rdeps', '--oneshot', '--buildpkg', '--usepkg', *packages], stderr=subprocess.PIPE)
     if emerge_call.returncode != 0:
         print(emerge_call.stderr)
