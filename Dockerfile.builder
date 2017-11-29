@@ -20,7 +20,7 @@ RUN emerge app-portage/flaggie
 RUN flaggie "net-misc/openssh" "-bindist" && \
   flaggie "dev-libs/openssl" "-bindist" && \
   emerge --oneshot --newuse "net-misc/openssh" "dev-libs/openssl" && \
-  emerge --update --newuse @world
+  emerge --update --newuse --deep @world
 
 RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
   emerge app-portage/layman && \
