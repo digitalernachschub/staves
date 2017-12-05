@@ -15,7 +15,8 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
 
     print('Installing build-time dependencies to builder')
     os.environ['FEATURES'] = '-binpkg-logs'
-    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--buildpkg', '--usepkg', *packages]
+    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--buildpkg',
+                            '--usepkg', '--with-bdeps=y', *packages]
     subprocess.run(emerge_bdeps_command + ['--pretend'])
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
