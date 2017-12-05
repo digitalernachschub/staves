@@ -28,4 +28,5 @@ setup_test_env
 run_unit_tests
 
 create_stage3_image
-docker build --tag staves/builder -f Dockerfile.builder .
+docker build --tag staves/builder-musl -f Dockerfile.builder-musl .
+docker build --tag staves/builder-glibc -f Dockerfile.builder-glibc .
