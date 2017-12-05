@@ -7,7 +7,7 @@ import subprocess
 
 
 def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
-    print(f'Creating rootfs at {rootfs_path} containing the following packages:')
+    print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end='', flush=True)
     lib_path = os.path.join(rootfs_path, 'usr', 'lib64')
     os.makedirs(lib_path, exist_ok=True)
@@ -22,7 +22,7 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
         print(emerge_bdeps_call.stderr)
         return
     print('Installing runtime dependencies to rootfs')
-    emerge_rdeps_command = ['emerge', '--verbose', f'--root={rootfs_path}', '--root-deps=rdeps', '--oneshot', '--buildpkg', '--usepkg', *packages]
+    emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot', '--buildpkg', '--usepkg', *packages]
     subprocess.run(emerge_rdeps_command + ['--pretend'])
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
