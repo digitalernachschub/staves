@@ -29,7 +29,5 @@ RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
 
 RUN emerge --update --newuse --deep @world
 
-RUN flaggie "dev-lang/python:3.6" "+~amd64" && \
-  emerge dev-lang/python:3.6
 COPY create_rootfs.py create_rootfs.py
-CMD ["python3.6", "create_rootfs.py"]
+CMD ["python3", "create_rootfs.py"]
