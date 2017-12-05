@@ -14,14 +14,15 @@ run_unit_tests() {
 }
 
 create_stage3_image() {
-    stage3_filename=stage3-amd64-musl-hardened-20171102.tar.bz2
+    build_date="20171204"
+    stage3_filename=stage3-amd64-musl-hardened-${build_date}.tar.bz2
     stage3_path=/tmp/${stage3_filename}
     if [ ! -f ${stage3_path} ]; then
         wget -O ${stage3_path} http://distfiles.gentoo.org/experimental/amd64/musl/${stage3_filename}
     fi
     mkdir gentoo
     fakeroot tar xpjf ${stage3_path} -C gentoo
-    docker build --tag staves/gentoo-stage3-amd64-musl-hardened:20171102 --tag staves/gentoo-stage3-amd64-musl-hardened:latest -f Dockerfile.stage3 .
+    docker build --tag staves/gentoo-stage3-amd64-musl-hardened:${build_date} --tag staves/gentoo-stage3-amd64-musl-hardened:latest -f Dockerfile.stage3 .
 }
 
 setup_test_env
