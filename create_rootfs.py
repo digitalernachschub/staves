@@ -20,14 +20,12 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     subprocess.run(emerge_bdeps_command + ['--pretend'])
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
-        print(emerge_bdeps_call.stderr)
         return
     print('Installing runtime dependencies to rootfs')
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot', '--buildpkg', '--usepkg', *packages]
     subprocess.run(emerge_rdeps_command + ['--pretend'])
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
-        print(emerge_rdeps_call.stderr)
         return
 
     # Copy libgcc (e.g. for pthreads)
