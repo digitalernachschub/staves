@@ -6,6 +6,10 @@ import shutil
 import subprocess
 
 
+class RootfsError(Exception):
+    pass
+
+
 def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end='', flush=True)
@@ -20,14 +24,14 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     subprocess.run(emerge_bdeps_command + ['--pretend'])
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
-        return
+        raise RootfsError('Unable to install build-time dependencies.')
     print('Installing runtime dependencies to rootfs')
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
                             '--autounmask-continue=y', '--buildpkg', '--usepkg', *packages]
     subprocess.run(emerge_rdeps_command + ['--pretend'])
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
-        return
+        raise RootfsError('Unable to install runtime dependencies.')
 
     # Copy libgcc (e.g. for pthreads)
     for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
