@@ -15,14 +15,15 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
 
     print('Installing build-time dependencies to builder')
     os.environ['FEATURES'] = '-binpkg-logs'
-    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--buildpkg',
-                            '--usepkg', '--with-bdeps=y', *packages]
+    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--autounmask-continue=y',
+                            '--buildpkg', '--usepkg', '--with-bdeps=y', *packages]
     subprocess.run(emerge_bdeps_command + ['--pretend'])
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
         return
     print('Installing runtime dependencies to rootfs')
-    emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot', '--buildpkg', '--usepkg', *packages]
+    emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
+                            '--autounmask-continue=y', '--buildpkg', '--usepkg', *packages]
     subprocess.run(emerge_rdeps_command + ['--pretend'])
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
