@@ -1,9 +1,7 @@
-FROM gentoo/portage as portage
-
 FROM staves/gentoo-stage3-amd64-musl-hardened
 LABEL libc=sys-libs/musl
 
-COPY --from=portage /usr/portage /usr/portage
+COPY --from=gentoo/portage /usr/portage /usr/portage
 
 ENV LANG en_US.UTF-8
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
