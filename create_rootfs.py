@@ -62,22 +62,22 @@ def _create_dockerfile(cmd: str) -> str:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
-    parser.add_argument('rootfs_path', help='Path to install the packages to')
     parser.add_argument('command', help='Start command to be used for the container')
     parser.add_argument('tag', help='Image tag')
     parser.add_argument('packages', metavar='package', nargs='+', help='Package to install')
     parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
     parser.add_argument('--gid', type=int, help='Group ID to be set as owner of the rootfs')
     args = parser.parse_args()
-    create_rootfs(args.rootfs_path, *args.packages, uid=args.uid, gid=args.gid)
+    rootfs_path = '/tmp/rootfs'
+    create_rootfs(rootfs_path, *args.packages, uid=args.uid, gid=args.gid)
     client = docker.from_env()
     dockerfile = _create_dockerfile(args.command).encode('utf-8')
     context = io.BytesIO()
-    rootfs_basepath = os.path.dirname(args.rootfs_path)
+    rootfs_basepath = os.path.dirname(rootfs_path)
     with tarfile.open(fileobj=context, mode='w') as tar:
         dockerfile_info = tarfile.TarInfo(name="Dockerfile")
         dockerfile_info.size = len(dockerfile)
         tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile))
-        tar.add(name=args.rootfs_path, arcname='rootfs')
+        tar.add(name=rootfs_path, arcname='rootfs')
     context.seek(0)
     client.images.build(fileobj=context, tag=args.tag, custom_context=True)
