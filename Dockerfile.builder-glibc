@@ -26,6 +26,6 @@ RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
   sed --in-place 's/check_official : .*/check_official : No/' /etc/layman/layman.cfg && \
   layman -f
 
-RUN emerge docker-py
+RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py
 COPY create_rootfs.py create_rootfs.py
 CMD ["python3", "create_rootfs.py"]
