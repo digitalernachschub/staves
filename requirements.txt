@@ -4,5 +4,12 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-
-
+certifi==2017.11.5        # via requests
+chardet==3.0.4            # via requests
+docker-pycreds==0.2.1     # via docker
+docker==2.7.0
+idna==2.6                 # via requests
+requests==2.18.4          # via docker
+six==1.11.0               # via docker, docker-pycreds, websocket-client
+urllib3==1.22             # via requests
+websocket-client==0.46.0  # via docker

@@ -5,6 +5,8 @@ import os
 import shutil
 import subprocess
 
+import docker
+
 
 class RootfsError(Exception):
     pass
@@ -51,8 +53,12 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
     parser.add_argument('rootfs_path', help='Path to install the packages to')
+    parser.add_argument('dockerfile', help='Dockerfile to be used')
+    parser.add_argument('tag', help='Image tag')
     parser.add_argument('packages', metavar='package', nargs='+', help='Package to install')
     parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
     parser.add_argument('--gid', type=int, help='Group ID to be set as owner of the rootfs')
     args = parser.parse_args()
     create_rootfs(args.rootfs_path, *args.packages, uid=args.uid, gid=args.gid)
+    client = docker.from_env()
+    client.images.build(path=os.path.dirname(args.rootfs_path), dockerfile=args.dockerfile, tag=args.tag)

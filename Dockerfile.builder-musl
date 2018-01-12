@@ -28,5 +28,6 @@ RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
 
 RUN emerge --update --newuse --deep @world
 
+RUN emerge docker-py
 COPY create_rootfs.py create_rootfs.py
 CMD ["python3", "create_rootfs.py"]
