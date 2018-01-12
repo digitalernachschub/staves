@@ -1,9 +1,11 @@
 """Installs Gentoo portage packages into a specified directory."""
 
 import argparse
+import io
 import os
 import shutil
 import subprocess
+import tarfile
 
 import docker
 
@@ -50,10 +52,18 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
             os.chown(os.path.join(base_path, f), uid, gid)
 
 
+def _create_dockerfile(cmd: str) -> str:
+    return """\
+    FROM scratch
+    COPY rootfs /
+    CMD ["{}"]
+    """.format(cmd)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
     parser.add_argument('rootfs_path', help='Path to install the packages to')
-    parser.add_argument('dockerfile', help='Dockerfile to be used')
+    parser.add_argument('command', help='Start command to be used for the container')
     parser.add_argument('tag', help='Image tag')
     parser.add_argument('packages', metavar='package', nargs='+', help='Package to install')
     parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
@@ -61,4 +71,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     create_rootfs(args.rootfs_path, *args.packages, uid=args.uid, gid=args.gid)
     client = docker.from_env()
-    client.images.build(path=os.path.dirname(args.rootfs_path), dockerfile=args.dockerfile, tag=args.tag)
+    dockerfile = _create_dockerfile(args.command).encode('utf-8')
+    context = io.BytesIO()
+    rootfs_basepath = os.path.dirname(args.rootfs_path)
+    with tarfile.open(fileobj=context, mode='w') as tar:
+        dockerfile_info = tarfile.TarInfo(name="Dockerfile")
+        dockerfile_info.size = len(dockerfile)
+        tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile))
+        tar.add(name=args.rootfs_path, arcname='rootfs')
+    context.seek(0)
+    client.images.build(fileobj=context, tag=args.tag, custom_context=True)
