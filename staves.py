@@ -91,6 +91,11 @@ def main(disable_cache, libc, uid, gid):
     toml_content = click.get_binary_stream('stdin').read().decode('utf-8')
     config = toml.loads(toml_content)
     rootfs_path = '/tmp/rootfs'
+    if 'env' in config:
+        for k, v in config['env'].items():
+            make_conf_path = os.path.join('/etc', 'portage', 'make.conf')
+            with open(make_conf_path, 'a') as make_conf:
+                make_conf.write('{}="{}"'.format(k, v))
     _create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
