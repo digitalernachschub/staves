@@ -17,7 +17,7 @@ class RootfsError(Exception):
 
 def create_rootfs(rootfs_path, *packages, uid=None, gid=None, disable_cache=None):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
-    print(*packages, sep=', ', end='', flush=True)
+    print(*packages, sep=', ', end=os.linesep, flush=True)
     lib_path = os.path.join(rootfs_path, 'usr', 'lib64')
     os.makedirs(lib_path, exist_ok=True)
     os.symlink('lib64', os.path.join(rootfs_path, 'usr', 'lib'))
