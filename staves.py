@@ -69,13 +69,12 @@ def _create_dockerfile(*cmd: str) -> str:
 
 
 @click.command(help='Installs the specified packages into to the desired location.')
-@click.argument('tag')
 @click.option('--disable-cache', multiple=True,
                     help='Package that should not be built as a binary package for caching. May occur multiple times.')
 @click.option('--libc', help='Libc to be installed into rootfs')
 @click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
 @click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
-def main(tag, disable_cache, libc, uid, gid):
+def main(disable_cache, libc, uid, gid):
     toml_content = click.get_binary_stream('stdin').read().decode('utf-8')
     config = toml.loads(toml_content)
     rootfs_path = '/tmp/rootfs'
@@ -89,7 +88,7 @@ def main(tag, disable_cache, libc, uid, gid):
         tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile))
         tar.add(name=rootfs_path, arcname='rootfs')
     context.seek(0)
-    client.images.build(fileobj=context, tag=tag, custom_context=True)
+    client.images.build(fileobj=context, tag=config['tag'], custom_context=True)
 
 
 if __name__ == '__main__':
