@@ -31,4 +31,4 @@ RUN layman -f && layman -a digitalernachschub
 
 RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click toml
 COPY staves.py staves.py
-CMD ["python3", "staves.py"]
+ENTRYPOINT ["python3", "staves.py"]

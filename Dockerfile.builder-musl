@@ -40,4 +40,4 @@ RUN emerge --update --newuse --deep @world
 
 RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click dev-python/toml
 COPY staves.py staves.py
-CMD ["python3", "staves.py"]
+ENTRYPOINT ["python3", "staves.py"]
