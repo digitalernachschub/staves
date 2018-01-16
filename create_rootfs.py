@@ -52,19 +52,21 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
             os.chown(os.path.join(base_path, f), uid, gid)
 
 
-def _create_dockerfile(cmd: str) -> str:
+def _create_dockerfile(*cmd: str) -> str:
+    command_string = ', '.join(['\"{}\"'.format(c) for c in cmd])
     return """\
     FROM scratch
     COPY rootfs /
-    CMD ["{}"]
-    """.format(cmd)
+    CMD [{}]
+    """.format(command_string)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
     parser.add_argument('package', help='Package to install')
     parser.add_argument('tag', help='Image tag')
-    parser.add_argument('command', help='Start command to be used for the container')
+    parser.add_argument('command', nargs='+', help='Start command to be used for the container. '
+                                                   'May consists of multiple components, e.g. \"python\" \"-m\" \"staves\"')
     parser.add_argument('--libc', help='Libc to be installed into rootfs')
     parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
     parser.add_argument('--gid', type=int, help='Group ID to be set as owner of the rootfs')
@@ -72,7 +74,7 @@ if __name__ == '__main__':
     rootfs_path = '/tmp/rootfs'
     create_rootfs(rootfs_path, args.libc, args.package, uid=args.uid, gid=args.gid)
     client = docker.from_env()
-    dockerfile = _create_dockerfile(args.command).encode('utf-8')
+    dockerfile = _create_dockerfile(*args.command).encode('utf-8')
     context = io.BytesIO()
     rootfs_basepath = os.path.dirname(rootfs_path)
     with tarfile.open(fileobj=context, mode='w') as tar:
