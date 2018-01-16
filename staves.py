@@ -96,10 +96,17 @@ def main(disable_cache, libc, uid, gid):
     config = toml.loads(toml_content)
     rootfs_path = '/tmp/rootfs'
     if 'env' in config:
+        make_conf_vars = {k: v for k, v in config['env'].items() if not isinstance(v, dict)}
         make_conf_path = os.path.join('/etc', 'portage', 'make.conf')
         with open(make_conf_path, 'a') as make_conf:
-            for line in _dict_to_env_vars(config['env']):
+            for line in _dict_to_env_vars(make_conf_vars):
                 make_conf.write(line)
+        specialized_envs = {k: v for k, v in config['env'].items() if k not in make_conf_vars}
+        for env_name, env in specialized_envs.items():
+            env_path = os.path.join('/etc', 'portage', 'env', env_name)
+            with open(env_path, 'w') as f:
+                for line in _dict_to_env_vars(env):
+                    f.write(line)
     _create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
