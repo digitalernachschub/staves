@@ -2,6 +2,7 @@
 
 import argparse
 import io
+import itertools
 import os
 import shutil
 import subprocess
@@ -14,7 +15,7 @@ class RootfsError(Exception):
     pass
 
 
-def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
+def create_rootfs(rootfs_path, *packages, uid=None, gid=None, disable_cache=None):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end='', flush=True)
     lib_path = os.path.join(rootfs_path, 'usr', 'lib64')
@@ -22,16 +23,21 @@ def create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     os.symlink('lib64', os.path.join(rootfs_path, 'usr', 'lib'))
 
     print('Installing build-time dependencies to builder', flush=True)
+    if disable_cache:
+        arg_prefix = itertools.cycle(['--buildpkg-exclude'])
+        disable_cache_args = [arg for tup in zip(arg_prefix, disable_cache) for arg in tup]
+    else:
+        disable_cache_args = []
     os.environ['FEATURES'] = '-binpkg-logs'
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--autounmask-continue=y',
-                            '--buildpkg', '--usepkg', '--with-bdeps=y', *packages]
+                            '--buildpkg', *disable_cache_args, '--usepkg', '--with-bdeps=y', *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
         raise RootfsError('Unable to install build-time dependencies.')
 
     print('Installing runtime dependencies to rootfs', flush=True)
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
-                            '--autounmask-continue=y', '--buildpkg', '--usepkg', *packages]
+                            '--autounmask-continue=y', '--buildpkg', *disable_cache_args, '--usepkg', *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
         raise RootfsError('Unable to install runtime dependencies.')
@@ -67,12 +73,14 @@ if __name__ == '__main__':
     parser.add_argument('tag', help='Image tag')
     parser.add_argument('command', nargs='+', help='Start command to be used for the container. '
                                                    'May consists of multiple components, e.g. \"python\" \"-m\" \"staves\"')
+    parser.add_argument('--disable-cache', action='append',
+                        help='Package that should not be built as a binary package for caching. May occur multiple times.')
     parser.add_argument('--libc', help='Libc to be installed into rootfs')
     parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
     parser.add_argument('--gid', type=int, help='Group ID to be set as owner of the rootfs')
     args = parser.parse_args()
     rootfs_path = '/tmp/rootfs'
-    create_rootfs(rootfs_path, args.libc, args.package, uid=args.uid, gid=args.gid)
+    create_rootfs(rootfs_path, args.libc, args.package, uid=args.uid, gid=args.gid, disable_cache=args.disable_cache)
     client = docker.from_env()
     dockerfile = _create_dockerfile(*args.command).encode('utf-8')
     context = io.BytesIO()
