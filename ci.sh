@@ -14,7 +14,7 @@ run_unit_tests() {
 }
 
 create_stage3_image() {
-    build_date="20171204"
+    build_date="20180106"
     stage3_filename=stage3-amd64-musl-hardened-${build_date}.tar.bz2
     stage3_path=/tmp/${stage3_filename}
     if [ ! -f ${stage3_path} ]; then
