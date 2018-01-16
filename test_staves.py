@@ -1,6 +1,6 @@
 import os
 
-from create_rootfs import create_rootfs
+from staves import create_rootfs
 
 
 def test_creates_lib_symlink(tmpdir, monkeypatch):

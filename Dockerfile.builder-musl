@@ -29,5 +29,5 @@ RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
 RUN emerge --update --newuse --deep @world
 
 RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py
-COPY create_rootfs.py create_rootfs.py
-CMD ["python3", "create_rootfs.py"]
+COPY staves.py staves.py
+CMD ["python3", "staves.py"]
