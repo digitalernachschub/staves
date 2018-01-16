@@ -28,6 +28,6 @@ RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
 
 RUN emerge --update --newuse --deep @world
 
-RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py
+RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click
 COPY staves.py staves.py
 CMD ["python3", "staves.py"]

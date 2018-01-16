@@ -26,6 +26,6 @@ RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
   sed --in-place 's/check_official : .*/check_official : No/' /etc/layman/layman.cfg && \
   layman -f
 
-RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py
+RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click
 COPY staves.py staves.py
 CMD ["python3", "staves.py"]

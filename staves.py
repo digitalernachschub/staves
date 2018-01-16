@@ -1,6 +1,6 @@
 """Installs Gentoo portage packages into a specified directory."""
 
-import argparse
+import click
 import io
 import itertools
 import os
@@ -67,28 +67,29 @@ def _create_dockerfile(*cmd: str) -> str:
     """.format(command_string)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
-    parser.add_argument('package', help='Package to install')
-    parser.add_argument('tag', help='Image tag')
-    parser.add_argument('command', nargs='+', help='Start command to be used for the container. '
-                                                   'May consists of multiple components, e.g. \"python\" \"-m\" \"staves\"')
-    parser.add_argument('--disable-cache', action='append',
-                        help='Package that should not be built as a binary package for caching. May occur multiple times.')
-    parser.add_argument('--libc', help='Libc to be installed into rootfs')
-    parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
-    parser.add_argument('--gid', type=int, help='Group ID to be set as owner of the rootfs')
-    args = parser.parse_args()
+@click.command(help='Installs the specified packages into to the desired location.')
+@click.argument('package')
+@click.argument('tag')
+@click.argument('command', nargs=-1, required=True)
+@click.option('--disable-cache', multiple=True,
+                    help='Package that should not be built as a binary package for caching. May occur multiple times.')
+@click.option('--libc', help='Libc to be installed into rootfs')
+@click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
+@click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
+def main(package, tag, command, disable_cache, libc, uid, gid):
     rootfs_path = '/tmp/rootfs'
-    create_rootfs(rootfs_path, args.libc, args.package, uid=args.uid, gid=args.gid, disable_cache=args.disable_cache)
+    create_rootfs(rootfs_path, libc, package, uid=uid, gid=gid, disable_cache=disable_cache)
     client = docker.from_env()
-    dockerfile = _create_dockerfile(*args.command).encode('utf-8')
+    dockerfile = _create_dockerfile(*command).encode('utf-8')
     context = io.BytesIO()
-    rootfs_basepath = os.path.dirname(rootfs_path)
     with tarfile.open(fileobj=context, mode='w') as tar:
         dockerfile_info = tarfile.TarInfo(name="Dockerfile")
         dockerfile_info.size = len(dockerfile)
         tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile))
         tar.add(name=rootfs_path, arcname='rootfs')
     context.seek(0)
-    client.images.build(fileobj=context, tag=args.tag, custom_context=True)
+    client.images.build(fileobj=context, tag=tag, custom_context=True)
+
+
+if __name__ == '__main__':
+    main()
