@@ -81,6 +81,10 @@ def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list):
     client.images.build(fileobj=context, tag=tag, custom_context=True)
 
 
+def _dict_to_env_vars(d: dict):
+    return ('{}="{}"'.format(k, v) for k, v in d.items())
+
+
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.option('--disable-cache', multiple=True,
                     help='Package that should not be built as a binary package for caching. May occur multiple times.')
@@ -92,10 +96,10 @@ def main(disable_cache, libc, uid, gid):
     config = toml.loads(toml_content)
     rootfs_path = '/tmp/rootfs'
     if 'env' in config:
-        for k, v in config['env'].items():
-            make_conf_path = os.path.join('/etc', 'portage', 'make.conf')
-            with open(make_conf_path, 'a') as make_conf:
-                make_conf.write('{}="{}"'.format(k, v))
+        make_conf_path = os.path.join('/etc', 'portage', 'make.conf')
+        with open(make_conf_path, 'a') as make_conf:
+            for line in _dict_to_env_vars(config['env']):
+                make_conf.write(line)
     _create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
