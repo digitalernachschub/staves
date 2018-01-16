@@ -102,7 +102,7 @@ def _write_package_config(package: str, env: list=None):
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.option('--disable-cache', multiple=True,
                     help='Package that should not be built as a binary package for caching. May occur multiple times.')
-@click.option('--libc', help='Libc to be installed into rootfs')
+@click.option('--libc', type=list, default=[], help='Libc to be installed into rootfs')
 @click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
 @click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
 def main(disable_cache, libc, uid, gid):
@@ -119,7 +119,7 @@ def main(disable_cache, libc, uid, gid):
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     for package, package_config in package_configs.items():
         _write_package_config(package, **package_config)
-    _create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
+    _create_rootfs(rootfs_path, config['package'], *libc, uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
 
