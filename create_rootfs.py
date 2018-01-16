@@ -65,11 +65,12 @@ if __name__ == '__main__':
     parser.add_argument('command', help='Start command to be used for the container')
     parser.add_argument('tag', help='Image tag')
     parser.add_argument('packages', metavar='package', nargs='+', help='Package to install')
+    parser.add_argument('--libc', help='Libc to be installed into rootfs')
     parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
     parser.add_argument('--gid', type=int, help='Group ID to be set as owner of the rootfs')
     args = parser.parse_args()
     rootfs_path = '/tmp/rootfs'
-    create_rootfs(rootfs_path, *args.packages, uid=args.uid, gid=args.gid)
+    create_rootfs(rootfs_path, args.libc, *args.packages, uid=args.uid, gid=args.gid)
     client = docker.from_env()
     dockerfile = _create_dockerfile(args.command).encode('utf-8')
     context = io.BytesIO()
