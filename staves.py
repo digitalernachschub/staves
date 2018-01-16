@@ -68,6 +68,19 @@ def _create_dockerfile(*cmd: str) -> str:
     """.format(command_string)
 
 
+def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list):
+    client = docker.from_env()
+    dockerfile = _create_dockerfile(*command).encode('utf-8')
+    context = io.BytesIO()
+    with tarfile.open(fileobj=context, mode='w') as tar:
+        dockerfile_info = tarfile.TarInfo(name="Dockerfile")
+        dockerfile_info.size = len(dockerfile)
+        tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile))
+        tar.add(name=rootfs_path, arcname='rootfs')
+    context.seek(0)
+    client.images.build(fileobj=context, tag=tag, custom_context=True)
+
+
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.option('--disable-cache', multiple=True,
                     help='Package that should not be built as a binary package for caching. May occur multiple times.')
@@ -79,16 +92,7 @@ def main(disable_cache, libc, uid, gid):
     config = toml.loads(toml_content)
     rootfs_path = '/tmp/rootfs'
     create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
-    client = docker.from_env()
-    dockerfile = _create_dockerfile(*config['command']).encode('utf-8')
-    context = io.BytesIO()
-    with tarfile.open(fileobj=context, mode='w') as tar:
-        dockerfile_info = tarfile.TarInfo(name="Dockerfile")
-        dockerfile_info.size = len(dockerfile)
-        tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile))
-        tar.add(name=rootfs_path, arcname='rootfs')
-    context.seek(0)
-    client.images.build(fileobj=context, tag=config['tag'], custom_context=True)
+    _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
 
 if __name__ == '__main__':
