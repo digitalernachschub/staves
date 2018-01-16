@@ -91,7 +91,7 @@ def _write_env(env_vars, name=None):
             make_conf.write(line)
 
 
-def _write_package_config(package: str, env: list=None, keywords: list=None):
+def _write_package_config(package: str, env: list=None, keywords: list=None, use: list=None):
     if env:
         package_config_path = os.path.join('/etc', 'portage', 'package.env')
         with open(package_config_path, 'a') as f:
@@ -102,6 +102,11 @@ def _write_package_config(package: str, env: list=None, keywords: list=None):
         with open(package_config_path, 'a') as f:
             package_keywords = ' '.join(keywords)
             f.write('{} {}'.format(package, package_keywords))
+    if use:
+        package_config_path = os.path.join('/etc', 'portage', 'package.use')
+        with open(package_config_path, 'a') as f:
+            package_use_flags = ' '.join(use)
+            f.write('{} {}'.format(package, package_use_flags))
 
 
 @click.command(help='Installs the specified packages into to the desired location.')
