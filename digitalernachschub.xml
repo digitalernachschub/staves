@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>                                                                                                     
+<repositories version="1.0">
+    <repo priority="50" quality="experimental" status="unofficial">
+        <name>digitalernachschub</name>
+        <description>General-purpose overlay for ebuilds requiring patches or ebuilds not in the portage tree.</description>
+        <homepage>https://github.com/digitalernachschub/gentoo-overlay</homepage>
+        <owner>
+            <email>m.seifert@digitalernachschub.de</email>
+        </owner>
+        <source type="git">git://github.com/digitalernachschub/gentoo-overlay.git</source>
+    </repo>
+</repositories>
