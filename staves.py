@@ -16,7 +16,7 @@ class RootfsError(Exception):
     pass
 
 
-def create_rootfs(rootfs_path, *packages, uid=None, gid=None, disable_cache=None):
+def _create_rootfs(rootfs_path, *packages, uid=None, gid=None, disable_cache=None):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end=os.linesep, flush=True)
     lib_path = os.path.join(rootfs_path, 'usr', 'lib64')
@@ -91,7 +91,7 @@ def main(disable_cache, libc, uid, gid):
     toml_content = click.get_binary_stream('stdin').read().decode('utf-8')
     config = toml.loads(toml_content)
     rootfs_path = '/tmp/rootfs'
-    create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
+    _create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
 
