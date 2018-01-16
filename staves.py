@@ -107,6 +107,14 @@ def main(disable_cache, libc, uid, gid):
             with open(env_path, 'w') as f:
                 for line in _dict_to_env_vars(env):
                     f.write(line)
+        config.pop('env')
+    package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
+    for package, package_config in package_configs.items():
+        if 'env' in package_config:
+            package_config_path = os.path.join('/etc', 'portage', 'package.env')
+            with open(package_config_path, 'a') as f:
+                package_environments = ' '.join(package_config['env'])
+                f.write('{} {}'.format(package, package_environments))
     _create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
