@@ -116,8 +116,7 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 @click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
 @click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
 def main(disable_cache, libc, uid, gid):
-    toml_content = click.get_binary_stream('stdin').read().decode('utf-8')
-    config = toml.loads(toml_content)
+    config = toml.load(click.get_text_stream('stdin'))
     rootfs_path = '/tmp/rootfs'
     if 'env' in config:
         make_conf_vars = {k: v for k, v in config['env'].items() if not isinstance(v, dict)}
