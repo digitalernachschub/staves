@@ -62,9 +62,9 @@ def _create_dockerfile(cmd: str) -> str:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Installs the specified packages into to the desired location.')
-    parser.add_argument('command', help='Start command to be used for the container')
-    parser.add_argument('tag', help='Image tag')
     parser.add_argument('package', help='Package to install')
+    parser.add_argument('tag', help='Image tag')
+    parser.add_argument('command', help='Start command to be used for the container')
     parser.add_argument('--libc', help='Libc to be installed into rootfs')
     parser.add_argument('--uid', type=int, help='User ID to be set as owner of the rootfs')
     parser.add_argument('--gid', type=int, help='Group ID to be set as owner of the rootfs')
