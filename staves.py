@@ -81,8 +81,26 @@ def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list):
     client.images.build(fileobj=context, tag=tag, custom_context=True)
 
 
+def _write_env(env_vars, name=None):
+    if name:
+        conf_path = os.path.join('/etc', 'portage', 'env', name)
+    else:
+        conf_path = os.path.join('/etc', 'portage', 'make.conf')
+    with open(conf_path, 'a') as make_conf:
+        for line in _dict_to_env_vars(env_vars):
+            make_conf.write(line)
+
+
 def _dict_to_env_vars(d: dict):
     return ('{}="{}"'.format(k, v) for k, v in d.items())
+
+
+def _write_package_config(package: str, env: list=None):
+    if 'env':
+        package_config_path = os.path.join('/etc', 'portage', 'package.env')
+        with open(package_config_path, 'a') as f:
+            package_environments = ' '.join(env)
+            f.write('{} {}'.format(package, package_environments))
 
 
 @click.command(help='Installs the specified packages into to the desired location.')
@@ -97,24 +115,14 @@ def main(disable_cache, libc, uid, gid):
     rootfs_path = '/tmp/rootfs'
     if 'env' in config:
         make_conf_vars = {k: v for k, v in config['env'].items() if not isinstance(v, dict)}
-        make_conf_path = os.path.join('/etc', 'portage', 'make.conf')
-        with open(make_conf_path, 'a') as make_conf:
-            for line in _dict_to_env_vars(make_conf_vars):
-                make_conf.write(line)
+        _write_env(make_conf_vars)
         specialized_envs = {k: v for k, v in config['env'].items() if k not in make_conf_vars}
         for env_name, env in specialized_envs.items():
-            env_path = os.path.join('/etc', 'portage', 'env', env_name)
-            with open(env_path, 'w') as f:
-                for line in _dict_to_env_vars(env):
-                    f.write(line)
+            _write_env(name=env_name, env_vars=env)
         config.pop('env')
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     for package, package_config in package_configs.items():
-        if 'env' in package_config:
-            package_config_path = os.path.join('/etc', 'portage', 'package.env')
-            with open(package_config_path, 'a') as f:
-                package_environments = ' '.join(package_config['env'])
-                f.write('{} {}'.format(package, package_environments))
+        _write_package_config(package, **package_config)
     _create_rootfs(rootfs_path, libc, config['package'], uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, config['tag'], config['command'])
 
