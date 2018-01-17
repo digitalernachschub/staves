@@ -80,8 +80,7 @@ def _write_env(env_vars, name=None):
     else:
         conf_path = os.path.join('/etc', 'portage', 'make.conf')
     with open(conf_path, 'a') as make_conf:
-        for line in ('{}="{}"'.format(k, v) for k, v in env_vars.items()):
-            make_conf.write(line)
+        make_conf.writelines(('{}="{}"{}'.format(k, v, os.linesep) for k, v in env_vars.items()))
 
 
 def _write_package_config(package: str, env: list=None, keywords: list=None, use: list=None):
