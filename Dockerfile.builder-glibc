@@ -31,6 +31,7 @@ RUN layman -f && layman -a digitalernachschub
 
 ENV STAVES_LIBC sys-libs/glibc
 
-RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click dev-python/toml
+RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click dev-python/toml && \
+  echo 'FEATURES="${FEATURES} buildpkg"' >> /etc/portage/make.conf
 COPY staves.py staves.py
 ENTRYPOINT ["python3", "staves.py"]
