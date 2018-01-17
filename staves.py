@@ -112,7 +112,7 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.option('--disable-cache', multiple=True,
                     help='Package that should not be built as a binary package for caching. May occur multiple times.')
-@click.option('--libc', type=list, default=[], help='Libc to be installed into rootfs')
+@click.option('--libc', envvar='STAVES_LIBC', help='Libc to be installed into rootfs')
 @click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
 @click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
 @click.option('--tag', help='Overrides the tag specified in the configuration')
@@ -131,7 +131,10 @@ def main(disable_cache, libc, uid, gid, tag):
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     for package, package_config in package_configs.items():
         _write_package_config(package, **package_config)
-    _create_rootfs(rootfs_path, config['package'], *libc, uid=uid, gid=gid, disable_cache=disable_cache)
+    packages_to_be_installed = [config['package']]
+    if libc:
+        packages_to_be_installed.append(libc)
+    _create_rootfs(rootfs_path, *packages_to_be_installed, uid=uid, gid=gid, disable_cache=disable_cache)
     _docker_image_from_rootfs(rootfs_path, tag, config['command'])
 
 
