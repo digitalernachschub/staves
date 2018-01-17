@@ -38,6 +38,8 @@ RUN layman -f && layman -a digitalernachschub
 
 RUN emerge --update --newuse --deep @world
 
+ENV STAVES_LIBC sys-libs/musl
+
 RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click dev-python/toml
 COPY staves.py staves.py
 ENTRYPOINT ["python3", "staves.py"]

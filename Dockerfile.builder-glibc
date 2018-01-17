@@ -29,6 +29,8 @@ RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
 COPY digitalernachschub.xml /etc/layman/overlays
 RUN layman -f && layman -a digitalernachschub
 
+ENV STAVES_LIBC sys-libs/glibc
+
 RUN ACCEPT_KEYWORDS="~amd64" emerge docker-py click dev-python/toml
 COPY staves.py staves.py
 ENTRYPOINT ["python3", "staves.py"]
