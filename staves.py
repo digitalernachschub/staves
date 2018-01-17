@@ -89,17 +89,17 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
         package_config_path = os.path.join('/etc', 'portage', 'package.env')
         with open(package_config_path, 'a') as f:
             package_environments = ' '.join(env)
-            f.write('{} {}'.format(package, package_environments))
+            f.write('{} {}{}'.format(package, package_environments, os.linesep))
     if keywords:
         package_config_path = os.path.join('/etc', 'portage', 'package.accept_keywords')
         with open(package_config_path, 'a') as f:
             package_keywords = ' '.join(keywords)
-            f.write('{} {}'.format(package, package_keywords))
+            f.write('{} {}{}'.format(package, package_keywords, os.linesep))
     if use:
         package_config_path = os.path.join('/etc', 'portage', 'package.use')
         with open(package_config_path, 'a') as f:
             package_use_flags = ' '.join(use)
-            f.write('{} {}'.format(package, package_use_flags))
+            f.write('{} {}{}'.format(package, package_use_flags, os.linesep))
 
 
 @click.command(help='Installs the specified packages into to the desired location.')
