@@ -16,7 +16,7 @@ class RootfsError(Exception):
     pass
 
 
-def _create_rootfs(rootfs_path, *packages, uid=None, gid=None, disable_cache=None):
+def _create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end=os.linesep, flush=True)
     lib_path = os.path.join(rootfs_path, 'usr', 'lib64')
@@ -24,21 +24,16 @@ def _create_rootfs(rootfs_path, *packages, uid=None, gid=None, disable_cache=Non
     os.symlink('lib64', os.path.join(rootfs_path, 'usr', 'lib'))
 
     print('Installing build-time dependencies to builder', flush=True)
-    if disable_cache:
-        arg_prefix = itertools.cycle(['--buildpkg-exclude'])
-        disable_cache_args = [arg for tup in zip(arg_prefix, disable_cache) for arg in tup]
-    else:
-        disable_cache_args = []
     os.environ['FEATURES'] = '-binpkg-logs'
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--autounmask-continue=y',
-                            *disable_cache_args, '--usepkg', '--with-bdeps=y', *packages]
+                            '--usepkg', '--with-bdeps=y', *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
         raise RootfsError('Unable to install build-time dependencies.')
 
     print('Installing runtime dependencies to rootfs', flush=True)
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
-                            '--autounmask-continue=y', *disable_cache_args, '--usepkg', *packages]
+                            '--autounmask-continue=y', '--usepkg', *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
         raise RootfsError('Unable to install runtime dependencies.')
@@ -111,13 +106,11 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
-@click.option('--disable-cache', multiple=True,
-                    help='Package that should not be built as a binary package for caching. May occur multiple times.')
 @click.option('--libc', envvar='STAVES_LIBC', help='Libc to be installed into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
 @click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
 @click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
-def main(version, disable_cache, libc, name, uid, gid):
+def main(version, libc, name, uid, gid):
     config = toml.load(click.get_text_stream('stdin'))
     rootfs_path = '/tmp/rootfs'
     if not name:
@@ -135,7 +128,7 @@ def main(version, disable_cache, libc, name, uid, gid):
     packages_to_be_installed = [config['package']]
     if libc:
         packages_to_be_installed.append(libc)
-    _create_rootfs(rootfs_path, *packages_to_be_installed, uid=uid, gid=gid, disable_cache=disable_cache)
+    _create_rootfs(rootfs_path, *packages_to_be_installed, uid=uid, gid=gid)
     tag = '{}:{}'.format(name, version)
     _docker_image_from_rootfs(rootfs_path, tag, config['command'])
 
