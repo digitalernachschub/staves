@@ -113,14 +113,14 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 @click.option('--disable-cache', multiple=True,
                     help='Package that should not be built as a binary package for caching. May occur multiple times.')
 @click.option('--libc', envvar='STAVES_LIBC', help='Libc to be installed into rootfs')
+@click.option('--name', help='Overrides the image name specified in the configuration')
 @click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
 @click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
-@click.option('--tag', help='Overrides the tag specified in the configuration')
-def main(disable_cache, libc, uid, gid, tag):
+def main(disable_cache, libc, name, uid, gid):
     config = toml.load(click.get_text_stream('stdin'))
     rootfs_path = '/tmp/rootfs'
-    if not tag:
-        tag = config['tag']
+    if not name:
+        name = config['name']
     if 'env' in config:
         make_conf_vars = {k: v for k, v in config['env'].items() if not isinstance(v, dict)}
         _write_env(make_conf_vars)
@@ -135,7 +135,7 @@ def main(disable_cache, libc, uid, gid, tag):
     if libc:
         packages_to_be_installed.append(libc)
     _create_rootfs(rootfs_path, *packages_to_be_installed, uid=uid, gid=gid, disable_cache=disable_cache)
-    _docker_image_from_rootfs(rootfs_path, tag, config['command'])
+    _docker_image_from_rootfs(rootfs_path, name, config['command'])
 
 
 if __name__ == '__main__':
