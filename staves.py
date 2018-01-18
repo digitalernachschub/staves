@@ -57,7 +57,7 @@ def _create_dockerfile(*cmd: str) -> str:
     return """\
     FROM scratch
     COPY rootfs /
-    CMD [{}]
+    ENTRYPOINT [{}]
     """.format(command_string)
 
 
