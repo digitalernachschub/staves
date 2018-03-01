@@ -25,10 +25,15 @@ create_stage3_image() {
     docker build --tag staves/gentoo-stage3-amd64-musl-hardened:${build_date} --tag staves/gentoo-stage3-amd64-musl-hardened:latest -f Dockerfile.stage3 .
 }
 
+version=$(git describe --tags --always --dirty)
 setup_test_env
 run_unit_tests
 
 build_date="20180106"
 create_stage3_image ${build_date}
-docker build --tag staves/builder-musl -f Dockerfile.builder-musl .
-docker build --tag staves/builder-glibc -f Dockerfile.builder-glibc .
+docker build --tag "staves/builder-musl:${version}.${build_date}" --tag "staves/builder-musl:${version}" \
+    --tag "staves/builder-musl:${version%.*}.${build_date}" --tag "staves/builder-musl:${version%%.*}.${build_date}" \
+    -f Dockerfile.builder-musl .
+docker build --tag "staves/builder-glibc:${version}.${build_date}" --tag "staves/builder-glibc:${version}" \
+    --tag "staves/builder-glibc:${version%.*}" --tag "staves/builder-glibc:${version%%.*}" \
+    -f Dockerfile.builder-glibc .
