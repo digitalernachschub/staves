@@ -29,7 +29,7 @@ version=$(git describe --tags --always --dirty)
 setup_test_env
 run_unit_tests
 
-build_date="20180106"
+build_date="20180204"
 create_stage3_image ${build_date}
 docker build --tag "staves/builder-musl:${version}.${build_date}" --tag "staves/builder-musl:${version}" \
     --tag "staves/builder-musl:${version%.*}.${build_date}" --tag "staves/builder-musl:${version%%.*}.${build_date}" \
