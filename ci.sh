@@ -14,7 +14,7 @@ run_unit_tests() {
 }
 
 create_stage3_image() {
-    build_date="20180106"
+    local build_date="$1"
     stage3_filename=stage3-amd64-musl-hardened-${build_date}.tar.bz2
     stage3_path=/tmp/${stage3_filename}
     if [ ! -f ${stage3_path} ]; then
@@ -28,6 +28,7 @@ create_stage3_image() {
 setup_test_env
 run_unit_tests
 
-create_stage3_image
+build_date="20180106"
+create_stage3_image ${build_date}
 docker build --tag staves/builder-musl -f Dockerfile.builder-musl .
 docker build --tag staves/builder-glibc -f Dockerfile.builder-glibc .
