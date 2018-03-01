@@ -29,11 +29,12 @@ version=$(git describe --tags --always --dirty)
 setup_test_env
 run_unit_tests
 
-build_date="20180204"
-create_stage3_image ${build_date}
-docker build --tag "staves/builder-musl:${version}.${build_date}" --tag "staves/builder-musl:${version}" \
-    --tag "staves/builder-musl:${version%.*}.${build_date}" --tag "staves/builder-musl:${version%%.*}.${build_date}" \
+musl_stage3_date="20180204"
+create_stage3_image ${musl_stage3_date}
+docker build --tag "staves/builder-musl:${version}.${musl_stage3_date}" --tag "staves/builder-musl:${version}" \
+    --tag "staves/builder-musl:${version%.*}" --tag "staves/builder-musl:${version%%.*}" \
     -f Dockerfile.builder-musl .
-docker build --tag "staves/builder-glibc:${version}.${build_date}" --tag "staves/builder-glibc:${version}" \
+glibc_stage3_date="20180228"
+docker build --tag "staves/builder-glibc:${version}.${glibc_stage3_date}" --tag "staves/builder-glibc:${version}" \
     --tag "staves/builder-glibc:${version%.*}" --tag "staves/builder-glibc:${version%%.*}" \
     -f Dockerfile.builder-glibc .
