@@ -4,7 +4,7 @@ COPY --from=gentoo/portage /usr/portage /usr/portage
 
 ENV LANG en_US.UTF-8
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
-  echo 'EMERGE_DEFAULT_OPTS="--nospinner --quiet"' >> /etc/portage/make.conf && \
+  echo 'EMERGE_DEFAULT_OPTS="--nospinner --quiet --autounmask-continue=y"' >> /etc/portage/make.conf && \
   echo 'PORTAGE_ELOG_SYSTEM="echo:warn,error"' >> /etc/portage/make.conf && \
   echo 'FEATURES="-news nodoc noinfo noman"' >> /etc/portage/make.conf
 

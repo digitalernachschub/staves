@@ -23,7 +23,7 @@ def _create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     os.symlink('lib64', os.path.join(rootfs_path, 'usr', 'lib'))
 
     print('Installing build-time dependencies to builder', flush=True)
-    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n', '--autounmask-continue=y',
+    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n',
                             '--usepkg', '--with-bdeps=y', *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
@@ -31,7 +31,7 @@ def _create_rootfs(rootfs_path, *packages, uid=None, gid=None):
 
     print('Installing runtime dependencies to rootfs', flush=True)
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
-                            '--autounmask-continue=y', '--usepkg', *packages]
+                            '--usepkg', *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
         raise RootfsError('Unable to install runtime dependencies.')
