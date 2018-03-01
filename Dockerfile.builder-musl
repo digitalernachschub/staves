@@ -1,5 +1,4 @@
 FROM staves/gentoo-stage3-amd64-musl-hardened
-LABEL libc=sys-libs/musl
 
 COPY --from=gentoo/portage /usr/portage /usr/portage
 

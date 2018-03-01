@@ -1,5 +1,4 @@
 FROM gentoo/stage3-amd64-hardened-nomultilib
-LABEL libc=sys-libs/glibc
 
 COPY --from=gentoo/portage /usr/portage /usr/portage
 
