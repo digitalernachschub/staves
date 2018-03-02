@@ -122,7 +122,7 @@ def main(version, libc, name, uid, gid):
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     for package, package_config in package_configs.items():
         _write_package_config(package, **package_config)
-    packages_to_be_installed = [config['package']]
+    packages_to_be_installed = [*config['packages']]
     if libc:
         packages_to_be_installed.append(libc)
     _create_rootfs(rootfs_path, *packages_to_be_installed, uid=uid, gid=gid)
