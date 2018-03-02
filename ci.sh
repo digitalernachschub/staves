@@ -25,7 +25,9 @@ create_stage3_image() {
     docker build --tag staves/gentoo-stage3-amd64-musl-hardened:${build_date} --tag staves/gentoo-stage3-amd64-musl-hardened:latest -f Dockerfile.stage3 .
 }
 
+project_name=$(basename $(pwd))
 version=$(git describe --tags --always --dirty)
+version=${version#${project_name}-}
 setup_test_env
 run_unit_tests
 
