@@ -21,12 +21,11 @@ RUN flaggie "net-misc/openssh" "-bindist" && \
   emerge --update --newuse @world
 
 RUN flaggie "dev-vcs/git" "-gpg" "-perl" "-python" && \
-  emerge app-portage/layman && \
-  sed --in-place 's/check_official : .*/check_official : No/' /etc/layman/layman.cfg && \
-  layman -f
-
-COPY digitalernachschub.xml /etc/layman/overlays
-RUN layman -f && layman -a digitalernachschub
+  emerge dev-vcs/git app-eselect/eselect-repository && \
+  mkdir /etc/portage/repos.conf && \
+  eselect repository list -i && \
+  eselect repository add digitalernachschub git git://github.com/digitalernachschub/gentoo-overlay.git && \
+  emaint sync --repo digitalernachschub
 
 ENV STAVES_LIBC sys-libs/glibc
 
