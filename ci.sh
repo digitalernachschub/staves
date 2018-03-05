@@ -33,10 +33,17 @@ run_unit_tests
 
 musl_stage3_date="20180204"
 create_stage3_image ${musl_stage3_date}
-docker build --tag "staves/builder-musl:${version}.${musl_stage3_date}" --tag "staves/builder-musl:${version}" \
-    --tag "staves/builder-musl:${version%.*}" --tag "staves/builder-musl:${version%%.*}" \
-    -f Dockerfile.builder-musl .
+docker build --tag "staves/builder-musl:${version}.${musl_stage3_date}" -f Dockerfile.builder-musl .
+
+if [[ $(git tag --list ${project_name}-${version}) ]]; then
+  docker tag "staves/builder-musl:${version}.${musl_stage3_date}" "staves/builder-musl:${version}"
+  docker tag "staves/builder-musl:${version}.${musl_stage3_date}" "staves/builder-musl:${version%.*}"
+  docker tag "staves/builder-musl:${version}.${musl_stage3_date}" "staves/builder-musl:${version%%.*}"
+fi
 glibc_stage3_date="20180228"
-docker build --tag "staves/builder-glibc:${version}.${glibc_stage3_date}" --tag "staves/builder-glibc:${version}" \
-    --tag "staves/builder-glibc:${version%.*}" --tag "staves/builder-glibc:${version%%.*}" \
-    -f Dockerfile.builder-glibc .
+docker build --tag "staves/builder-glibc:${version}.${glibc_stage3_date}" -f Dockerfile.builder-glibc .
+if [[ $(git tag --list ${project_name}-${version}) ]]; then
+  docker tag "staves/builder-glibc:${version}.${glibc_stage3_date}" "staves/builder-glibc:${version}"
+  docker tag "staves/builder-glibc:${version}.${glibc_stage3_date}" "staves/builder-glibc:${version%.*}"
+  docker tag "staves/builder-glibc:${version}.${glibc_stage3_date}" "staves/builder-glibc:${version%%.*}"
+fi
