@@ -38,9 +38,6 @@ RUN emerge --update --newuse --deep @world
 
 ENV STAVES_LIBC sys-libs/musl
 
-RUN flaggie "dev-python/docker-py" "+~amd64" && \
-  flaggie "dev-python/click" "+~amd64" && \
-  flaggie "dev-python/toml" "+~amd64" && \
-  emerge dev-util/staves && \
+RUN emerge dev-util/staves && \
   echo 'FEATURES="${FEATURES} buildpkg binpkg-multi-instance -binpkg-logs"' >> /etc/portage/make.conf
 ENTRYPOINT ["python3", "staves.py"]
