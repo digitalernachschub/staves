@@ -31,4 +31,4 @@ ENV STAVES_LIBC sys-libs/glibc
 
 RUN emerge dev-util/staves && \
   echo 'FEATURES="${FEATURES} buildpkg binpkg-multi-instance -binpkg-logs"' >> /etc/portage/make.conf
-ENTRYPOINT ["python3", "staves.py"]
+ENTRYPOINT ["python3", "-m", "staves"]
