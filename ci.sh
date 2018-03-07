@@ -43,7 +43,7 @@ fi
 glibc_stage3_date="20180228"
 docker build --tag "staves/bootstrap-x86_64-glibc:${version}.${glibc_stage3_date}" --no-cache -f Dockerfile.x86_64-hardened-nomultilib .
 cat x86_64-hardened-nomultilib.toml | docker run --rm --interactive \
-    --volume type=volume,source=staves-x86_64-glibc-cache,target=/usr/portage/packages \
+    --mount type=volume,source=staves-x86_64-glibc-cache,target=/usr/portage/packages \
     --mount type=bind,source=/run/docker.sock,target=/run/docker.sock \
     "staves/bootstrap-x86_64-glibc:${version}.${glibc_stage3_date}" --libc "sys-libs/glibc" "${version}.${glibc_stage3_date}"
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
