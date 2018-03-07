@@ -75,6 +75,7 @@ def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list):
 
 
 def _write_env(env_vars, name=None):
+    os.makedirs('/etc/portage/env', exist_ok=True)
     if name:
         conf_path = os.path.join('/etc', 'portage', 'env', name)
     else:
