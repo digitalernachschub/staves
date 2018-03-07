@@ -15,7 +15,7 @@ class RootfsError(Exception):
     pass
 
 
-def _create_rootfs(rootfs_path, *packages, uid=None, gid=None):
+def _create_rootfs(rootfs_path, *packages):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end=os.linesep, flush=True)
     for prefix in ['', 'usr', 'usr/local']:
@@ -42,16 +42,6 @@ def _create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
         if 'libgcc_s.so.1' in files:
             shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
-
-    if not uid:
-        uid = os.getuid()
-    if not gid:
-        gid = os.getgid()
-    for base_path, dirs, files in os.walk(rootfs_path):
-        for d in dirs:
-            os.chown(os.path.join(base_path, d), uid, gid)
-        for f in files:
-            os.chown(os.path.join(base_path, f), uid, gid)
 
 
 def _create_dockerfile(*cmd: str) -> str:
@@ -111,9 +101,7 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', help='Libc to be installed into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
-@click.option('--uid', type=int, help='User ID to be set as owner of the rootfs')
-@click.option('--gid', type=int, help='Group ID to be set as owner of the rootfs')
-def main(version, libc, name, uid, gid):
+def main(version, libc, name):
     config = toml.load(click.get_text_stream('stdin'))
     rootfs_path = '/tmp/rootfs'
     if not name:
@@ -139,7 +127,7 @@ def main(version, libc, name, uid, gid):
     packages_to_be_installed = [*config.get('packages', [])]
     if libc:
         packages_to_be_installed.append(libc)
-    _create_rootfs(rootfs_path, *packages_to_be_installed, uid=uid, gid=gid)
+    _create_rootfs(rootfs_path, *packages_to_be_installed)
     tag = '{}:{}'.format(name, version)
     _docker_image_from_rootfs(rootfs_path, tag, config['command'])
 
