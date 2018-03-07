@@ -120,6 +120,14 @@ def main(version, libc, name, uid, gid):
         for env_name, env in specialized_envs.items():
             _write_env(name=env_name, env_vars=env)
         config.pop('env')
+    os.makedirs('/etc/portage/repos.conf', exist_ok=True)
+    subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
+    for repository in config.get('repositories', []):
+        if 'name' in repository and 'uri' in repository and 'type' in repository:
+            subprocess.run(['eselect', 'repository', 'add', repository['name'], repository['type'], repository['uri']], stderr=subprocess.PIPE)
+            subprocess.run(['emaint', 'sync', '--repo', repository['name']], stderr=subprocess.PIPE)
+    if 'repositories' in config:
+        config.pop('repositories')
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     for package, package_config in package_configs.items():
         _write_package_config(package, **package_config)
