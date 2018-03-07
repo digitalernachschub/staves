@@ -18,9 +18,11 @@ class RootfsError(Exception):
 def _create_rootfs(rootfs_path, *packages, uid=None, gid=None):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end=os.linesep, flush=True)
-    lib_path = os.path.join(rootfs_path, 'usr', 'lib64')
-    os.makedirs(lib_path, exist_ok=True)
-    os.symlink('lib64', os.path.join(rootfs_path, 'usr', 'lib'))
+    for prefix in ['', 'usr', 'usr/local']:
+        lib_prefix = os.path.join(rootfs_path, prefix)
+        lib_path = os.path.join(lib_prefix, 'lib64')
+        os.makedirs(lib_path, exist_ok=True)
+        os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
 
     print('Installing build-time dependencies to builder', flush=True)
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n',
