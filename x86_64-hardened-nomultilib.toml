@@ -1,0 +1,33 @@
+name = 'staves/x86_64-glibc'
+packages = ['dev-util/staves', '@world']
+command = ['python3', '-m', 'staves']
+
+[env]
+MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)"
+EMERGE_DEFAULT_OPTS="--nospinner --quiet --autounmask-continue=y"
+PORTAGE_ELOG_SYSTEM="echo:warn,error"
+FEATURES="-news nodoc noinfo noman buildpkg binpkg-multi-instance -binpkg-logs"
+
+[env.no-sandbox]
+FEATURES="-sandbox -usersandbox"
+
+['sys-libs/glibc']
+# Sandbox uses ptrace which is not permitted by default in Docker
+env = ['no-sandbox']
+
+['net-misc/openssh']
+use = ['-bindist']
+
+['dev-libs/openssl']
+use = ['-bindist']
+
+['dev-vcs/git']
+use = ['-gpg', '-perl', '-python']
+
+['dev-util/staves']
+use = ['git']
+
+[[repositories]]
+name = 'digitalernachschub'
+type = 'git'
+uri = 'git://github.com/digitalernachschub/gentoo-overlay.git'
