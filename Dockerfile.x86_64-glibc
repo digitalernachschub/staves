@@ -1,6 +1,7 @@
 FROM gentoo/stage3-amd64-hardened-nomultilib:20180228
 COPY --from=gentoo/portage /usr/portage /usr/portage
-RUN MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)" USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
+RUN mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
+  MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)" USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
   mkdir /etc/portage/repos.conf && \
   eselect repository list -i && \
   eselect repository add digitalernachschub git git://github.com/digitalernachschub/gentoo-overlay.git && \

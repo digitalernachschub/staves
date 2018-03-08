@@ -8,6 +8,7 @@ RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf &
   sed -i "s/postinst_qa_check() {/postinst_qa_check() { return 0/" /usr/lib/portage/python3.5/misc-functions.sh && \
   emerge --oneshot bash && \
   mv /tmp/misc-functions.sh /usr/lib/portage/python3.5/misc-functions.sh && \
+  mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
   USE="-gpg -perl -python" emerge --oneshot dev-vcs/git app-eselect/eselect-repository && \
   mkdir /etc/portage/repos.conf && \
   eselect repository list -i && \
