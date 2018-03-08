@@ -11,6 +11,9 @@ FEATURES="-news nodoc noinfo noman buildpkg binpkg-multi-instance -binpkg-logs"
 [env.no-sandbox]
 FEATURES="-sandbox -usersandbox"
 
+[env.nocache]
+FEATURES="-buildpkg"
+
 ['sys-libs/glibc']
 # Sandbox uses ptrace which is not permitted by default in Docker
 env = ['no-sandbox']
@@ -26,6 +29,9 @@ use = ['-gpg', '-perl', '-python']
 
 ['dev-util/staves']
 use = ['git']
+
+['=dev-util/staves-9999']
+env = ['nocache']
 
 [[repositories]]
 name = 'digitalernachschub'
