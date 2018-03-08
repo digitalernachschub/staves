@@ -33,13 +33,17 @@ run_unit_tests
 
 musl_stage3_date="20180204"
 create_stage3_image ${musl_stage3_date}
-docker build --tag "staves/builder-musl:${version}.${musl_stage3_date}" -f Dockerfile.builder-musl .
-
+docker build --tag "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" -f Dockerfile.x86_64-musl .
+cat x86_64-musl.toml | docker run --rm --interactive \
+    --mount type=volume,source=staves-x86_64-musl-cache,target=/usr/portage/packages \
+    --mount type=bind,source=/run/docker.sock,target=/run/docker.sock \
+    "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" --libc "sys-libs/musl" "${version}.${musl_stage3_date}"
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
-  docker tag "staves/builder-musl:${version}.${musl_stage3_date}" "staves/builder-musl:${version}"
-  docker tag "staves/builder-musl:${version}.${musl_stage3_date}" "staves/builder-musl:${version%.*}"
-  docker tag "staves/builder-musl:${version}.${musl_stage3_date}" "staves/builder-musl:${version%%.*}"
+  docker tag "staves/x86_64-musl:${version}.${musl_stage3_date}" "staves/x86_64-musl:${version}"
+  docker tag "staves/x86_64-musl:${version}.${musl_stage3_date}" "staves/x86_64-musl:${version%.*}"
+  docker tag "staves/x86_64-musl:${version}.${musl_stage3_date}" "staves/x86_64-musl:${version%%.*}"
 fi
+
 glibc_stage3_date="20180228"
 docker build --tag "staves/bootstrap-x86_64-glibc:${version}.${glibc_stage3_date}" --no-cache -f Dockerfile.x86_64-glibc .
 cat x86_64-glibc.toml | docker run --rm --interactive \
