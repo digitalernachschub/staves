@@ -31,7 +31,7 @@ version=${version#${project_name}-}
 setup_test_env
 run_unit_tests
 
-musl_stage3_date="20180204"
+musl_stage3_date="20180304"
 create_stage3_image ${musl_stage3_date}
 docker build --tag "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" -f Dockerfile.x86_64-musl .
 cat x86_64-musl.toml | docker run --rm --interactive \
