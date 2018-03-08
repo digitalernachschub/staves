@@ -5,7 +5,7 @@ RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf &
   cp /usr/lib/portage/python3.5/misc-functions.sh /tmp/ && \
   sed -i "s/install_qa_check() {/install_qa_check() { return 0/" /usr/lib/portage/python3.5/misc-functions.sh && \
   sed -i "s/postinst_qa_check() {/postinst_qa_check() { return 0/" /usr/lib/portage/python3.5/misc-functions.sh && \
-  emerge -1 bash && \
+  emerge --oneshot --quiet=y bash && \
   mv /tmp/misc-functions.sh /usr/lib/portage/python3.5/misc-functions.sh && \
   USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
   mkdir /etc/portage/repos.conf && \
