@@ -116,8 +116,11 @@ def main(version, libc, name):
     os.makedirs('/etc/portage/repos.conf', exist_ok=True)
     subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
     for repository in config.get('repositories', []):
-        if 'name' in repository and 'uri' in repository and 'type' in repository:
-            subprocess.run(['eselect', 'repository', 'add', repository['name'], repository['type'], repository['uri']], stderr=subprocess.PIPE)
+        if 'name' in repository:
+            if 'uri' in repository and 'type' in repository:
+                subprocess.run(['eselect', 'repository', 'add', repository['name'], repository['type'], repository['uri']], stderr=subprocess.PIPE)
+            else:
+                subprocess.run(['eselect', 'repository', 'enable', repository['name']], stderr=subprocess.PIPE)
             subprocess.run(['emaint', 'sync', '--repo', repository['name']], stderr=subprocess.PIPE)
     if 'repositories' in config:
         config.pop('repositories')
