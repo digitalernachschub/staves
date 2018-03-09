@@ -33,7 +33,7 @@ run_unit_tests
 
 musl_stage3_date="20180304"
 create_stage3_image ${musl_stage3_date}
-docker build --tag "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" -f Dockerfile.x86_64-musl .
+docker build --tag "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" --no-cache -f Dockerfile.x86_64-musl .
 cat x86_64-musl.toml | docker run --rm --interactive \
     --mount type=volume,source=staves-x86_64-musl-cache,target=/usr/portage/packages \
     --mount type=bind,source=/run/docker.sock,target=/run/docker.sock \
