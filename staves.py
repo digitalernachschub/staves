@@ -15,14 +15,15 @@ class RootfsError(Exception):
     pass
 
 
-def _create_rootfs(rootfs_path, *packages):
+def _create_rootfs(rootfs_path, *packages, symlink_lib=True):
     print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     print(*packages, sep=', ', end=os.linesep, flush=True)
-    for prefix in ['', 'usr', 'usr/local']:
-        lib_prefix = os.path.join(rootfs_path, prefix)
-        lib_path = os.path.join(lib_prefix, 'lib64')
-        os.makedirs(lib_path, exist_ok=True)
-        os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
+    if symlink_lib:
+        for prefix in ['', 'usr', 'usr/local']:
+            lib_prefix = os.path.join(rootfs_path, prefix)
+            lib_path = os.path.join(lib_prefix, 'lib64')
+            os.makedirs(lib_path, exist_ok=True)
+            os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
 
     print('Installing build-time dependencies to builder', flush=True)
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n',
@@ -130,7 +131,12 @@ def main(version, libc, name):
     packages_to_be_installed = [*config.get('packages', [])]
     if libc:
         packages_to_be_installed.append(libc)
-    _create_rootfs(rootfs_path, *packages_to_be_installed)
+        # This value should depend on the selected profile, but there is currently no musl profile with
+        # links to lib directories.
+        symlink_lib = 'musl' not in libc
+    else:
+        symlink_lib = True
+    _create_rootfs(rootfs_path, *packages_to_be_installed, symlink_lib=symlink_lib)
     tag = '{}:{}'.format(name, version)
     _docker_image_from_rootfs(rootfs_path, tag, config['command'])
 
