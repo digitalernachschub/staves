@@ -5,6 +5,7 @@ import io
 import os
 import shutil
 import subprocess
+import sys
 import tarfile
 
 import docker
@@ -30,6 +31,7 @@ def _create_rootfs(rootfs_path, *packages, symlink_lib=True):
                             '--usepkg', '--with-bdeps=y', *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
+        print(emerge_bdeps_call.stderr, file=sys.stderr)
         raise RootfsError('Unable to install build-time dependencies.')
 
     print('Installing runtime dependencies to rootfs', flush=True)
@@ -37,6 +39,7 @@ def _create_rootfs(rootfs_path, *packages, symlink_lib=True):
                             '--usepkg', *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
+        print(emerge_bdeps_call.stderr, file=sys.stderr)
         raise RootfsError('Unable to install runtime dependencies.')
 
     # Copy libgcc (e.g. for pthreads)
