@@ -139,7 +139,14 @@ def main(version, libc, name):
         symlink_lib = 'musl' not in libc
     else:
         symlink_lib = True
+    if 'glibc' in libc:
+        with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
+            locale_conf.writelines(['en_US.UTF-8 UTF-8'])
+            subprocess.run('locale-gen')
     _create_rootfs(rootfs_path, *packages_to_be_installed, symlink_lib=symlink_lib)
+    if 'glibc' in libc:
+        os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
+        shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
     tag = '{}:{}'.format(name, version)
     _docker_image_from_rootfs(rootfs_path, tag, config['command'])
 
