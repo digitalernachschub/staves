@@ -101,7 +101,9 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 @click.option('--name', help='Overrides the image name specified in the configuration')
 @click.option('--rootfs_path', default=os.path.join('/tmp', 'rootfs'),
               help='Directory where the root filesystem will be installed. Defaults to /tmp/rootfs')
-def main(version, libc, name, rootfs_path):
+@click.option('--packaging', type=click.Choice(['none', 'docker']), default='docker',
+              help='Packaging format of the resulting image')
+def main(version, libc, name, rootfs_path, packaging):
     config = toml.load(click.get_text_stream('stdin'))
     if not name:
         name = config['name']
@@ -146,7 +148,8 @@ def main(version, libc, name, rootfs_path):
         os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
         shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
     tag = '{}:{}'.format(name, version)
-    _docker_image_from_rootfs(rootfs_path, tag, config['command'])
+    if packaging == 'docker':
+        _docker_image_from_rootfs(rootfs_path, tag, config['command'])
 
 
 if __name__ == '__main__':
