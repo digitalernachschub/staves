@@ -17,23 +17,23 @@ class RootfsError(Exception):
 
 
 def _create_rootfs(rootfs_path, *packages):
-    print('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
-    print(*packages, sep=', ', end=os.linesep, flush=True)
+    click.echo('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
+    click.echo(', '.join(packages))
 
-    print('Installing build-time dependencies to builder', flush=True)
+    click.echo('Installing build-time dependencies to builder')
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n',
                             '--usepkg', '--with-bdeps=y', *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
-        print(emerge_bdeps_call.stderr, file=sys.stderr)
+        click.echo(emerge_bdeps_call.stderr, file=sys.stderr)
         raise RootfsError('Unable to install build-time dependencies.')
 
-    print('Installing runtime dependencies to rootfs', flush=True)
+    click.echo('Installing runtime dependencies to rootfs')
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
                             '--usepkg', *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
-        print(emerge_bdeps_call.stderr, file=sys.stderr)
+        click.echo(emerge_bdeps_call.stderr, file=sys.stderr)
         raise RootfsError('Unable to install runtime dependencies.')
 
 
