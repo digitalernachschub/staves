@@ -97,7 +97,7 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
-@click.option('--libc', envvar='STAVES_LIBC', help='Libc to be installed into rootfs')
+@click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
 def main(version, libc, name):
     config = toml.load(click.get_text_stream('stdin'))
