@@ -1,5 +1,5 @@
 name = 'staves/x86_64-musl'
-packages = ['dev-util/staves', '@world']
+packages = ['dev-util/staves', '@system']
 command = ['python3', '-m', 'staves']
 
 [env]
