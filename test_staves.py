@@ -2,7 +2,7 @@ import os
 
 import toml
 from click.testing import CliRunner
-from staves import _create_rootfs, main
+from staves import main
 
 
 def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
