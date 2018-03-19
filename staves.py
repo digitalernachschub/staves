@@ -146,6 +146,10 @@ def main(version, libc, name, rootfs_path, packaging):
             subprocess.run('locale-gen')
         os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
         shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
+    if {'virtual/package-manager', '@system', '@world'} & set(packages_to_be_installed):
+        shutil.copytree(os.path.join('/usr', 'portage'), os.path.join(rootfs_path, 'usr', 'portage'))
+        profile = os.readlink(os.path.join('/etc', 'portage', 'make.profile'))
+        os.symlink(profile, os.path.join(rootfs_path, 'etc', 'portage', 'make.profile'))
     tag = '{}:{}'.format(name, version)
     if packaging == 'docker':
         _docker_image_from_rootfs(rootfs_path, tag, config['command'])
