@@ -14,11 +14,10 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
         packages=['virtual/libintl'],
         command=''
     ))
-    mocker.patch('staves._docker_image_from_rootfs')
     mocker.patch('staves._create_rootfs')
     cli = CliRunner()
 
-    cli.invoke(main, input=config, args=['--rootfs_path', rootfs_path, 'latest'])
+    cli.invoke(main, input=config, args=['--rootfs_path', rootfs_path, '--packaging', 'none', 'latest'])
 
     assert os.path.islink(os.path.join(rootfs_path, 'lib'))
     assert os.path.islink(os.path.join(rootfs_path, 'usr', 'lib'))
@@ -34,9 +33,8 @@ def test_copies_libgcc(tmpdir, monkeypatch, mocker):
         packages=['virtual/libintl'],
         command=''
     ))
-    mocker.patch('staves._docker_image_from_rootfs')
     cli = CliRunner()
 
-    cli.invoke(main, input=config, args=['--rootfs_path', rootfs_path, 'latest'])
+    cli.invoke(main, input=config, args=['--rootfs_path', rootfs_path, '--packaging', 'none', 'latest'])
 
     assert os.path.exists(os.path.join(rootfs_path, 'usr', 'lib64', 'libgcc_s.so.1'))
