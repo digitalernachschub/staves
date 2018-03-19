@@ -96,6 +96,14 @@ def _copy_stdlib(rootfs_path: str):
             shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
 
 
+def _add_repository(name: str, sync_type: str=None, uri: str=None):
+    if uri and sync_type:
+        subprocess.run(['eselect', 'repository', 'add', name, sync_type, uri], stderr=subprocess.PIPE)
+    else:
+        subprocess.run(['eselect', 'repository', 'enable', name], stderr=subprocess.PIPE)
+    subprocess.run(['emaint', 'sync', '--repo', name], stderr=subprocess.PIPE)
+
+
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
@@ -118,12 +126,7 @@ def main(version, libc, name, rootfs_path, packaging):
     os.makedirs('/etc/portage/repos.conf', exist_ok=True)
     subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
     for repository in config.get('repositories', []):
-        if 'name' in repository:
-            if 'uri' in repository and 'type' in repository:
-                subprocess.run(['eselect', 'repository', 'add', repository['name'], repository['type'], repository['uri']], stderr=subprocess.PIPE)
-            else:
-                subprocess.run(['eselect', 'repository', 'enable', repository['name']], stderr=subprocess.PIPE)
-            subprocess.run(['emaint', 'sync', '--repo', repository['name']], stderr=subprocess.PIPE)
+        _add_repository(repository['name'], sync_type=repository.get('type'), uri=repository.get('uri'))
     if 'repositories' in config:
         config.pop('repositories')
     locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
