@@ -36,11 +36,6 @@ def _create_rootfs(rootfs_path, *packages):
         print(emerge_bdeps_call.stderr, file=sys.stderr)
         raise RootfsError('Unable to install runtime dependencies.')
 
-    # Copy libgcc (e.g. for pthreads)
-    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
-        if 'libgcc_s.so.1' in files:
-            shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
-
 
 def _create_dockerfile(*cmd: str) -> str:
     command_string = ', '.join(['\"{}\"'.format(c) for c in cmd])
@@ -141,6 +136,10 @@ def main(version, libc, name, rootfs_path, packaging):
             os.makedirs(lib_path, exist_ok=True)
             os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
     _create_rootfs(rootfs_path, *packages_to_be_installed)
+    # Copy libgcc (e.g. for pthreads)
+    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
+        if 'libgcc_s.so.1' in files:
+            shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
     if 'glibc' in libc:
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
             locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
