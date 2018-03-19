@@ -33,7 +33,7 @@ def _create_rootfs(rootfs_path, *packages):
                             '--usepkg', *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
     if emerge_rdeps_call.returncode != 0:
-        click.echo(emerge_bdeps_call.stderr, err=True)
+        click.echo(emerge_rdeps_call.stderr, err=True)
         raise RootfsError('Unable to install runtime dependencies.')
 
 
