@@ -10,7 +10,7 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
     monkeypatch.setenv('PKGDIR', package_dir)
     unprivileged_test_root = tmpdir.join('test_root')
     monkeypatch.setenv('ROOT', unprivileged_test_root)
-    rootfs_path = '/tmp/rootfs'
+    rootfs_path = tmpdir.join('rootfs')
     config = toml.dumps(dict(
         name='staves_test',
         packages=['virtual/libintl'],
@@ -20,7 +20,7 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
     mocker.patch('staves._create_rootfs')
     cli = CliRunner()
 
-    cli.invoke(main, input=config, args=['latest'])
+    cli.invoke(main, input=config, args=['--rootfs_path', rootfs_path, 'latest'])
 
     assert os.path.islink(os.path.join(rootfs_path, 'lib'))
     assert os.path.islink(os.path.join(rootfs_path, 'usr', 'lib'))
