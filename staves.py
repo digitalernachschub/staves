@@ -90,6 +90,12 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
             f.write('{} {}{}'.format(package, package_use_flags, os.linesep))
 
 
+def _copy_stdlib(rootfs_path: str):
+    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
+        if 'libgcc_s.so.1' in files:
+            shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
+
+
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
@@ -136,10 +142,7 @@ def main(version, libc, name, rootfs_path, packaging):
             os.makedirs(lib_path, exist_ok=True)
             os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
     _create_rootfs(rootfs_path, *packages_to_be_installed)
-    # Copy libgcc (e.g. for pthreads)
-    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
-        if 'libgcc_s.so.1' in files:
-            shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
+    _copy_stdlib(rootfs_path)
     if 'glibc' in libc:
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
             locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
