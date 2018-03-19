@@ -123,12 +123,11 @@ def main(version, libc, name, rootfs_path, packaging):
         for env_name, env in specialized_envs.items():
             _write_env(name=env_name, env_vars=env)
         config.pop('env')
-    os.makedirs('/etc/portage/repos.conf', exist_ok=True)
-    subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
-    for repository in config.get('repositories', []):
-        _add_repository(repository['name'], sync_type=repository.get('type'), uri=repository.get('uri'))
     if 'repositories' in config:
-        config.pop('repositories')
+        os.makedirs('/etc/portage/repos.conf', exist_ok=True)
+        subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
+        for repository in config.pop('repositories'):
+            _add_repository(repository['name'], sync_type=repository.get('type'), uri=repository.get('uri'))
     locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     for package, package_config in package_configs.items():
