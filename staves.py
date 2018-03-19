@@ -99,9 +99,10 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
-def main(version, libc, name):
+@click.option('--rootfs_path', default=os.path.join('/tmp', 'rootfs'),
+              help='Directory where the root filesystem will be installed. Defaults to /tmp/rootfs')
+def main(version, libc, name, rootfs_path):
     config = toml.load(click.get_text_stream('stdin'))
-    rootfs_path = '/tmp/rootfs'
     if not name:
         name = config['name']
     if 'env' in config:
