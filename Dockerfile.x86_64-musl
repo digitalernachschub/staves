@@ -1,4 +1,5 @@
-FROM staves/gentoo-stage3-amd64-musl-hardened:20180304
+ARG STAGE3=latest
+FROM staves/gentoo-stage3-amd64-musl-hardened:${STAGE3}
 COPY --from=gentoo/portage /usr/portage /usr/portage
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
   echo "EMERGE_DEFAULT_OPTS=\"--quiet=y --verbose --autounmask-continue=y\"" >> /etc/portage/make.conf && \

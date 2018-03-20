@@ -1,4 +1,5 @@
-FROM gentoo/stage3-amd64-hardened-nomultilib:20180228
+ARG STAGE3=latest
+FROM gentoo/stage3-amd64-hardened-nomultilib:${STAGE3}
 COPY --from=gentoo/portage /usr/portage /usr/portage
 RUN mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
   MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)" USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
