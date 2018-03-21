@@ -104,6 +104,13 @@ def _add_repository(name: str, sync_type: str=None, uri: str=None):
     subprocess.run(['emaint', 'sync', '--repo', name], stderr=subprocess.PIPE)
 
 
+def _update_builder():
+    update_world = subprocess.run(['emerge', '--update', '--changed-use', '--deep', '--usepkg', '--with-bdeps=y', '@world'], stderr=subprocess.PIPE)
+    if update_world.returncode != 0:
+        click.echo(update_world.stderr, err=True)
+        raise RootfsError('Unable to update builder environment')
+
+
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
@@ -143,6 +150,7 @@ def main(version, libc, name, rootfs_path, packaging):
             lib_path = os.path.join(lib_prefix, 'lib64')
             os.makedirs(lib_path, exist_ok=True)
             os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
+    _update_builder()
     _create_rootfs(rootfs_path, *packages_to_be_installed)
     _copy_stdlib(rootfs_path)
     if 'glibc' in libc:
