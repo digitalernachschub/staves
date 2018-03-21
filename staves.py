@@ -143,6 +143,7 @@ def main(version, libc, name, rootfs_path, packaging):
             lib_path = os.path.join(lib_prefix, 'lib64')
             os.makedirs(lib_path, exist_ok=True)
             os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
+    subprocess.run(['emerge', '--updated', '--changed-use', '--deep', '--usepkg', '--with-bdeps=y', '@world'], stderr=subprocess.PIPE)
     _create_rootfs(rootfs_path, *packages_to_be_installed)
     _copy_stdlib(rootfs_path)
     if 'glibc' in libc:
