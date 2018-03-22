@@ -105,7 +105,7 @@ def _add_repository(name: str, sync_type: str=None, uri: str=None):
 
 
 def _update_builder():
-    update_world = subprocess.run(['emerge', '--update', '--changed-use', '--deep', '--usepkg', '--with-bdeps=y', '@world'], stderr=subprocess.PIPE)
+    update_world = subprocess.run(['emerge', '--update', '--newuse', '--deep', '--usepkg', '--with-bdeps=y', '@world'], stderr=subprocess.PIPE)
     if update_world.returncode != 0:
         click.echo(update_world.stderr, err=True)
         raise RootfsError('Unable to update builder environment')
