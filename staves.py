@@ -105,6 +105,11 @@ def _add_repository(name: str, sync_type: str=None, uri: str=None):
 
 
 def _update_builder():
+    # Register staves in /var/lib/portage/world
+    register_staves = subprocess.run(['emerge', '--noreplace', 'dev-util/staves'], stderr=subprocess.PIPE)
+    if register_staves.returncode != 0:
+        click.echo(register_staves.stderr, err=True)
+        raise RootfsError('Unable to register Staves as an installed package')
     update_world = subprocess.run(['emerge', '--update', '--newuse', '--deep', '--usepkg', '--with-bdeps=y', '@world'], stderr=subprocess.PIPE)
     if update_world.returncode != 0:
         click.echo(update_world.stderr, err=True)
