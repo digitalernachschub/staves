@@ -110,7 +110,7 @@ def _update_builder():
     if register_staves.returncode != 0:
         click.echo(register_staves.stderr, err=True)
         raise RootfsError('Unable to register Staves as an installed package')
-    update_world = subprocess.run(['emerge', '--verbose', '--update', '--deep', '--usepkg', '--with-bdeps=y', '@world'], stderr=subprocess.PIPE)
+    update_world = subprocess.run(['emerge', '--verbose', '--deep', '--usepkg', '--with-bdeps=y', '@world'], stderr=subprocess.PIPE)
     if update_world.returncode != 0:
         click.echo(update_world.stderr, err=True)
         raise RootfsError('Unable to update builder environment')
