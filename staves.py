@@ -155,6 +155,12 @@ def main(version, libc, name, rootfs_path, packaging):
             lib_path = os.path.join(lib_prefix, 'lib64')
             os.makedirs(lib_path, exist_ok=True)
             os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
+    if os.path.exists(os.path.join(rootfs_path, 'usr', 'portage')):
+        for directory_path, subdirs, files in os.walk(os.path.join(rootfs_path, 'usr', 'portage')):
+            for subdir in subdirs:
+                shutil.chown(os.path.join(directory_path, subdir), user='portage', group='portage')
+            for f in files:
+                shutil.chown(os.path.join(directory_path, f), user='portage', group='portage')
     _update_builder()
     _create_rootfs(rootfs_path, *packages_to_be_installed)
     _copy_stdlib(rootfs_path)
