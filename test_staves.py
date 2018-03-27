@@ -14,6 +14,7 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
         packages=['virtual/libintl'],
         command=''
     ))
+    mocker.patch('staves._fix_portage_tree_permissions')
     mocker.patch('staves._update_builder')
     mocker.patch('staves._create_rootfs')
     cli = CliRunner()
@@ -34,6 +35,7 @@ def test_copies_libgcc(tmpdir, monkeypatch, mocker):
         packages=['virtual/libintl'],
         command=''
     ))
+    mocker.patch('staves._fix_portage_tree_permissions')
     mocker.patch('staves._update_builder')
     mocker.patch('staves._create_rootfs')
     cli = CliRunner()
