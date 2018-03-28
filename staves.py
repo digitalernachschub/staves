@@ -130,6 +130,9 @@ def _copy_to_rootfs(rootfs, path):
         shutil.copytree(path, dst)
     elif os.path.isfile(path):
         shutil.copy(path, dst)
+    elif os.path.islink(path):
+        link_target = os.readlink(path)
+        os.symlink(link_target, dst)
 
 
 @click.command(help='Installs the specified packages into to the desired location.')
@@ -187,8 +190,7 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
     if create_builder:
         _copy_to_rootfs(rootfs_path, os.path.join('/usr', 'portage'))
         _copy_to_rootfs(rootfs_path, os.path.join('/etc', 'portage', 'make.conf'))
-        profile = os.readlink(os.path.join('/etc', 'portage', 'make.profile'))
-        os.symlink(profile, os.path.join(rootfs_path, 'etc', 'portage', 'make.profile'))
+        _copy_to_rootfs(rootfs_path, os.path.join('/etc', 'portage', 'make.profile'))
     tag = '{}:{}'.format(name, version)
     if packaging == 'docker':
         _docker_image_from_rootfs(rootfs_path, tag, config['command'])
