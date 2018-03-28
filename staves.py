@@ -197,6 +197,8 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
         _copy_to_rootfs(rootfs_path, '/usr/portage')
         _copy_to_rootfs(rootfs_path, '/etc/portage/make.conf')
         _copy_to_rootfs(rootfs_path, '/etc/portage/make.profile')
+        _copy_to_rootfs(rootfs_path, '/etc/portage/repos.conf')
+        _copy_to_rootfs(rootfs_path, '/var/db/repos')
     tag = '{}:{}'.format(name, version)
     if packaging == 'docker':
         _docker_image_from_rootfs(rootfs_path, tag, config['command'])
