@@ -132,7 +132,7 @@ def _copy_to_rootfs(rootfs, path):
     globs = glob.iglob(path)
     for g in globs:
         dst = os.path.join(rootfs, os.path.relpath(g, '/'))
-        os.makedirs(os.path.basename(dst), exist_ok=True)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
         if os.path.isdir(g):
             shutil.copytree(g, dst)
         elif os.path.isfile(g):
