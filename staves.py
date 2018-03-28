@@ -124,6 +124,14 @@ def _fix_portage_tree_permissions():
             shutil.chown(os.path.join(directory_path, f), user='portage', group='portage')
 
 
+def _copy_to_rootfs(rootfs, path):
+    dst = os.path.join(rootfs, path)
+    if os.path.isdir(path):
+        shutil.copytree(path, dst)
+    elif os.path.isfile(path):
+        shutil.copy(path, dst)
+
+
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
@@ -177,8 +185,8 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
         os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
         shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
     if create_builder:
-        shutil.copytree(os.path.join('/usr', 'portage'), os.path.join(rootfs_path, 'usr', 'portage'))
-        shutil.copy(os.path.join('/etc', 'portage', 'make.conf'), os.path.join(rootfs_path, 'etc', 'portage', 'make.conf'))
+        _copy_to_rootfs(rootfs_path, os.path.join('/usr', 'portage'))
+        _copy_to_rootfs(rootfs_path, os.path.join('/etc', 'portage', 'make.conf'))
         profile = os.readlink(os.path.join('/etc', 'portage', 'make.profile'))
         os.symlink(profile, os.path.join(rootfs_path, 'etc', 'portage', 'make.profile'))
     tag = '{}:{}'.format(name, version)
