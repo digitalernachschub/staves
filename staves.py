@@ -137,6 +137,8 @@ def _copy_to_rootfs(rootfs, path):
     elif os.path.islink(path):
         link_target = os.readlink(path)
         os.symlink(link_target, dst)
+    else:
+        raise StavesError('Copying {} to rootfs is not supported.'.format(path))
 
 
 @click.command(help='Installs the specified packages into to the desired location.')
