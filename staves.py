@@ -130,6 +130,7 @@ def _fix_portage_tree_permissions():
 
 def _copy_to_rootfs(rootfs, path):
     dst = os.path.join(rootfs, path)
+    os.makedirs(os.path.basename(dst), exist_ok=True)
     if os.path.isdir(path):
         shutil.copytree(path, dst)
     elif os.path.isfile(path):
