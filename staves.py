@@ -174,7 +174,8 @@ def main(version, libc, name, rootfs_path, packaging):
             subprocess.run('locale-gen')
         os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
         shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
-    if {'virtual/package-manager', '@system', '@world'} & set(packages_to_be_installed):
+    rootfs_is_builder = {'virtual/package-manager', '@system', '@world'} & set(packages_to_be_installed)
+    if rootfs_is_builder:
         shutil.copytree(os.path.join('/usr', 'portage'), os.path.join(rootfs_path, 'usr', 'portage'))
         profile = os.readlink(os.path.join('/etc', 'portage', 'make.profile'))
         os.symlink(profile, os.path.join(rootfs_path, 'etc', 'portage', 'make.profile'))
