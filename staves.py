@@ -192,8 +192,7 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
             locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
             subprocess.run('locale-gen')
-        os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
-        shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
+        _copy_to_rootfs(rootfs_path, '/usr/lib/locale/locale-archive')
     if create_builder:
         builder_files = [
             '/usr/portage',
