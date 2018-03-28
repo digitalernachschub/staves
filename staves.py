@@ -177,6 +177,7 @@ def main(version, libc, name, rootfs_path, packaging):
     rootfs_is_builder = {'virtual/package-manager', '@system', '@world'} & set(packages_to_be_installed)
     if rootfs_is_builder:
         shutil.copytree(os.path.join('/usr', 'portage'), os.path.join(rootfs_path, 'usr', 'portage'))
+        shutil.copy(os.path.join('/etc', 'portage', 'make.conf'), os.path.join(rootfs_path, 'etc', 'portage', 'make.conf'))
         profile = os.readlink(os.path.join('/etc', 'portage', 'make.profile'))
         os.symlink(profile, os.path.join(rootfs_path, 'etc', 'portage', 'make.profile'))
     tag = '{}:{}'.format(name, version)
