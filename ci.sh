@@ -39,7 +39,7 @@ docker build --tag "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}"
 cat x86_64-musl.toml | docker run --rm --interactive \
     --mount type=volume,source=staves-x86_64-musl-cache,target=/usr/portage/packages \
     --mount type=bind,source=/run/docker.sock,target=/run/docker.sock \
-    "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" --libc "sys-libs/musl" "${version}.${musl_stage3_date}"
+    "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" --create-builder --libc "sys-libs/musl" "${version}.${musl_stage3_date}"
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-musl:${version}.${musl_stage3_date}" "staves/x86_64-musl:${version}"
   docker tag "staves/x86_64-musl:${version}.${musl_stage3_date}" "staves/x86_64-musl:${version%.*}"
@@ -52,7 +52,7 @@ docker build --tag "staves/bootstrap-x86_64-glibc:${version}.${glibc_stage3_date
 cat x86_64-glibc.toml | docker run --rm --interactive \
     --mount type=volume,source=staves-x86_64-glibc-cache,target=/usr/portage/packages \
     --mount type=bind,source=/run/docker.sock,target=/run/docker.sock \
-    "staves/bootstrap-x86_64-glibc:${version}.${glibc_stage3_date}" --libc "sys-libs/glibc" "${version}.${glibc_stage3_date}"
+    "staves/bootstrap-x86_64-glibc:${version}.${glibc_stage3_date}" --create-builder --libc "sys-libs/glibc" "${version}.${glibc_stage3_date}"
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-glibc:${version}.${glibc_stage3_date}" "staves/x86_64-glibc:${version}"
   docker tag "staves/x86_64-glibc:${version}.${glibc_stage3_date}" "staves/x86_64-glibc:${version%.*}"

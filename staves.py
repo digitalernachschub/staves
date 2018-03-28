@@ -132,7 +132,9 @@ def _fix_portage_tree_permissions():
               help='Directory where the root filesystem will be installed. Defaults to /tmp/rootfs')
 @click.option('--packaging', type=click.Choice(['none', 'docker']), default='docker',
               help='Packaging format of the resulting image')
-def main(version, libc, name, rootfs_path, packaging):
+@click.option('--create-builder', is_flag=True, default=False,
+              help='When a builder is created, Staves will copy files such as the Portage tree, make.conf and make.profile.')
+def main(version, libc, name, rootfs_path, packaging, create_builder):
     config = toml.load(click.get_text_stream('stdin'))
     if not name:
         name = config['name']
@@ -174,8 +176,7 @@ def main(version, libc, name, rootfs_path, packaging):
             subprocess.run('locale-gen')
         os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
         shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
-    rootfs_is_builder = {'virtual/package-manager', '@system', '@world'} & set(packages_to_be_installed)
-    if rootfs_is_builder:
+    if create_builder:
         shutil.copytree(os.path.join('/usr', 'portage'), os.path.join(rootfs_path, 'usr', 'portage'))
         shutil.copy(os.path.join('/etc', 'portage', 'make.conf'), os.path.join(rootfs_path, 'etc', 'portage', 'make.conf'))
         profile = os.readlink(os.path.join('/etc', 'portage', 'make.profile'))
