@@ -2,10 +2,10 @@
 
 import click
 import io
+import glob
 import os
 import shutil
 import subprocess
-import sys
 import tarfile
 
 import docker
@@ -129,17 +129,19 @@ def _fix_portage_tree_permissions():
 
 
 def _copy_to_rootfs(rootfs, path):
-    dst = os.path.join(rootfs, os.path.relpath(path, '/'))
-    os.makedirs(os.path.basename(dst), exist_ok=True)
-    if os.path.isdir(path):
-        shutil.copytree(path, dst)
-    elif os.path.isfile(path):
-        shutil.copy(path, dst)
-    elif os.path.islink(path):
-        link_target = os.readlink(path)
-        os.symlink(link_target, dst)
-    else:
-        raise StavesError('Copying {} to rootfs is not supported.'.format(path))
+    globs = glob.iglob(path)
+    for g in globs:
+        dst = os.path.join(rootfs, os.path.relpath(g, '/'))
+        os.makedirs(os.path.basename(dst), exist_ok=True)
+        if os.path.isdir(g):
+            shutil.copytree(g, dst)
+        elif os.path.isfile(g):
+            shutil.copy(g, dst)
+        elif os.path.islink(g):
+            link_target = os.readlink(g)
+            os.symlink(link_target, dst)
+        else:
+            raise StavesError('Copying {} to rootfs is not supported.'.format(path))
 
 
 @click.command(help='Installs the specified packages into to the desired location.')
