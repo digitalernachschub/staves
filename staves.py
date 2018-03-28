@@ -12,6 +12,10 @@ import docker
 import toml
 
 
+class StavesError(Exception):
+    pass
+
+
 class RootfsError(Exception):
     pass
 
