@@ -194,11 +194,15 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
         os.makedirs(os.path.join(rootfs_path, 'usr', 'lib', 'locale'), exist_ok=True)
         shutil.copy(os.path.join('/usr', 'lib', 'locale', 'locale-archive'), os.path.join(rootfs_path, 'usr', 'lib', 'locale'))
     if create_builder:
-        _copy_to_rootfs(rootfs_path, '/usr/portage')
-        _copy_to_rootfs(rootfs_path, '/etc/portage/make.conf')
-        _copy_to_rootfs(rootfs_path, '/etc/portage/make.profile')
-        _copy_to_rootfs(rootfs_path, '/etc/portage/repos.conf')
-        _copy_to_rootfs(rootfs_path, '/var/db/repos')
+        builder_files = [
+            '/usr/portage',
+            '/etc/portage/make.conf',
+            '/etc/portage/make.profile',
+            '/etc/portage/repos.conf',
+            '/var/db/repos'
+        ]
+        for f in builder_files:
+            _copy_to_rootfs(rootfs_path, f)
     tag = '{}:{}'.format(name, version)
     if packaging == 'docker':
         _docker_image_from_rootfs(rootfs_path, tag, config['command'])
