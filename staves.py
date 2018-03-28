@@ -201,7 +201,7 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
             '/etc/portage/make.conf',
             '/etc/portage/make.profile',
             '/etc/portage/repos.conf',
-            '/var/db/repos'
+            '/var/db/repos/*'
         ]
         for f in builder_files:
             _copy_to_rootfs(rootfs_path, f)
