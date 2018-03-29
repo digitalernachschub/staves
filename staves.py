@@ -130,16 +130,16 @@ def _fix_portage_tree_permissions():
 
 def _copy_to_rootfs(rootfs, path):
     globs = glob.iglob(path)
-    for g in globs:
-        dst = os.path.join(rootfs, os.path.relpath(g, '/'))
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        if os.path.isdir(g):
-            shutil.copytree(g, dst)
-        elif os.path.isfile(g):
-            shutil.copy(g, dst)
-        elif os.path.islink(g):
-            link_target = os.readlink(g)
-            os.symlink(link_target, dst)
+    for host_path in globs:
+        rootfs_path = os.path.join(rootfs, os.path.relpath(host_path, '/'))
+        os.makedirs(os.path.dirname(rootfs_path), exist_ok=True)
+        if os.path.islink(host_path): # Needs to be checked first, because other methods follow links
+            link_target = os.readlink(host_path)
+            os.symlink(link_target, rootfs_path)
+        elif os.path.isdir(host_path):
+            shutil.copytree(host_path, rootfs_path)
+        elif os.path.isfile(host_path):
+            shutil.copy(host_path, rootfs_path)
         else:
             raise StavesError('Copying {} to rootfs is not supported.'.format(path))
 
