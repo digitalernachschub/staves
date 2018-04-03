@@ -187,7 +187,8 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
             os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
     if os.path.exists(os.path.join('/usr', 'portage')):
         _fix_portage_tree_permissions()
-    _update_builder()
+    if create_builder:
+        _update_builder()
     _create_rootfs(rootfs_path, *packages_to_be_installed)
     _copy_stdlib(rootfs_path)
     if 'glibc' in libc:
