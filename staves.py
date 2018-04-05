@@ -202,6 +202,10 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
             '/etc/portage/make.conf',
             '/etc/portage/make.profile',
             '/etc/portage/repos.conf',
+            '/etc/portage/env',
+            '/etc/portage/package.env',
+            '/etc/portage/package.use',
+            '/etc/portage/package.accept_keywords',
             '/var/db/repos/*'
         ]
         for f in builder_files:
