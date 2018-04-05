@@ -3,6 +3,7 @@
 import click
 import io
 import glob
+import multiprocessing
 import os
 import shutil
 import subprocess
@@ -25,9 +26,13 @@ def _create_rootfs(rootfs_path, *packages):
     click.echo(', '.join(packages))
 
     click.echo('Installing build-time dependencies to builder')
+    cpu_count = multiprocessing.cpu_count()
+    emerge_env = {
+        'MAKEOPTS': '-j{} -l{}'.format(cpu_count + 1, cpu_count),
+    }
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps'
                             '--usepkg', '--with-bdeps=y', *packages]
-    emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
+    emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_bdeps_call.returncode != 0:
         click.echo(emerge_bdeps_call.stderr, err=True)
         raise RootfsError('Unable to install build-time dependencies.')
@@ -35,7 +40,7 @@ def _create_rootfs(rootfs_path, *packages):
     click.echo('Installing runtime dependencies to rootfs')
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
                             '--usepkg', *packages]
-    emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE)
+    emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_rdeps_call.returncode != 0:
         click.echo(emerge_rdeps_call.stderr, err=True)
         raise RootfsError('Unable to install runtime dependencies.')
