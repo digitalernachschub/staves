@@ -3,7 +3,6 @@ packages = ['dev-util/staves', '@system', 'virtual/pkgconfig']
 command = ['python3', '-m', 'staves']
 
 [env]
-MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)"
 EMERGE_DEFAULT_OPTS="--nospinner --quiet --autounmask-continue=y"
 PORTAGE_ELOG_SYSTEM="echo:warn,error"
 FEATURES="-news nodoc noinfo noman buildpkg binpkg-multi-instance -binpkg-logs"
