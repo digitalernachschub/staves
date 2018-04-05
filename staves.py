@@ -25,7 +25,7 @@ def _create_rootfs(rootfs_path, *packages):
     click.echo(', '.join(packages))
 
     click.echo('Installing build-time dependencies to builder')
-    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--onlydeps-with-rdeps=n',
+    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps'
                             '--usepkg', '--with-bdeps=y', *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE)
     if emerge_bdeps_call.returncode != 0:
