@@ -4,13 +4,14 @@ FROM gentoo/portage:${PORTAGE_SNAPSHOT} as portage
 FROM gentoo/stage3-amd64-hardened-nomultilib:${STAGE3}
 ARG PORTAGE_SNAPSHOT=latest
 COPY --from=portage --chown=portage:portage /usr/portage /usr/portage
-RUN mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
-  MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)" USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
+RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
+  mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
+  USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
   mkdir /etc/portage/repos.conf && \
   eselect repository list -i && \
   eselect repository add digitalernachschub git git://github.com/digitalernachschub/gentoo-overlay.git && \
   emaint sync --repo digitalernachschub && \
-  MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)" USE="-bindist" emerge --oneshot --verbose --quiet=y dev-libs/openssl net-misc/openssh && \
-  MAKEOPTS="-j$(($(nproc)+1)) -l$(nproc)" emerge --verbose --autounmask-continue=y --quiet=y dev-util/staves
+  USE="-bindist" emerge --oneshot --verbose --quiet=y dev-libs/openssl net-misc/openssh && \
+  emerge --verbose --autounmask-continue=y --quiet=y dev-util/staves
 ENV LANG en_US.UTF-8
 ENTRYPOINT ["python", "-m", "staves"]
