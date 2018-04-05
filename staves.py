@@ -77,19 +77,19 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
     if env:
         package_config_path = os.path.join('/etc', 'portage', 'package.env', *package.split('/'))
         os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
-        with open(package_config_path, 'a') as f:
+        with open(package_config_path, 'w') as f:
             package_environments = ' '.join(env)
             f.write('{} {}{}'.format(package, package_environments, os.linesep))
     if keywords:
         package_config_path = os.path.join('/etc', 'portage', 'package.accept_keywords', *package.split('/'))
         os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
-        with open(package_config_path, 'a') as f:
+        with open(package_config_path, 'w') as f:
             package_keywords = ' '.join(keywords)
             f.write('{} {}{}'.format(package, package_keywords, os.linesep))
     if use:
         package_config_path = os.path.join('/etc', 'portage', 'package.use', *package.split('/'))
         os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
-        with open(package_config_path, 'a') as f:
+        with open(package_config_path, 'w') as f:
             package_use_flags = ' '.join(use)
             f.write('{} {}{}'.format(package, package_use_flags, os.linesep))
 
