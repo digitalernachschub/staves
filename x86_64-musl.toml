@@ -10,7 +10,7 @@ FEATURES="-news nodoc noinfo noman buildpkg binpkg-multi-instance -binpkg-logs"
 [env.no-sandbox]
 FEATURES="-sandbox -usersandbox"
 
-[env.nocache]
+[env.no-cache]
 FEATURES="-buildpkg"
 
 ['sys-libs/musl']
@@ -30,7 +30,7 @@ use = ['-gpg', '-perl', '-python']
 use = ['git']
 
 ['=dev-util/staves-9999']
-env = ['nocache']
+env = ['no-cache']
 
 [[repositories]]
 name = 'digitalernachschub'
