@@ -120,7 +120,7 @@ def _add_repository(name: str, sync_type: str=None, uri: str=None):
     subprocess.run(['emaint', 'sync', '--repo', name], stderr=subprocess.PIPE)
 
 
-def _update_builder():
+def _update_builder(max_concurrent_jobs: int=1, max_cpu_load: int=1):
     # Register staves in /var/lib/portage/world
     register_staves = subprocess.run(['emerge', '--noreplace', 'dev-util/staves'], stderr=subprocess.PIPE)
     if register_staves.returncode != 0:
@@ -128,10 +128,10 @@ def _update_builder():
         raise RootfsError('Unable to register Staves as an installed package')
 
     emerge_env = {
-        'MAKEOPTS': '-j{} -l{}'.format(_max_concurrent_jobs(), _max_cpu_load()),
+        'MAKEOPTS': '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load),
     }
-    update_world = subprocess.run(['emerge', '--verbose', '--deep', '--usepkg', '--with-bdeps=y', '--jobs', str(_max_concurrent_jobs()),
-                                   '--load-average', str(_max_cpu_load()), '@world'], stderr=subprocess.PIPE, env=emerge_env)
+    update_world = subprocess.run(['emerge', '--verbose', '--deep', '--usepkg', '--with-bdeps=y', '--jobs', str(max_concurrent_jobs),
+                                   '--load-average', str(max_cpu_load), '@world'], stderr=subprocess.PIPE, env=emerge_env)
     if update_world.returncode != 0:
         click.echo(update_world.stderr, err=True)
         raise RootfsError('Unable to update builder environment')
@@ -205,7 +205,7 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
     if os.path.exists(os.path.join('/usr', 'portage')):
         _fix_portage_tree_permissions()
     if create_builder:
-        _update_builder()
+        _update_builder(max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
     _create_rootfs(rootfs_path, *packages_to_be_installed, max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
     _copy_stdlib(rootfs_path)
     if 'glibc' in libc:
