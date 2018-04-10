@@ -27,12 +27,11 @@ def _create_rootfs(rootfs_path, *packages):
 
     click.echo('Installing build-time dependencies to builder')
     max_load = multiprocessing.cpu_count()
-    max_concurrent_jobs = max_load + 1
     emerge_env = {
-        'MAKEOPTS': '-j{} -l{}'.format(max_concurrent_jobs, max_load),
+        'MAKEOPTS': '-j{} -l{}'.format(_max_concurrent_jobs(), _max_cpu_load()),
     }
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--usepkg', '--with-bdeps=y',
-                            '--jobs={}'.format(max_concurrent_jobs), '--load-average={}'.format(max_load), *packages]
+                            '--jobs={}'.format(_max_concurrent_jobs()), '--load-average={}'.format(_max_cpu_load()), *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_bdeps_call.returncode != 0:
         click.echo(emerge_bdeps_call.stderr, err=True)
@@ -40,11 +39,19 @@ def _create_rootfs(rootfs_path, *packages):
 
     click.echo('Installing runtime dependencies to rootfs')
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
-                            '--usepkg', '--jobs={}'.format(max_concurrent_jobs), '--load-average={}'.format(max_load), *packages]
+                            '--usepkg', '--jobs={}'.format(_max_concurrent_jobs()), '--load-average={}'.format(_max_cpu_load()), *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_rdeps_call.returncode != 0:
         click.echo(emerge_rdeps_call.stderr, err=True)
         raise RootfsError('Unable to install runtime dependencies.')
+
+
+def _max_cpu_load() -> int:
+    return multiprocessing.cpu_count()
+
+
+def _max_concurrent_jobs() -> int:
+    return _max_cpu_load() + 1
 
 
 def _create_dockerfile(*cmd: str) -> str:
