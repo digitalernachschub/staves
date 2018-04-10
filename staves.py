@@ -28,7 +28,9 @@ def _create_rootfs(rootfs_path, *packages, max_concurrent_jobs: int=1, max_cpu_l
     click.echo('Installing build-time dependencies to builder')
     emerge_env = os.environ
     emerge_env['MAKEOPTS'] = '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load)
-    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--usepkg', '--with-bdeps=y',
+    # --emptytree is needed, because build dependencies of runtime dependencies are ignored by --root-deps=rdeps
+    # (even when --with-bdeps=y is passed). By adding --emptytree, we get a binary package that can be installed to rootfs
+    emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--usepkg', '--with-bdeps=y', '--emptytree',
                             '--jobs', str(max_concurrent_jobs), '--load-average', str(max_cpu_load), *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_bdeps_call.returncode != 0:
