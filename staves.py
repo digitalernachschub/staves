@@ -131,7 +131,7 @@ def _update_builder():
         'MAKEOPTS': '-j{} -l{}'.format(_max_concurrent_jobs(), _max_cpu_load()),
     }
     update_world = subprocess.run(['emerge', '--verbose', '--deep', '--usepkg', '--with-bdeps=y', '--jobs', str(_max_concurrent_jobs()),
-                                   '--load-average', str(_max_cpu_load()), '@world'], stderr=subprocess.PIPE, env=emerge_env, shell=True)
+                                   '--load-average', str(_max_cpu_load()), '@world'], stderr=subprocess.PIPE, env=emerge_env)
     if update_world.returncode != 0:
         click.echo(update_world.stderr, err=True)
         raise RootfsError('Unable to update builder environment')
