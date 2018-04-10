@@ -21,16 +21,16 @@ class RootfsError(Exception):
     pass
 
 
-def _create_rootfs(rootfs_path, *packages):
+def _create_rootfs(rootfs_path, *packages, max_concurrent_jobs: int=1, max_cpu_load: int=1):
     click.echo('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
     click.echo(', '.join(packages))
 
     click.echo('Installing build-time dependencies to builder')
     emerge_env = {
-        'MAKEOPTS': '-j{} -l{}'.format(_max_concurrent_jobs(), _max_cpu_load()),
+        'MAKEOPTS': '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load),
     }
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--usepkg', '--with-bdeps=y',
-                            '--jobs', str(_max_concurrent_jobs()), '--load-average', str(_max_cpu_load()), *packages]
+                            '--jobs', str(max_concurrent_jobs), '--load-average', str(max_cpu_load), *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_bdeps_call.returncode != 0:
         click.echo(emerge_bdeps_call.stderr, err=True)
@@ -38,7 +38,7 @@ def _create_rootfs(rootfs_path, *packages):
 
     click.echo('Installing runtime dependencies to rootfs')
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
-                            '--usepkg', '--jobs', str(_max_concurrent_jobs()), '--load-average', str(_max_cpu_load()), *packages]
+                            '--usepkg', '--jobs', str(max_concurrent_jobs), '--load-average', str(max_cpu_load), *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_rdeps_call.returncode != 0:
         click.echo(emerge_rdeps_call.stderr, err=True)
@@ -206,7 +206,7 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
         _fix_portage_tree_permissions()
     if create_builder:
         _update_builder()
-    _create_rootfs(rootfs_path, *packages_to_be_installed)
+    _create_rootfs(rootfs_path, *packages_to_be_installed, max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
     _copy_stdlib(rootfs_path)
     if 'glibc' in libc:
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
