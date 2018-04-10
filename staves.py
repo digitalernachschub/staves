@@ -26,9 +26,8 @@ def _create_rootfs(rootfs_path, *packages, max_concurrent_jobs: int=1, max_cpu_l
     click.echo(', '.join(packages))
 
     click.echo('Installing build-time dependencies to builder')
-    emerge_env = {
-        'MAKEOPTS': '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load),
-    }
+    emerge_env = os.environ
+    emerge_env['MAKEOPTS'] = '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load)
     emerge_bdeps_command = ['emerge', '--verbose', '--onlydeps', '--usepkg', '--with-bdeps=y',
                             '--jobs', str(max_concurrent_jobs), '--load-average', str(max_cpu_load), *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE, env=emerge_env)
@@ -127,9 +126,8 @@ def _update_builder(max_concurrent_jobs: int=1, max_cpu_load: int=1):
         click.echo(register_staves.stderr, err=True)
         raise RootfsError('Unable to register Staves as an installed package')
 
-    emerge_env = {
-        'MAKEOPTS': '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load),
-    }
+    emerge_env = os.environ
+    emerge_env['MAKEOPTS'] = '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load)
     update_world = subprocess.run(['emerge', '--verbose', '--deep', '--usepkg', '--with-bdeps=y', '--jobs', str(max_concurrent_jobs),
                                    '--load-average', str(max_cpu_load), '@world'], stderr=subprocess.PIPE, env=emerge_env)
     if update_world.returncode != 0:
