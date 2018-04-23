@@ -107,11 +107,11 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
             f.write('{} {}{}'.format(package, package_use_flags, os.linesep))
 
 
-def _copy_stdlib(rootfs_path: str):
+def _copy_stdlib(rootfs_path: str, copy_libstdcpp: bool):
     for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
         if 'libgcc_s.so.1' in files:
             shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
-        if 'libstdc++.so.6' in files:
+        if copy_libstdcpp and 'libstdc++.so.6' in files:
             shutil.copy(os.path.join(directory_path, 'libstdc++.so.6'), os.path.join(rootfs_path, 'usr', 'lib'))
 
 
@@ -166,6 +166,7 @@ def _copy_to_rootfs(rootfs, path):
 @click.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
+@click.option('--stdlib', is_flag=True, help='Copy libstdc++ into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
 @click.option('--rootfs_path', default=os.path.join('/tmp', 'rootfs'),
               help='Directory where the root filesystem will be installed. Defaults to /tmp/rootfs')
@@ -173,7 +174,7 @@ def _copy_to_rootfs(rootfs, path):
               help='Packaging format of the resulting image')
 @click.option('--create-builder', is_flag=True, default=False,
               help='When a builder is created, Staves will copy files such as the Portage tree, make.conf and make.profile.')
-def main(version, libc, name, rootfs_path, packaging, create_builder):
+def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib):
     config = toml.load(click.get_text_stream('stdin'))
     if not name:
         name = config['name']
@@ -209,7 +210,7 @@ def main(version, libc, name, rootfs_path, packaging, create_builder):
     if create_builder:
         _update_builder(max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
     _create_rootfs(rootfs_path, *packages_to_be_installed, max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
-    _copy_stdlib(rootfs_path)
+    _copy_stdlib(rootfs_path, copy_libstdcpp=stdlib)
     if 'glibc' in libc:
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
             locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
