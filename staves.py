@@ -111,6 +111,8 @@ def _copy_stdlib(rootfs_path: str):
     for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
         if 'libgcc_s.so.1' in files:
             shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
+        if 'libstdc++.so.6' in files:
+            shutil.copy(os.path.join(directory_path, 'libstdc++.so.6'), os.path.join(rootfs_path, 'usr', 'lib'))
 
 
 def _add_repository(name: str, sync_type: str=None, uri: str=None):
