@@ -17,6 +17,9 @@ FEATURES="-buildpkg"
 # Sandbox uses ptrace which is not permitted by default in Docker
 env = ['no-sandbox']
 
+['sys-apps/sanbox']
+env = ['no-sandbox']
+
 ['net-misc/openssh']
 use = ['-bindist']
 
