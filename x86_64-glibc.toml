@@ -20,6 +20,9 @@ env = ['no-sandbox']
 ['sys-apps/sanbox']
 env = ['no-sandbox']
 
+['sys-libs/ncurses']
+env = ['no-sandbox']
+
 ['net-misc/openssh']
 use = ['-bindist']
 
