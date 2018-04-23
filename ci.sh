@@ -32,7 +32,7 @@ setup_test_env
 run_unit_tests
 
 portage_snapshot="20180422"
-musl_stage3_date="20180304"
+musl_stage3_date="20180404"
 create_stage3_image ${musl_stage3_date}
 docker build --tag "staves/bootstrap-x86_64-musl:${version}.${musl_stage3_date}" --no-cache \
     -f Dockerfile.x86_64-musl --build-arg STAGE3=${musl_stage3_date} --build-arg PORTAGE_SNAPSHOT=${portage_snapshot} .
