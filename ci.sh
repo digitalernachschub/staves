@@ -46,7 +46,7 @@ if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-musl:${version}.${musl_stage3_date}" "staves/x86_64-musl:${version%%.*}"
 fi
 
-glibc_stage3_date="20180319"
+glibc_stage3_date="20180422"
 docker build --tag "staves/bootstrap-x86_64-glibc:${version}.${glibc_stage3_date}" --no-cache \
     -f Dockerfile.x86_64-glibc --build-arg STAGE3=${glibc_stage3_date} --build-arg PORTAGE_SNAPSHOT=${portage_snapshot} .
 cat x86_64-glibc.toml | docker run --rm --interactive \
