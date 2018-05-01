@@ -5,7 +5,7 @@ command = ['python3', '-m', 'staves']
 [env]
 EMERGE_DEFAULT_OPTS="--nospinner --quiet --autounmask-continue=y"
 PORTAGE_ELOG_SYSTEM="echo:warn,error"
-FEATURES="-news nodoc noinfo noman buildpkg binpkg-multi-instance -binpkg-logs"
+FEATURES="-news nodoc noinfo noman buildpkg binpkg-multi-instance -binpkg-logs -userfetch -userpriv"
 
 [env.no-sandbox]
 FEATURES="-sandbox -usersandbox"
