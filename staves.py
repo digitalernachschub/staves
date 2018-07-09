@@ -108,11 +108,23 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 
 
 def _copy_stdlib(rootfs_path: str, copy_libstdcpp: bool):
-    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc')):
-        if 'libgcc_s.so.1' in files:
-            shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
-        if copy_libstdcpp and 'libstdc++.so.6' in files:
-            shutil.copy(os.path.join(directory_path, 'libstdc++.so.6'), os.path.join(rootfs_path, 'usr', 'lib'))
+    libgcc = 'libgcc_s.so.1'
+    libstdcpp = 'libstdc++.so.6'
+    search_path = os.path.join('/usr', 'lib', 'gcc')
+    libgcc_path = None
+    libstdcpp_path = None
+    for directory_path, subdirs, files in os.walk(search_path):
+        if libgcc in files:
+            libgcc_path = os.path.join(directory_path, libgcc)
+        if libstdcpp in files:
+            libstdcpp_path = os.path.join(directory_path, libstdcpp)
+    if libgcc_path is None:
+        raise StavesError('Unable to find ' + libgcc + ' in ' + search_path)
+    shutil.copy(libgcc_path, os.path.join(rootfs_path, 'usr', 'lib'))
+    if copy_libstdcpp:
+        if libstdcpp_path is None:
+            raise StavesError('Unable to find ' + libstdcpp + ' in ' + search_path)
+        shutil.copy(libstdcpp_path, os.path.join(rootfs_path, 'usr', 'lib'))
 
 
 def _add_repository(name: str, sync_type: str=None, uri: str=None):
