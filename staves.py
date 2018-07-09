@@ -108,7 +108,7 @@ def _write_package_config(package: str, env: list=None, keywords: list=None, use
 
 
 def _copy_stdlib(rootfs_path: str, copy_libstdcpp: bool):
-    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc', 'x86_64-pc-linux-gnu')):
+    for directory_path, subdirs, files in os.walk(os.path.join('/usr', 'lib', 'gcc')):
         if 'libgcc_s.so.1' in files:
             shutil.copy(os.path.join(directory_path, 'libgcc_s.so.1'), os.path.join(rootfs_path, 'usr', 'lib'))
         if copy_libstdcpp and 'libstdc++.so.6' in files:
