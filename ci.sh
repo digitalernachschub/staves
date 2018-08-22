@@ -31,8 +31,8 @@ version=${version#${project_name}-}
 setup_test_env
 run_unit_tests
 
-portage_snapshot="20180705"
-musl_stage3_date="20180624"
+portage_snapshot="20180821"
+musl_stage3_date="20180804"
 create_stage3_image ${musl_stage3_date}
 full_version="${version}.${musl_stage3_date}"
 docker build --tag "staves/bootstrap-x86_64-musl:${full_version}" --no-cache \
@@ -47,7 +47,7 @@ if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version%%.*}"
 fi
 
-glibc_stage3_date="20180705"
+glibc_stage3_date="20180821"
 full_version="${version}.${glibc_stage3_date}"
 docker build --tag "staves/bootstrap-x86_64-glibc:${full_version}" --no-cache \
     -f Dockerfile.x86_64-glibc --build-arg STAGE3=${glibc_stage3_date} --build-arg PORTAGE_SNAPSHOT=${portage_snapshot} .
