@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 import tarfile
+from typing import Mapping
 
 import docker
 import toml
@@ -54,18 +55,23 @@ def _max_concurrent_jobs() -> int:
     return _max_cpu_load() + 1
 
 
-def _create_dockerfile(*cmd: str) -> str:
+def _create_dockerfile(annotations: Mapping[str, str], *cmd: str) -> str:
+    label_string = ' '.join([f'"{key}"="{value}"' for key, value in annotations.items()])
     command_string = ', '.join(['\"{}\"'.format(c) for c in cmd])
-    return """\
+    dockerfile = ''
+    if label_string:
+        dockerfile += 'LABEL {label_string}' + os.linesep
+    dockerfile += f"""\
     FROM scratch
     COPY rootfs /
-    ENTRYPOINT [{}]
-    """.format(command_string)
+    ENTRYPOINT [{command_string}]
+    """
+    return dockerfile
 
 
-def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list):
+def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list, annotations: Mapping[str, str]):
     client = docker.from_env()
-    dockerfile = _create_dockerfile(*command).encode('utf-8')
+    dockerfile = _create_dockerfile(annotations, *command).encode('utf-8')
     context = io.BytesIO()
     with tarfile.open(fileobj=context, mode='w') as tar:
         dockerfile_info = tarfile.TarInfo(name="Dockerfile")
@@ -244,7 +250,7 @@ def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib):
             _copy_to_rootfs(rootfs_path, f)
     tag = '{}:{}'.format(name, version)
     if packaging == 'docker':
-        _docker_image_from_rootfs(rootfs_path, tag, config['command'])
+        _docker_image_from_rootfs(rootfs_path, tag, config['command'], config.get('annotations', {}))
 
 
 if __name__ == '__main__':
