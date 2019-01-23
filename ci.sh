@@ -37,10 +37,9 @@ create_stage3_image ${musl_stage3_date}
 full_version="${version}.${musl_stage3_date}"
 docker build --tag "staves/bootstrap-x86_64-musl:${full_version}" --no-cache \
     -f Dockerfile.x86_64-musl --build-arg STAGE3=${musl_stage3_date} --build-arg PORTAGE_SNAPSHOT=${portage_snapshot} .
-cat x86_64-musl.toml | docker run --rm --interactive \
-    --mount type=volume,source=staves-x86_64-musl-cache,target=/usr/portage/packages \
-    --mount type=bind,source=/run/docker.sock,target=/run/docker.sock \
-    "staves/bootstrap-x86_64-musl:${full_version}" --create-builder --libc "sys-libs/musl" "${full_version}"
+python3 -m staves --runtime docker --runtime-docker-build-cache staves-x86_64-musl-cache \
+    --runtime-docker-builder "staves/bootstrap-x86_64-musl:${full_version}" --create-builder --libc "sys-libs/musl" \
+    "${full_version}" <x86_64-musl.toml
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version}"
   docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version%.*}"
@@ -51,10 +50,10 @@ glibc_stage3_date="20190104"
 full_version="${version}.${glibc_stage3_date}"
 docker build --tag "staves/bootstrap-x86_64-glibc:${full_version}" --no-cache \
     -f Dockerfile.x86_64-glibc --build-arg STAGE3=${glibc_stage3_date} --build-arg PORTAGE_SNAPSHOT=${portage_snapshot} .
-cat x86_64-glibc.toml | docker run --rm --interactive \
-    --mount type=volume,source=staves-x86_64-glibc-cache,target=/usr/portage/packages \
-    --mount type=bind,source=/run/docker.sock,target=/run/docker.sock \
-    "staves/bootstrap-x86_64-glibc:${full_version}" --create-builder --libc "sys-libs/glibc" "${full_version}"
+python3 -m staves --runtime docker --runtime-docker-build-cache staves-x86_64-glibc-cache  \
+    --runtime-docker-builder "staves/bootstrap-x86_64-glibc:${full_version}" --create-builder --libc "sys-libs/glibc" \
+    "${full_version}" <x86_64-glibc.toml
+
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-glibc:${full_version}" "staves/x86_64-glibc:${version}"
   docker tag "staves/x86_64-glibc:${full_version}" "staves/x86_64-glibc:${version%.*}"
