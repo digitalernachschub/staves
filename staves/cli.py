@@ -192,8 +192,22 @@ def _copy_to_rootfs(rootfs, path):
               help='Packaging format of the resulting image')
 @click.option('--create-builder', is_flag=True, default=False,
               help='When a builder is created, Staves will copy files such as the Portage tree, make.conf and make.profile.')
-def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib):
+@click.option('--runtime', type=click.Choice(['none', 'docker']), default='none',
+              help='Which environment staves will be executed in')
+@click.option('--runtime-docker-builder', help='The name of the builder image')
+@click.option('--runtime-docker-build-cache', help='The name of the cache volume')
+def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, runtime, runtime_docker_builder, runtime_docker_build_cache):
     config = toml.load(click.get_text_stream('stdin'))
+    if runtime == 'docker':
+        import staves.runtimes.docker as run_docker
+        args = ['--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
+        if stdlib:
+            args += ['--stdlib']
+        if create_builder:
+            args += ['--create-builder']
+        if name:
+            args += ['--name', name]
+        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config)
     if not name:
         name = config['name']
     if 'env' in config:
