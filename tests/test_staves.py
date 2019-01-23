@@ -2,7 +2,7 @@ import os
 
 import toml
 from click.testing import CliRunner
-from staves import main
+from staves.cli import main
 
 
 def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
@@ -14,9 +14,9 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
         packages=['virtual/libintl'],
         command=''
     ))
-    mocker.patch('staves._fix_portage_tree_permissions')
-    mocker.patch('staves._update_builder')
-    mocker.patch('staves._create_rootfs')
+    mocker.patch('staves.cli._fix_portage_tree_permissions')
+    mocker.patch('staves.cli._update_builder')
+    mocker.patch('staves.cli._create_rootfs')
     cli = CliRunner()
 
     cli.invoke(main, input=config, args=['--rootfs_path', rootfs_path, '--packaging', 'none', 'latest'])
@@ -35,9 +35,9 @@ def test_copies_libgcc(tmpdir, monkeypatch, mocker):
         packages=['virtual/libintl'],
         command=''
     ))
-    mocker.patch('staves._fix_portage_tree_permissions')
-    mocker.patch('staves._update_builder')
-    mocker.patch('staves._create_rootfs')
+    mocker.patch('staves.cli._fix_portage_tree_permissions')
+    mocker.patch('staves.cli._update_builder')
+    mocker.patch('staves.cli._create_rootfs')
     cli = CliRunner()
 
     cli.invoke(main, input=config, args=['--rootfs_path', rootfs_path, '--packaging', 'none', 'latest'])
