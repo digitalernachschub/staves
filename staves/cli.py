@@ -7,6 +7,7 @@ import multiprocessing
 import os
 import shutil
 import subprocess
+import sys
 import tarfile
 from typing import Mapping
 
@@ -200,7 +201,7 @@ def _copy_to_rootfs(rootfs, path):
 @click.option('--runtime-docker-netrc', is_flag=True, default=False, help='Use this user\'s netrc configuration in the builder')
 def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, runtime, runtime_docker_builder,
          runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
-    config = toml.load(click.get_text_stream('stdin'))
+    config_file = click.get_text_stream('stdin')
     if runtime == 'docker':
         import staves.runtimes.docker as run_docker
         args = ['--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
@@ -210,8 +211,11 @@ def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, ru
             args += ['--create-builder']
         if name:
             args += ['--name', name]
-        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config, ssh=runtime_docker_ssh,
+        args.append(version)
+        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config_file, ssh=runtime_docker_ssh,
                        netrc=runtime_docker_netrc)
+        sys.exit(0)
+    config = toml.load(config_file)
     if not name:
         name = config['name']
     if 'env' in config:
