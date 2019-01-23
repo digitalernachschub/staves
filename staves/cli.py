@@ -197,8 +197,9 @@ def _copy_to_rootfs(rootfs, path):
 @click.option('--runtime-docker-builder', help='The name of the builder image')
 @click.option('--runtime-docker-build-cache', help='The name of the cache volume')
 @click.option('--runtime-docker-ssh', is_flag=True, default=False, help='Use this user\'s ssh identity for the builder')
+@click.option('--runtime-docker-netrc', is_flag=True, default=False, help='Use this user\'s netrc configuration in the builder')
 def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, runtime, runtime_docker_builder,
-         runtime_docker_build_cache, runtime_docker_ssh):
+         runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
     config = toml.load(click.get_text_stream('stdin'))
     if runtime == 'docker':
         import staves.runtimes.docker as run_docker
@@ -209,7 +210,8 @@ def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, ru
             args += ['--create-builder']
         if name:
             args += ['--name', name]
-        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config, ssh=runtime_docker_ssh)
+        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config, ssh=runtime_docker_ssh,
+                       netrc=runtime_docker_netrc)
     if not name:
         name = config['name']
     if 'env' in config:
