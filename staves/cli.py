@@ -8,9 +8,6 @@ from typing import Mapping
 
 import click
 import docker
-import toml
-
-from staves.builders.gentoo import build
 
 
 def _create_dockerfile(annotations: Mapping[str, str], *cmd: str) -> str:
@@ -72,17 +69,9 @@ def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, ru
         args.append(version)
         run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config_file, ssh=runtime_docker_ssh,
                        netrc=runtime_docker_netrc)
-        sys.exit(0)
-    config = toml.load(config_file)
-    if not name:
-        name = config['name']
-    env = config.pop('env')
-    repositories = config.pop('repositories')
-    locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
-    package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
-    packages_to_be_installed = [*config.get('packages', [])]
-    build(name, locale, package_configs, packages_to_be_installed, libc, rootfs_path, packaging, version, create_builder,
-          stdlib, annotations=config.get('annotations', {}), env=env, repositories=repositories, command=config['command'])
+    else:
+        from staves.runtimes.core import run
+        run(config_file, libc, rootfs_path, packaging, version, create_builder, stdlib, name=name)
 
 
 if __name__ == '__main__':
