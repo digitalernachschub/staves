@@ -5,6 +5,9 @@ import os
 import shutil
 import subprocess
 
+from typing import Mapping, MutableSequence, Optional, Sequence
+
+from staves.cli import _docker_image_from_rootfs
 
 class StavesError(Exception):
     pass
@@ -144,3 +147,59 @@ def _copy_to_rootfs(rootfs, path):
             shutil.copy(host_path, rootfs_path)
         else:
             raise StavesError('Copying {} to rootfs is not supported.'.format(path))
+
+
+def build(name: str, locale: Mapping[str, str], package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
+          libc: str, root_path: str, packaging: str, version: str, create_builder: bool, stdlib: bool,
+          annotations: Mapping, env: Optional[Mapping]=None, repositories: Optional[Mapping]=None, command: Sequence=[]):
+    if env:
+        make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
+        _write_env(make_conf_vars)
+        specialized_envs = {k: v for k, v in env.items() if k not in make_conf_vars}
+        for env_name, env in specialized_envs.items():
+            _write_env(name=env_name, env_vars=env)
+    if repositories:
+        os.makedirs('/etc/portage/repos.conf', exist_ok=True)
+        subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
+        for repository in repositories:
+            _add_repository(repository['name'], sync_type=repository.get('type'), uri=repository.get('uri'))
+    for package, package_config in package_configs.items():
+        _write_package_config(package, **package_config)
+    if libc:
+        packages.append(libc)
+    if 'musl' not in libc:
+        # This value should depend on the selected profile, but there is currently no musl profile with
+        # links to lib directories.
+        for prefix in ['', 'usr', 'usr/local']:
+            lib_prefix = os.path.join(root_path, prefix)
+            lib_path = os.path.join(lib_prefix, 'lib64')
+            os.makedirs(lib_path, exist_ok=True)
+            os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
+    if os.path.exists(os.path.join('/usr', 'portage')):
+        _fix_portage_tree_permissions()
+    if create_builder:
+        _update_builder(max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
+    _create_rootfs(root_path, *packages, max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
+    _copy_stdlib(root_path, copy_libstdcpp=stdlib)
+    if 'glibc' in libc:
+        with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
+            locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
+            subprocess.run('locale-gen')
+        _copy_to_rootfs(root_path, '/usr/lib/locale/locale-archive')
+    if create_builder:
+        builder_files = [
+            '/usr/portage',
+            '/etc/portage/make.conf',
+            '/etc/portage/make.profile',
+            '/etc/portage/repos.conf',
+            '/etc/portage/env',
+            '/etc/portage/package.env',
+            '/etc/portage/package.use',
+            '/etc/portage/package.accept_keywords',
+            '/var/db/repos/*'
+        ]
+        for f in builder_files:
+            _copy_to_rootfs(root_path, f)
+    tag = '{}:{}'.format(name, version)
+    if packaging == 'docker':
+        _docker_image_from_rootfs(root_path, tag, command, annotations)

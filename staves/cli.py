@@ -2,7 +2,6 @@
 
 import io
 import os
-import subprocess
 import sys
 import tarfile
 from typing import Mapping
@@ -11,9 +10,7 @@ import click
 import docker
 import toml
 
-from staves.builders.gentoo import _create_rootfs, _max_cpu_load, _max_concurrent_jobs, _write_env, \
-    _write_package_config, _copy_stdlib, _add_repository, _update_builder, _fix_portage_tree_permissions, \
-    _copy_to_rootfs
+from staves.builders.gentoo import build
 
 
 def _create_dockerfile(annotations: Mapping[str, str], *cmd: str) -> str:
@@ -79,62 +76,17 @@ def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, ru
     config = toml.load(config_file)
     if not name:
         name = config['name']
-    if 'env' in config:
-        make_conf_vars = {k: v for k, v in config['env'].items() if not isinstance(v, dict)}
-        _write_env(make_conf_vars)
-        specialized_envs = {k: v for k, v in config['env'].items() if k not in make_conf_vars}
-        for env_name, env in specialized_envs.items():
-            _write_env(name=env_name, env_vars=env)
-        config.pop('env')
-    if 'repositories' in config:
-        os.makedirs('/etc/portage/repos.conf', exist_ok=True)
-        subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
-        for repository in config.pop('repositories'):
-            _add_repository(repository['name'], sync_type=repository.get('type'), uri=repository.get('uri'))
+    env = config.pop('env')
+    repositories = config.pop('repositories')
     locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
-    for package, package_config in package_configs.items():
-        _write_package_config(package, **package_config)
     packages_to_be_installed = [*config.get('packages', [])]
-    if libc:
-        packages_to_be_installed.append(libc)
-    if 'musl' not in libc:
-        # This value should depend on the selected profile, but there is currently no musl profile with
-        # links to lib directories.
-        for prefix in ['', 'usr', 'usr/local']:
-            lib_prefix = os.path.join(rootfs_path, prefix)
-            lib_path = os.path.join(lib_prefix, 'lib64')
-            os.makedirs(lib_path, exist_ok=True)
-            os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
-    if os.path.exists(os.path.join('/usr', 'portage')):
-        _fix_portage_tree_permissions()
-    if create_builder:
-        _update_builder(max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
-    _create_rootfs(rootfs_path, *packages_to_be_installed, max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
-    _copy_stdlib(rootfs_path, copy_libstdcpp=stdlib)
-    if 'glibc' in libc:
-        with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
-            locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
-            subprocess.run('locale-gen')
-        _copy_to_rootfs(rootfs_path, '/usr/lib/locale/locale-archive')
-    if create_builder:
-        builder_files = [
-            '/usr/portage',
-            '/etc/portage/make.conf',
-            '/etc/portage/make.profile',
-            '/etc/portage/repos.conf',
-            '/etc/portage/env',
-            '/etc/portage/package.env',
-            '/etc/portage/package.use',
-            '/etc/portage/package.accept_keywords',
-            '/var/db/repos/*'
-        ]
-        for f in builder_files:
-            _copy_to_rootfs(rootfs_path, f)
-    tag = '{}:{}'.format(name, version)
-    if packaging == 'docker':
-        _docker_image_from_rootfs(rootfs_path, tag, config['command'], config.get('annotations', {}))
+    build(name, locale, package_configs, packages_to_be_installed, libc, rootfs_path, packaging, version, create_builder,
+          stdlib, annotations=config.get('annotations', {}), env=env, repositories=repositories, command=config['command'])
 
 
 if __name__ == '__main__':
     main()
+
+
+
