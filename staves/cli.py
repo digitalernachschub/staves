@@ -37,7 +37,24 @@ def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list, annotat
     client.images.build(fileobj=context, tag=tag, custom_context=True)
 
 
-@click.command(help='Installs the specified packages into to the desired location.')
+@click.group(name='staves')
+def main():
+    pass
+
+
+@main.command(help='Initializes a builder for the specified runtime')
+@click.option('--staves-version')
+@click.option('--runtime', type=click.Choice(['docker']))
+@click.option('--stage3')
+@click.option('--portage-snapshot')
+@click.option('--libc', type=click.Choice(['glibc', 'musl']))
+def init(staves_version, runtime, stage3, portage_snapshot, libc):
+    if runtime == 'docker':
+        from staves.runtimes.docker import init
+        init(staves_version, stage3, portage_snapshot, libc)
+
+
+@main.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
 @click.option('--stdlib', is_flag=True, help='Copy libstdc++ into rootfs')
@@ -54,12 +71,12 @@ def _docker_image_from_rootfs(rootfs_path: str, tag: str, command: list, annotat
 @click.option('--runtime-docker-build-cache', help='The name of the cache volume')
 @click.option('--runtime-docker-ssh', is_flag=True, default=False, help='Use this user\'s ssh identity for the builder')
 @click.option('--runtime-docker-netrc', is_flag=True, default=False, help='Use this user\'s netrc configuration in the builder')
-def main(version, libc, name, rootfs_path, packaging, create_builder, stdlib, runtime, runtime_docker_builder,
+def build(version, libc, name, rootfs_path, packaging, create_builder, stdlib, runtime, runtime_docker_builder,
          runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
     config_file = click.get_text_stream('stdin')
     if runtime == 'docker':
         import staves.runtimes.docker as run_docker
-        args = ['--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
+        args = ['build', '--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
         if stdlib:
             args += ['--stdlib']
         if create_builder:

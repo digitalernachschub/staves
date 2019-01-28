@@ -3,6 +3,15 @@ from typing import IO, Sequence
 import subprocess
 
 
+def init(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
+    image_name = f'staves/bootstrap-x86_64-{libc}:{version}'
+    command = ['docker', 'build', '--tag', image_name, '--no-cache',
+               '-f', f'Dockerfile.x86_64-{libc}', '--build-arg', f'STAGE3={stage3}',
+               '--build-arg', f'PORTAGE_SNAPSHOT={portage_snapshot}', '.']
+    subprocess.run(command)
+    return image_name
+
+
 def run(builder: str, args: Sequence[str], build_cache: str, config_file: IO, ssh: bool=False, netrc: bool=False):
     command = [
         'docker', 'run', '--rm', '--interactive',
