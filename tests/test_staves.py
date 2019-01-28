@@ -19,7 +19,7 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
     mocker.patch('staves.builders.gentoo._create_rootfs')
     cli = CliRunner()
 
-    result = cli.invoke(main, input=config, args=['build', '--rootfs_path', rootfs_path, '--packaging', 'none', 'latest'])
+    result = cli.invoke(main, input=config, args=['build', '--rootfs_path', rootfs_path, '--packaging', 'none', '--config', '-', 'latest'])
 
     assert result.exit_code == 0, result.output
     assert os.path.islink(os.path.join(rootfs_path, 'lib'))
@@ -41,7 +41,7 @@ def test_copies_libgcc(tmpdir, monkeypatch, mocker):
     mocker.patch('staves.builders.gentoo._create_rootfs')
     cli = CliRunner()
 
-    result = cli.invoke(main, input=config, args=['build', '--rootfs_path', rootfs_path, '--packaging', 'none', 'latest'])
+    result = cli.invoke(main, input=config, args=['build', '--rootfs_path', rootfs_path, '--packaging', 'none', '--config', '-', 'latest'])
 
     assert result.exit_code == 0, result.output
     assert os.path.exists(os.path.join(rootfs_path, 'usr', 'lib64', 'libgcc_s.so.1'))
