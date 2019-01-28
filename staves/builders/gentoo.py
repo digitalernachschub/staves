@@ -151,7 +151,8 @@ def _copy_to_rootfs(rootfs, path):
 
 def build(name: str, locale: Mapping[str, str], package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: str, root_path: str, packaging: str, version: str, create_builder: bool, stdlib: bool,
-          annotations: Mapping, env: Optional[Mapping]=None, repositories: Optional[Mapping]=None, command: Sequence=[]):
+          annotations: Mapping, env: Optional[Mapping]=None, repositories: Optional[Mapping]=None, command: Sequence=[],
+          max_concurrent_jobs: int=None):
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
         _write_env(make_conf_vars)
@@ -177,9 +178,10 @@ def build(name: str, locale: Mapping[str, str], package_configs: Mapping[str, Ma
             os.symlink('lib64', os.path.join(lib_prefix, 'lib'))
     if os.path.exists(os.path.join('/usr', 'portage')):
         _fix_portage_tree_permissions()
+    concurrent_jobs = max_concurrent_jobs if max_concurrent_jobs else _max_concurrent_jobs()
     if create_builder:
-        _update_builder(max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
-    _create_rootfs(root_path, *packages, max_concurrent_jobs=_max_concurrent_jobs(), max_cpu_load=_max_cpu_load())
+        _update_builder(max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load())
+    _create_rootfs(root_path, *packages, max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load())
     _copy_stdlib(root_path, copy_libstdcpp=stdlib)
     if 'glibc' in libc:
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
