@@ -56,6 +56,7 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 
 @main.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
+@click.option('--config-file', type=click.File(), default=click.get_text_stream('stdin'))
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
 @click.option('--stdlib', is_flag=True, help='Copy libstdc++ into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
@@ -72,9 +73,8 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 @click.option('--runtime-docker-build-cache', help='The name of the cache volume')
 @click.option('--runtime-docker-ssh', is_flag=True, default=False, help='Use this user\'s ssh identity for the builder')
 @click.option('--runtime-docker-netrc', is_flag=True, default=False, help='Use this user\'s netrc configuration in the builder')
-def build(version, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime, runtime_docker_builder,
-         runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
-    config_file = click.get_text_stream('stdin')
+def build(version, config_file, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime,
+          runtime_docker_builder, runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
     if runtime == 'docker':
         import staves.runtimes.docker as run_docker
         args = ['build', '--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
