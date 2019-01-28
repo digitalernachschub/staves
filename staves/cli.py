@@ -65,13 +65,14 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
               help='Packaging format of the resulting image')
 @click.option('--create-builder', is_flag=True, default=False,
               help='When a builder is created, Staves will copy files such as the Portage tree, make.conf and make.profile.')
+@click.option('--jobs', type=int, help='Number of concurrent jobs executed by the builder')
 @click.option('--runtime', type=click.Choice(['none', 'docker']), default='none',
               help='Which environment staves will be executed in')
 @click.option('--runtime-docker-builder', help='The name of the builder image')
 @click.option('--runtime-docker-build-cache', help='The name of the cache volume')
 @click.option('--runtime-docker-ssh', is_flag=True, default=False, help='Use this user\'s ssh identity for the builder')
 @click.option('--runtime-docker-netrc', is_flag=True, default=False, help='Use this user\'s netrc configuration in the builder')
-def build(version, libc, name, rootfs_path, packaging, create_builder, stdlib, runtime, runtime_docker_builder,
+def build(version, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime, runtime_docker_builder,
          runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
     config_file = click.get_text_stream('stdin')
     if runtime == 'docker':
@@ -83,12 +84,14 @@ def build(version, libc, name, rootfs_path, packaging, create_builder, stdlib, r
             args += ['--create-builder']
         if name:
             args += ['--name', name]
+        if jobs:
+            args += ['--jobs', str(jobs)]
         args.append(version)
         run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config_file, ssh=runtime_docker_ssh,
                        netrc=runtime_docker_netrc)
     else:
         from staves.runtimes.core import run
-        run(config_file, libc, rootfs_path, packaging, version, create_builder, stdlib, name=name)
+        run(config_file, libc, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs)
 
 
 if __name__ == '__main__':
