@@ -33,4 +33,6 @@ def run(builder: str, args: MutableSequence[str], build_cache: str, config: str,
             Mount(type='bind', source='${HOME}/.netrc', target='/root/.netrc', read_only=True),
             Mount(type='bind', source='${HOME}/.netrc', target='/var/tmp/portage/.netrc', read_only=True)
         ]
-    docker_client.containers.run(builder, command=args, auto_remove=True, mounts=mounts)
+    container = docker_client.containers.run(builder, command=args, auto_remove=True, mounts=mounts, detach=True)
+    for line in container.logs(stream=True):
+        print(line.decode(), end='')
