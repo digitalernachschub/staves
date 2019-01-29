@@ -38,7 +38,7 @@ full_version="${version}.${musl_stage3_date}"
 python3 -m staves init --runtime docker --staves-version "${full_version}" --libc musl --stage3 "${musl_stage3_date}" --portage-snapshot "${portage_snapshot}"
 python3 -m staves build --runtime docker --runtime-docker-build-cache staves-x86_64-musl-cache \
     --runtime-docker-builder "staves/bootstrap-x86_64-musl:${full_version}" --create-builder --libc "sys-libs/musl" \
-    "${full_version}" <x86_64-musl.toml
+    --config x86_64-musl.toml "${full_version}"
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version}"
   docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version%.*}"
@@ -50,7 +50,7 @@ full_version="${version}.${glibc_stage3_date}"
 python3 -m staves init --runtime docker --staves-version "${full_version}" --libc glibc --stage3 "${glibc_stage3_date}" --portage-snapshot "${portage_snapshot}"
 python3 -m staves build --runtime docker --runtime-docker-build-cache staves-x86_64-glibc-cache  \
     --runtime-docker-builder "staves/bootstrap-x86_64-glibc:${full_version}" --create-builder --libc "sys-libs/glibc" \
-    "${full_version}" <x86_64-glibc.toml
+    --config x86_64-glibc.toml "${full_version}"
 
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-glibc:${full_version}" "staves/x86_64-glibc:${version}"

@@ -2,7 +2,6 @@
 
 import io
 import os
-import sys
 import tarfile
 from typing import Mapping
 
@@ -56,7 +55,7 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 
 @main.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
-@click.option('--config', type=click.File())
+@click.option('--config', type=click.Path(dir_okay=False, exists=True))
 @click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
 @click.option('--stdlib', is_flag=True, help='Copy libstdc++ into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
@@ -76,7 +75,8 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 def build(version, config, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime,
           runtime_docker_builder, runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
     if not config:
-        config = click.get_text_stream('stdin')
+        config = 'staves.toml'
+    config = os.path.abspath(config)
     if runtime == 'docker':
         import staves.runtimes.docker as run_docker
         args = ['build', '--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
@@ -89,11 +89,12 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
         if jobs:
             args += ['--jobs', str(jobs)]
         args.append(version)
-        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config.read(), ssh=runtime_docker_ssh,
+        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config, ssh=runtime_docker_ssh,
                        netrc=runtime_docker_netrc)
     else:
         from staves.runtimes.core import run
-        run(config, libc, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs)
+        with open(config, mode='r') as config_file:
+            run(config_file, libc, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs)
 
 
 if __name__ == '__main__':
