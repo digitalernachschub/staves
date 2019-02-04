@@ -8,7 +8,8 @@ import subprocess
 from typing import Mapping, MutableSequence, Optional, Sequence
 
 from staves.cli import _docker_image_from_rootfs
-from staves.runtimes.core import Libc
+from staves.types import Libc
+
 
 class StavesError(Exception):
     pass

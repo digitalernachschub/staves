@@ -8,6 +8,8 @@ from typing import Mapping
 import click
 import docker
 
+from staves.types import Libc
+
 
 def _create_dockerfile(annotations: Mapping[str, str], *cmd: str) -> str:
     label_string = ' '.join([f'"{key}"="{value}"' for key, value in annotations.items()])
@@ -93,12 +95,10 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
                        netrc=runtime_docker_netrc)
     else:
         from staves.runtimes.core import run
+        libc_enum = Libc.musl if 'musl' in libc else Libc.glibc
         with open(config, mode='r') as config_file:
-            run(config_file, libc, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs)
+            run(config_file, libc_enum, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs)
 
 
 if __name__ == '__main__':
     main()
-
-
-
