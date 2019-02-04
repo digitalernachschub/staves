@@ -3,11 +3,17 @@ from typing import IO
 import toml
 
 from staves.builders.gentoo import build
-from staves.types import Libc
+from staves.types import Libc, StavesError
 
 
 def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: str,
-        create_builder: bool, stdlib: bool, name: str=None, jobs: int=None):
+        create_builder: bool, stdlib: bool, name: str=None, jobs: int=None, ssh: bool=True, netrc: bool=True):
+    if not ssh:
+        raise StavesError('Default runtime does not have any filesystem isolation. Therefore, it is not possible not '
+                          'to use the user\'s ssh keys')
+    if not netrc:
+        raise StavesError('Default runtime does not have any filesystem isolation. Therefore, it is not possible not '
+                          'to use the user\'s netrc configuration')
     config = toml.load(config_file)
     if not name:
         name = config['name']
