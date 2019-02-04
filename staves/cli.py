@@ -66,7 +66,7 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 @click.option('--create-builder', is_flag=True, default=False,
               help='When a builder is created, Staves will copy files such as the Portage tree, make.conf and make.profile.')
 @click.option('--jobs', type=int, help='Number of concurrent jobs executed by the builder')
-@click.option('--runtime', type=click.Choice(['none', 'docker']), default='none',
+@click.option('--runtime', type=click.Choice(['none', 'docker']), default='docker',
               help='Which environment staves will be executed in')
 @click.option('--runtime-docker-builder', help='The name of the builder image')
 @click.option('--runtime-docker-build-cache', help='The name of the cache volume')
