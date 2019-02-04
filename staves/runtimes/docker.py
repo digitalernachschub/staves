@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 from typing import MutableSequence
 
 import docker
@@ -24,14 +25,16 @@ def run(builder: str, args: MutableSequence[str], build_cache: str, config: str,
         Mount(type='bind', source=config, target='/staves.toml', read_only=True)
     ]
     if ssh:
+        ssh_dir = str(Path.home().joinpath('.ssh'))
         mounts += [
-            Mount(type='bind', source='${HOME}/.ssh', target='/root/.ssh', read_only=True),
-            Mount(type='bind', source='${HOME}/.ssh', target='/var/tmp/portage/.ssh', read_only=True)
+            Mount(type='bind', source=ssh_dir, target='/root/.ssh', read_only=True),
+            Mount(type='bind', source=ssh_dir, target='/var/tmp/portage/.ssh', read_only=True)
         ]
     if netrc:
+        netrc_path = str(Path.home().joinpath('.ssh'))
         mounts += [
-            Mount(type='bind', source='${HOME}/.netrc', target='/root/.netrc', read_only=True),
-            Mount(type='bind', source='${HOME}/.netrc', target='/var/tmp/portage/.netrc', read_only=True)
+            Mount(type='bind', source=netrc_path, target='/root/.netrc', read_only=True),
+            Mount(type='bind', source=netrc_path, target='/var/tmp/portage/.netrc', read_only=True)
         ]
     container = docker_client.containers.run(builder, command=args, auto_remove=True, mounts=mounts, detach=True)
     for line in container.logs(stream=True):
