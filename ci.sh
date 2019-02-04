@@ -29,7 +29,7 @@ project_name=$(basename $(pwd))
 version=$(git describe --tags --always --dirty)
 version=${version#${project_name}-}
 setup_test_env
-run_unit_tests
+#run_unit_tests
 
 portage_snapshot="20190127"
 #musl_stage3_date="20190104"
