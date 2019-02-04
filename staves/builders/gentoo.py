@@ -15,7 +15,7 @@ class StavesError(Exception):
     pass
 
 
-class RootfsError(Exception):
+class RootfsError(StavesError):
     pass
 
 
