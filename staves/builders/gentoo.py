@@ -7,7 +7,7 @@ import subprocess
 
 from typing import Mapping, MutableSequence, Optional, Sequence
 
-from staves.cli import _docker_image_from_rootfs
+from staves.packagers.docker import _docker_image_from_rootfs
 from staves.types import Libc, StavesError
 
 
