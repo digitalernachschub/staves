@@ -25,3 +25,6 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
     build(name, locale, package_configs, packages_to_be_installed, libc, root_path, packaging, version, create_builder,
           stdlib, annotations=config.get('annotations', {}), env=env, repositories=repositories, command=config['command'],
           max_concurrent_jobs=jobs)
+    if packaging == 'docker':
+        from staves.packagers.docker import package
+        package(root_path, name, version, config['command'], config.get('annotations', {}))

@@ -7,7 +7,6 @@ import subprocess
 
 from typing import Mapping, MutableSequence, Optional, Sequence
 
-from staves.packagers.docker import _docker_image_from_rootfs
 from staves.types import Libc, StavesError
 
 
@@ -209,6 +208,3 @@ def build(name: str, locale: Mapping[str, str], package_configs: Mapping[str, Ma
         ]
         for f in builder_files:
             _copy_to_rootfs(root_path, f)
-    tag = '{}:{}'.format(name, version)
-    if packaging == 'docker':
-        _docker_image_from_rootfs(root_path, tag, command, annotations)
