@@ -6,7 +6,7 @@ from pathlib import Path
 
 import click
 
-from staves.types import Libc
+from staves.types import Libc, StavesError
 
 
 logger = logging.getLogger(__name__)
@@ -56,6 +56,8 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 def build(version, config, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime,
           runtime_docker_builder, runtime_docker_build_cache, ssh, netrc):
     config_path = Path(str(config)) if config else Path('staves.toml')
+    if not config_path.exists():
+        raise StavesError(f'No configuration file found at path "{str(config_path)}"')
     if runtime == 'docker':
         import staves.runtimes.docker as run_docker
         args = ['build', '--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
