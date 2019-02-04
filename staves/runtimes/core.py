@@ -1,8 +1,14 @@
+from enum import auto, Enum
 from typing import IO
 
 import toml
 
 from staves.builders.gentoo import build
+
+
+class Libc(Enum):
+    glibc = auto()
+    musl = auto()
 
 
 def run(config_file: IO, libc: str, root_path: str, packaging: str, version: str,
@@ -15,6 +21,7 @@ def run(config_file: IO, libc: str, root_path: str, packaging: str, version: str
     locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     packages_to_be_installed = [*config.get('packages', [])]
-    build(name, locale, package_configs, packages_to_be_installed, libc, root_path, packaging, version, create_builder,
+    libc_enum = Libc.musl if 'musl' in libc else Libc.glibc
+    build(name, locale, package_configs, packages_to_be_installed, libc_enum, root_path, packaging, version, create_builder,
           stdlib, annotations=config.get('annotations', {}), env=env, repositories=repositories, command=config['command'],
           max_concurrent_jobs=jobs)

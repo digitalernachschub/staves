@@ -8,6 +8,7 @@ import subprocess
 from typing import Mapping, MutableSequence, Optional, Sequence
 
 from staves.cli import _docker_image_from_rootfs
+from staves.runtimes.core import Libc
 
 class StavesError(Exception):
     pass
@@ -149,8 +150,17 @@ def _copy_to_rootfs(rootfs, path):
             raise StavesError('Copying {} to rootfs is not supported.'.format(path))
 
 
+def libc_to_package_name(libc: Libc) -> str:
+    if libc == Libc.glibc:
+        return 'sys-libs/glibc'
+    elif libc == Libc.musl:
+        return 'sys-libs/musl'
+    else:
+        raise ValueError(f'Unsupported value for libc: {libc}')
+
+
 def build(name: str, locale: Mapping[str, str], package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
-          libc: str, root_path: str, packaging: str, version: str, create_builder: bool, stdlib: bool,
+          libc: Libc, root_path: str, packaging: str, version: str, create_builder: bool, stdlib: bool,
           annotations: Mapping, env: Optional[Mapping]=None, repositories: Optional[Mapping]=None, command: Sequence=[],
           max_concurrent_jobs: int=None):
     if env:
@@ -167,8 +177,8 @@ def build(name: str, locale: Mapping[str, str], package_configs: Mapping[str, Ma
     for package, package_config in package_configs.items():
         _write_package_config(package, **package_config)
     if libc:
-        packages.append(libc)
-    if 'musl' not in libc:
+        packages.append(libc_to_package_name(libc))
+    if libc != Libc.musl:
         # This value should depend on the selected profile, but there is currently no musl profile with
         # links to lib directories.
         for prefix in ['', 'usr', 'usr/local']:
@@ -183,7 +193,7 @@ def build(name: str, locale: Mapping[str, str], package_configs: Mapping[str, Ma
         _update_builder(max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load())
     _create_rootfs(root_path, *packages, max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load())
     _copy_stdlib(root_path, copy_libstdcpp=stdlib)
-    if 'glibc' in libc:
+    if libc == Libc.glibc:
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
             locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
             subprocess.run('locale-gen')
