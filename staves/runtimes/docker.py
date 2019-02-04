@@ -1,9 +1,13 @@
+import logging
 import subprocess
 from pathlib import Path
 from typing import MutableSequence
 
 import docker
 from docker.types import Mount
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def init(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
@@ -36,6 +40,9 @@ def run(builder: str, args: MutableSequence[str], build_cache: str, config: Path
             Mount(type='bind', source=netrc_path, target='/root/.netrc', read_only=True),
             Mount(type='bind', source=netrc_path, target='/var/tmp/portage/.netrc', read_only=True)
         ]
+    logger.debug('Starting docker container with the following mounts:')
+    for mount in mounts:
+        logger.debug(str(mount))
     container = docker_client.containers.run(builder, command=args, auto_remove=True, mounts=mounts, detach=True)
     for line in container.logs(stream=True):
         print(line.decode(), end='')

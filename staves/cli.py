@@ -67,6 +67,7 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
             args += ['--name', name]
         if jobs:
             args += ['--jobs', str(jobs)]
+        args += ['--runtime', 'none']
         args.append(version)
         run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config_path, ssh=ssh,
                        netrc=netrc)
