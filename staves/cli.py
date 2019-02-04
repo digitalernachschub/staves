@@ -58,7 +58,7 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 @main.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--config', type=click.Path(dir_okay=False, exists=True))
-@click.option('--libc', envvar='STAVES_LIBC', default='', help='Libc to be installed into rootfs')
+@click.option('--libc', type=click.Choice(['glibc', 'musl']), default='glibc', help='Libc to be installed into rootfs')
 @click.option('--stdlib', is_flag=True, help='Copy libstdc++ into rootfs')
 @click.option('--name', help='Overrides the image name specified in the configuration')
 @click.option('--rootfs_path', default=os.path.join('/tmp', 'rootfs'),
