@@ -1,6 +1,7 @@
 """Installs Gentoo portage packages into a specified directory."""
 
 import os
+from pathlib import Path
 
 import click
 
@@ -45,9 +46,7 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 @click.option('--netrc/--no-netrc', is_flag=True, default=True, help='Use this user\'s netrc configuration in the builder')
 def build(version, config, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime,
           runtime_docker_builder, runtime_docker_build_cache, ssh, netrc):
-    if not config:
-        config = 'staves.toml'
-    config = os.path.abspath(config)
+    config_path = Path(str(config)) if config else Path('staves.toml')
     if runtime == 'docker':
         import staves.runtimes.docker as run_docker
         args = ['build', '--libc', libc, '--rootfs_path', rootfs_path, '--packaging', packaging]
@@ -60,12 +59,12 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
         if jobs:
             args += ['--jobs', str(jobs)]
         args.append(version)
-        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config, ssh=ssh,
+        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config_path, ssh=ssh,
                        netrc=netrc)
     else:
         from staves.runtimes.core import run
         libc_enum = Libc.musl if 'musl' in libc else Libc.glibc
-        with open(config, mode='r') as config_file:
+        with config_path.open(mode='r') as config_file:
             run(config_file, libc_enum, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs)
 
 

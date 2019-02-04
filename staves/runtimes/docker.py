@@ -15,14 +15,14 @@ def init(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
     return image_name
 
 
-def run(builder: str, args: MutableSequence[str], build_cache: str, config: str, ssh: bool=False, netrc: bool=False):
+def run(builder: str, args: MutableSequence[str], build_cache: str, config: Path, ssh: bool=False, netrc: bool=False):
     docker_client = docker.from_env()
     args.insert(-1, '--config')
     args.insert(-1, '/staves.toml')
     mounts = [
         Mount(type='volume', source=build_cache, target='/usr/portage/packages',),
         Mount(type='bind', source='/run/docker.sock', target='/var/run/docker.sock'),
-        Mount(type='bind', source=config, target='/staves.toml', read_only=True)
+        Mount(type='bind', source=str(config.resolve()), target='/staves.toml', read_only=True)
     ]
     if ssh:
         ssh_dir = str(Path.home().joinpath('.ssh'))
