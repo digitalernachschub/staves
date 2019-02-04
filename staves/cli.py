@@ -1,11 +1,20 @@
 """Installs Gentoo portage packages into a specified directory."""
 
+import logging
 import os
 from pathlib import Path
 
 import click
 
 from staves.types import Libc
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+logger.addHandler(console_handler)
 
 
 @click.group(name='staves')
