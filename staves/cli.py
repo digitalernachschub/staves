@@ -72,10 +72,10 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
               help='Which environment staves will be executed in')
 @click.option('--runtime-docker-builder', help='The name of the builder image')
 @click.option('--runtime-docker-build-cache', help='The name of the cache volume')
-@click.option('--runtime-docker-ssh', is_flag=True, default=False, help='Use this user\'s ssh identity for the builder')
-@click.option('--runtime-docker-netrc', is_flag=True, default=False, help='Use this user\'s netrc configuration in the builder')
+@click.option('--ssh/--no-ssh', is_flag=True, default=True, help='Use this user\'s ssh identity for the builder')
+@click.option('--netrc/--no-netrc', is_flag=True, default=True, help='Use this user\'s netrc configuration in the builder')
 def build(version, config, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime,
-          runtime_docker_builder, runtime_docker_build_cache, runtime_docker_ssh, runtime_docker_netrc):
+          runtime_docker_builder, runtime_docker_build_cache, ssh, netrc):
     if not config:
         config = 'staves.toml'
     config = os.path.abspath(config)
@@ -91,8 +91,8 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
         if jobs:
             args += ['--jobs', str(jobs)]
         args.append(version)
-        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config, ssh=runtime_docker_ssh,
-                       netrc=runtime_docker_netrc)
+        run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config, ssh=ssh,
+                       netrc=netrc)
     else:
         from staves.runtimes.core import run
         libc_enum = Libc.musl if 'musl' in libc else Libc.glibc
