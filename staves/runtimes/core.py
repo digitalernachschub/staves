@@ -22,9 +22,8 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
     locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     packages_to_be_installed = [*config.get('packages', [])]
-    build(name, locale, package_configs, packages_to_be_installed, libc, root_path, packaging, version, create_builder,
-          stdlib, annotations=config.get('annotations', {}), env=env, repositories=repositories, command=config['command'],
-          max_concurrent_jobs=jobs)
+    build(locale, package_configs, packages_to_be_installed, libc, root_path, create_builder, stdlib, env=env,
+          repositories=repositories, max_concurrent_jobs=jobs)
     if packaging == 'docker':
         from staves.packagers.docker import package
         package(root_path, name, version, config['command'], config.get('annotations', {}))
