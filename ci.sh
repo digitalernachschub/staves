@@ -6,7 +6,6 @@ setup_test_env() {
     python3.6 -m venv venv
     . venv/bin/activate
     pip install poetry
-    poetry install
 }
 
 run_unit_tests() {
@@ -45,9 +44,11 @@ project_name=$(basename $(pwd))
 version=$(git describe --tags --always --dirty)
 version=${version#${project_name}-}
 pep440_version ${version}
-poetry version "${__pep440_version}"
-
 setup_test_env
+
+poetry version "${__pep440_version}"
+poetry install
+
 #run_unit_tests
 
 portage_snapshot="20190127"
