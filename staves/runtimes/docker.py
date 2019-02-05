@@ -1,7 +1,7 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import MutableSequence
+from typing import Mapping, MutableSequence
 
 import docker
 from docker.types import Mount
@@ -19,7 +19,8 @@ def init(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
     return image_name
 
 
-def run(builder: str, args: MutableSequence[str], build_cache: str, config: Path, ssh: bool=False, netrc: bool=False):
+def run(builder: str, args: MutableSequence[str], build_cache: str, config: Path, ssh: bool=False, netrc: bool=False,
+        env: Mapping[str, str]=None):
     docker_client = docker.from_env()
     args.insert(-1, '--config')
     args.insert(-1, '/staves.toml')
@@ -43,6 +44,7 @@ def run(builder: str, args: MutableSequence[str], build_cache: str, config: Path
     logger.debug('Starting docker container with the following mounts:')
     for mount in mounts:
         logger.debug(str(mount))
-    container = docker_client.containers.run(builder, command=args, auto_remove=True, mounts=mounts, detach=True)
+    container = docker_client.containers.run(builder, command=args, auto_remove=True, mounts=mounts, detach=True,
+                                             environment=env)
     for line in container.logs(stream=True):
         print(line.decode(), end='')
