@@ -53,8 +53,9 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 @click.option('--runtime-docker-build-cache', help='The name of the cache volume')
 @click.option('--ssh/--no-ssh', is_flag=True, default=True, help='Use this user\'s ssh identity for the builder')
 @click.option('--netrc/--no-netrc', is_flag=True, default=True, help='Use this user\'s netrc configuration in the builder')
+@click.option('--locale', default='en_US.UTF-8', help='Specifies the locale (LANG env var) to be set in the builder')
 def build(version, config, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime,
-          runtime_docker_builder, runtime_docker_build_cache, ssh, netrc):
+          runtime_docker_builder, runtime_docker_build_cache, ssh, netrc, locale):
     config_path = Path(str(config)) if config else Path('staves.toml')
     if not config_path.exists():
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
@@ -72,7 +73,7 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
         args += ['--runtime', 'none']
         args.append(version)
         run_docker.run(runtime_docker_builder, args, runtime_docker_build_cache, config_path, ssh=ssh,
-                       netrc=netrc)
+                       netrc=netrc, env={'LANG': locale})
     else:
         from staves.runtimes.core import run
         libc_enum = Libc.musl if 'musl' in libc else Libc.glibc
