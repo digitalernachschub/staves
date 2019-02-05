@@ -76,3 +76,10 @@ if [[ $(git tag --list ${project_name}-${version}) ]]; then
   docker tag "staves/x86_64-glibc:${full_version}" "staves/x86_64-glibc:${version%.*}"
   docker tag "staves/x86_64-glibc:${full_version}" "staves/x86_64-glibc:${version%%.*}"
 fi
+
+if [[ $(git tag --list ${project_name}-${version}) ]]; then
+    echo "Found release version. Deploying tarball…"
+    poetry publish --repository ameto
+else
+    echo "Found development version. Nothing to publish."
+fi
