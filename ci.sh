@@ -5,8 +5,8 @@ setup_test_env() {
     echo "Setting up test environment…"
     python3.6 -m venv venv
     . venv/bin/activate
-    pip install pip-tools
-    pip-sync requirements.txt dev-requirements.txt
+    pip install poetry
+    poetry install
 }
 
 run_unit_tests() {
