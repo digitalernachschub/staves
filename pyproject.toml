@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "staves"
+description = "Command-line interface building container images using Gentoo"
+authors = ["Michael Seifert <m.seifert@digitalernachschub.de>"]
+version = "0.4.1"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+click = "^6.7"
+docker= "^3.6"
+toml = "^0.9"
+
+[tool.poetry.dev-dependencies]
+hypothesis = "^3.37"
+pytest = "^3.2"
+pytest-mock= "^1.6"
+
+[tool.poetry.scripts]
+staves = "staves.cli:main"
