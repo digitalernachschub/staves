@@ -47,6 +47,7 @@ pep440_version ${version}
 setup_test_env
 
 poetry version "${__pep440_version}"
+poetry build
 poetry install
 
 #run_unit_tests
