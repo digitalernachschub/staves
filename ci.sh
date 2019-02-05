@@ -13,6 +13,22 @@ run_unit_tests() {
     PYTHONPATH=. pytest
 }
 
+pep440_version() {
+    __pep440_version=
+    local version=$1
+    local version_without_commit_hash="${version%-g*}"
+    local full_version="${version_without_commit_hash#*-}"
+    local tag_version="${version_without_commit_hash%-*}"
+    if [[ "${full_version}" == "${tag_version}" ]]; then
+        # Release version
+        __pep440_version="${tag_version}"
+    else
+        # Development version
+        local commits_after_tag="${full_version##*-}"
+        __pep440_version="${tag_version}.dev${commits_after_tag}"
+    fi
+}
+
 create_stage3_image() {
     local build_date="$1"
     stage3_filename=stage3-amd64-musl-hardened-${build_date}.tar.bz2
@@ -28,6 +44,9 @@ create_stage3_image() {
 project_name=$(basename $(pwd))
 version=$(git describe --tags --always --dirty)
 version=${version#${project_name}-}
+pep440_version ${version}
+poetry version "${__pep440_version}"
+
 setup_test_env
 #run_unit_tests
 
