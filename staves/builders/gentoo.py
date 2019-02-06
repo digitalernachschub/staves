@@ -7,6 +7,7 @@ import subprocess
 
 from typing import Mapping, MutableSequence, Optional, Sequence
 
+from staves.runtimes.core import Repository
 from staves.types import Libc, StavesError
 
 
@@ -157,7 +158,7 @@ def libc_to_package_name(libc: Libc) -> str:
 
 def build(locale: Mapping[str, str], package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
-          env: Optional[Mapping]=None, repositories: Optional[Sequence]=None, max_concurrent_jobs: int=None):
+          env: Optional[Mapping]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None):
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
         _write_env(make_conf_vars)
@@ -168,7 +169,7 @@ def build(locale: Mapping[str, str], package_configs: Mapping[str, Mapping], pac
         os.makedirs('/etc/portage/repos.conf', exist_ok=True)
         subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
         for repository in repositories:
-            _add_repository(repository['name'], sync_type=repository.get('type'), uri=repository.get('uri'))
+            _add_repository(repository.name, repository.sync_type, repository.uri)
     for package, package_config in package_configs.items():
         _write_package_config(package, **package_config)
     if libc:

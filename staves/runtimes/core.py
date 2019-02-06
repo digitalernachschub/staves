@@ -1,9 +1,15 @@
-from typing import Any, IO, MutableMapping, Sequence
+from typing import Any, IO, MutableMapping, NamedTuple, Optional, Sequence
 
 import toml
 
 from staves.builders.gentoo import build
 from staves.types import Libc, StavesError
+
+
+class Repository(NamedTuple):
+    name: str
+    sync_type: Optional[str]=None
+    uri: Optional[str]=None
 
 
 def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: str,
@@ -29,7 +35,8 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
         package(root_path, name, version, config['command'], config.get('annotations', {}))
 
 
-def _parse_repositories(config: MutableMapping[str, Any]) -> Sequence:
+def _parse_repositories(config: MutableMapping[str, Any]) -> Sequence[Repository]:
     if 'respositories' not in config:
         return []
-    return config.pop('repositories')
+    repos = config.pop('repositories')
+    return [Repository(r['name'], sync_type=r.get('type'), uri=r.get('uri')) for r in repos]
