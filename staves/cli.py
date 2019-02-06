@@ -27,7 +27,7 @@ def main():
 @click.option('--runtime', type=click.Choice(['docker']), default='docker')
 @click.option('--stage3')
 @click.option('--portage-snapshot', default='latest')
-@click.option('--libc', type=click.Choice(['glibc', 'musl']))
+@click.option('--libc', type=click.Choice(['glibc', 'musl']), default='glibc')
 def init(staves_version, runtime, stage3, portage_snapshot, libc):
     if runtime == 'docker':
         from staves.runtimes.docker import init
