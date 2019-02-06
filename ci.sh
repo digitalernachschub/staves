@@ -58,7 +58,7 @@ portage_snapshot="20190127"
 #full_version="${version}.${musl_stage3_date}"
 #staves init --runtime docker --staves-version "${full_version}" --libc musl --stage3 "${musl_stage3_date}" --portage-snapshot "${portage_snapshot}"
 #staves build --runtime-docker-build-cache staves-x86_64-musl-cache \
-#    --runtime-docker-builder "staves/bootstrap-x86_64-musl:${full_version}" --create-builder --libc "musl" \
+#    --builder "staves/bootstrap-x86_64-musl:${full_version}" --create-builder --libc "musl" \
 #    --config x86_64-musl.toml "${full_version}"
 #if [[ $(git tag --list ${project_name}-${version}) ]]; then
 #  docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version}"
@@ -70,7 +70,7 @@ glibc_stage3_date="20190104"
 full_version="${version}.${glibc_stage3_date}"
 staves init --runtime docker --staves-version "${full_version}" --libc glibc --stage3 "${glibc_stage3_date}" --portage-snapshot "${portage_snapshot}"
 staves build --runtime-docker-build-cache staves-x86_64-glibc-cache  \
-    --runtime-docker-builder "staves/bootstrap-x86_64-glibc:${full_version}" --create-builder --libc "glibc" \
+    --builder "staves/bootstrap-x86_64-glibc:${full_version}" --create-builder --libc "glibc" \
     --config x86_64-glibc.toml "${full_version}"
 
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
