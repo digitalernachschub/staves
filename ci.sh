@@ -56,7 +56,7 @@ portage_snapshot="20190127"
 #musl_stage3_date="20190104"
 #create_stage3_image ${musl_stage3_date}
 #full_version="${version}.${musl_stage3_date}"
-#builder_name=$(staves init --runtime docker --staves-version "${full_version}" --libc musl --stage3 "${musl_stage3_date}" --portage-snapshot "${portage_snapshot}")
+#builder_name=$(staves init --staves-version "${full_version}" --libc musl --stage3 "${musl_stage3_date}" --portage-snapshot "${portage_snapshot}")
 #staves build --runtime-docker-build-cache staves-x86_64-musl-cache \
 #    --builder "${builder_name}" --create-builder --libc "musl" \
 #    --config x86_64-musl.toml "${full_version}"
@@ -68,7 +68,7 @@ portage_snapshot="20190127"
 
 glibc_stage3_date="20190104"
 full_version="${version}.${glibc_stage3_date}"
-builder_name=$(staves init --runtime docker --staves-version "${full_version}" --stage3 "${glibc_stage3_date}" --portage-snapshot "${portage_snapshot}")
+builder_name=$(staves init --staves-version "${full_version}" --stage3 "${glibc_stage3_date}" --portage-snapshot "${portage_snapshot}")
 staves build --runtime-docker-build-cache staves-x86_64-glibc-cache  \
     --builder "${builder_name}" --create-builder --config x86_64-glibc.toml "${full_version}"
 

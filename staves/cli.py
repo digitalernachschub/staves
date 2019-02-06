@@ -24,7 +24,7 @@ def main():
 
 @main.command(help='Initializes a builder for the specified runtime')
 @click.option('--staves-version')
-@click.option('--runtime', type=click.Choice(['docker']))
+@click.option('--runtime', type=click.Choice(['docker']), default='docker')
 @click.option('--stage3')
 @click.option('--portage-snapshot')
 @click.option('--libc', type=click.Choice(['glibc', 'musl']))
