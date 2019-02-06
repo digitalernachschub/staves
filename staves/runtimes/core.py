@@ -1,4 +1,4 @@
-from typing import IO
+from typing import Any, IO, MutableMapping, Sequence
 
 import toml
 
@@ -18,7 +18,7 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
     if not name:
         name = config['name']
     env = config.pop('env') if 'env' in config else None
-    repositories = config.pop('repositories') if 'respositories' in config else None
+    repositories = _parse_repositories(config)
     locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     packages_to_be_installed = [*config.get('packages', [])]
@@ -27,3 +27,9 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
     if packaging == 'docker':
         from staves.packagers.docker import package
         package(root_path, name, version, config['command'], config.get('annotations', {}))
+
+
+def _parse_repositories(config: MutableMapping[str, Any]) -> Sequence:
+    if 'respositories' not in config:
+        return []
+    return config.pop('repositories')

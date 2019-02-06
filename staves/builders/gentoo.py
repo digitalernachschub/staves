@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 
-from typing import Mapping, MutableSequence, Optional
+from typing import Mapping, MutableSequence, Optional, Sequence
 
 from staves.types import Libc, StavesError
 
@@ -157,7 +157,7 @@ def libc_to_package_name(libc: Libc) -> str:
 
 def build(locale: Mapping[str, str], package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
-          env: Optional[Mapping]=None, repositories: Optional[Mapping]=None, max_concurrent_jobs: int=None):
+          env: Optional[Mapping]=None, repositories: Optional[Sequence]=None, max_concurrent_jobs: int=None):
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
         _write_env(make_conf_vars)
