@@ -31,7 +31,8 @@ def main():
 def init(staves_version, runtime, stage3, portage_snapshot, libc):
     if runtime == 'docker':
         from staves.runtimes.docker import init
-        init(staves_version, stage3, portage_snapshot, libc)
+        builder_name = init(staves_version, stage3, portage_snapshot, libc)
+        click.echo(builder_name)
 
 
 @main.command(help='Installs the specified packages into to the desired location.')
