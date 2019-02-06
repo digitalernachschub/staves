@@ -2,6 +2,7 @@ ARG PORTAGE_SNAPSHOT=latest
 ARG STAGE3=latest
 FROM gentoo/portage:${PORTAGE_SNAPSHOT} as portage
 FROM gentoo/stage3-amd64-hardened-nomultilib:${STAGE3}
+ARG STAVES_VERSION="9999"
 COPY --from=portage --chown=portage:portage /usr/portage /usr/portage
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
   mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
@@ -11,6 +12,6 @@ RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf &
   eselect repository add digitalernachschub git git://github.com/digitalernachschub/gentoo-overlay.git && \
   emaint sync --repo digitalernachschub && \
   USE="-bindist" emerge --oneshot --verbose --quiet=y dev-libs/openssl net-misc/openssh && \
-  emerge --verbose --autounmask-continue=y --quiet=y =dev-util/staves-9999
+  emerge --verbose --autounmask-continue=y --quiet=y =dev-util/staves-${STAVES_VERSION}
 ENV LANG en_US.UTF-8
 ENTRYPOINT ["python", "-m", "staves"]
