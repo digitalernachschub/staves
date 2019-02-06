@@ -2,7 +2,6 @@ ARG PORTAGE_SNAPSHOT=latest
 ARG STAGE3=latest
 FROM gentoo/portage:${PORTAGE_SNAPSHOT} as portage
 FROM gentoo/stage3-amd64-hardened-nomultilib:${STAGE3}
-ARG PORTAGE_SNAPSHOT=latest
 COPY --from=portage --chown=portage:portage /usr/portage /usr/portage
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
   mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
