@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 def init(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
     image_name = f'staves/bootstrap-x86_64-{libc}:{version}'
-    command = ['docker', 'build', '--tag', image_name, '--no-cache',
+    command = ['docker', 'build', '--pull', '--tag', image_name, '--no-cache',
                '-f', f'Dockerfile.x86_64-{libc}', '--build-arg', f'STAGE3={stage3}',
                '--build-arg', f'PORTAGE_SNAPSHOT={portage_snapshot}', '.']
     subprocess.run(command, check=True)
