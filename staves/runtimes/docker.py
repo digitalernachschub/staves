@@ -1,5 +1,6 @@
 import logging
 import subprocess
+import sys
 from pathlib import Path
 from typing import Mapping, MutableSequence
 
@@ -15,7 +16,9 @@ def init(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
     command = ['docker', 'build', '--pull', '--tag', image_name, '--no-cache',
                '-f', f'Dockerfile.x86_64-{libc}', '--build-arg', f'STAGE3={stage3}',
                '--build-arg', f'PORTAGE_SNAPSHOT={portage_snapshot}', '.']
-    subprocess.run(command, check=True)
+    docker_call = subprocess.run(command, stdout=subprocess.PIPE, universal_newlines=True)
+    print(docker_call.stdout, file=sys.stderr, flush=True)
+    docker_call.check_returncode()
     return image_name
 
 
