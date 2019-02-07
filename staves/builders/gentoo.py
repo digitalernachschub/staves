@@ -5,9 +5,8 @@ import os
 import shutil
 import subprocess
 
-from typing import Mapping, MutableSequence, Optional, Sequence
+from typing import Mapping, MutableSequence, Optional, Sequence, NamedTuple
 
-from staves.runtimes.core import Repository
 from staves.types import Libc, StavesError
 
 
@@ -154,6 +153,12 @@ def libc_to_package_name(libc: Libc) -> str:
         return 'sys-libs/musl'
     else:
         raise ValueError(f'Unsupported value for libc: {libc}')
+
+
+class Repository(NamedTuple):
+    name: str
+    sync_type: Optional[str]=None
+    uri: Optional[str]=None
 
 
 def build(locale: Mapping[str, str], package_configs: Mapping[str, Mapping], packages: MutableSequence[str],

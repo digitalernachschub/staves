@@ -1,15 +1,9 @@
-from typing import Any, IO, MutableMapping, NamedTuple, Optional, Sequence
+from typing import Any, IO, MutableMapping, Sequence
 
 import toml
 
-from staves.builders.gentoo import build
+from staves.builders.gentoo import build, Repository
 from staves.types import Libc, StavesError
-
-
-class Repository(NamedTuple):
-    name: str
-    sync_type: Optional[str]=None
-    uri: Optional[str]=None
 
 
 def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: str,
