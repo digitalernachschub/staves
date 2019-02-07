@@ -57,7 +57,7 @@ def _write_env(env_vars, name=None):
         make_conf.writelines(('{}="{}"{}'.format(k, v, os.linesep) for k, v in env_vars.items()))
 
 
-def _write_package_config(package: str, env: list=None, keywords: list=None, use: list=None):
+def _write_package_config(package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
     if env:
         package_config_path = os.path.join('/etc', 'portage', 'package.env', *package.split('/'))
         os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
