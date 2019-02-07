@@ -168,7 +168,7 @@ class Repository(NamedTuple):
 
 def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
-          env: Optional[Mapping]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None):
+          env: Optional[Mapping[str, str]]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None):
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
         _write_env(make_conf_vars)
