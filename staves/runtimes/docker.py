@@ -15,7 +15,7 @@ def init(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
     command = ['docker', 'build', '--tag', image_name, '--no-cache',
                '-f', f'Dockerfile.x86_64-{libc}', '--build-arg', f'STAGE3={stage3}',
                '--build-arg', f'PORTAGE_SNAPSHOT={portage_snapshot}', '.']
-    subprocess.run(command)
+    subprocess.run(command, check=True)
     return image_name
 
 
