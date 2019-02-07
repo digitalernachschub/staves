@@ -98,14 +98,6 @@ def _copy_stdlib(rootfs_path: str, copy_libstdcpp: bool):
         shutil.copy(libstdcpp_path, os.path.join(rootfs_path, 'usr', 'lib'))
 
 
-def _add_repository(name: str, sync_type: str=None, uri: str=None):
-    if uri and sync_type:
-        subprocess.run(['eselect', 'repository', 'add', name, sync_type, uri], stderr=subprocess.PIPE)
-    else:
-        subprocess.run(['eselect', 'repository', 'enable', name], stderr=subprocess.PIPE)
-    subprocess.run(['emaint', 'sync', '--repo', name], stderr=subprocess.PIPE)
-
-
 def _update_builder(max_concurrent_jobs: int=1, max_cpu_load: int=1):
     # Register staves in /var/lib/portage/world
     register_staves = subprocess.run(['emerge', '--noreplace', 'dev-util/staves'], stderr=subprocess.PIPE)
@@ -166,6 +158,19 @@ class Repository(NamedTuple):
     uri: Optional[str]=None
 
 
+class BuildEnvironment:
+    def __init__(self):
+        os.makedirs('/etc/portage/repos.conf', exist_ok=True)
+        subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
+
+    def add_repository(self, name: str, sync_type: str = None, uri: str = None):
+        if uri and sync_type:
+            subprocess.run(['eselect', 'repository', 'add', name, sync_type, uri], stderr=subprocess.PIPE)
+        else:
+            subprocess.run(['eselect', 'repository', 'enable', name], stderr=subprocess.PIPE)
+        subprocess.run(['emaint', 'sync', '--repo', name], stderr=subprocess.PIPE)
+
+
 def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
           env: Optional[Mapping[str, str]]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None):
@@ -176,10 +181,9 @@ def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: Muta
         for env_name, env in specialized_envs.items():
             _write_env(name=env_name, env_vars=env)
     if repositories:
-        os.makedirs('/etc/portage/repos.conf', exist_ok=True)
-        subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
+        build_env = BuildEnvironment()
         for repository in repositories:
-            _add_repository(repository.name, repository.sync_type, repository.uri)
+            build_env.add_repository(repository.name, repository.sync_type, repository.uri)
     for package, package_config in package_configs.items():
         _write_package_config(package, **package_config)
     if libc:
