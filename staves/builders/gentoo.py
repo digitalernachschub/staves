@@ -57,27 +57,6 @@ def _write_env(env_vars, name=None):
         make_conf.writelines(('{}="{}"{}'.format(k, v, os.linesep) for k, v in env_vars.items()))
 
 
-def _write_package_config(package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
-    if env:
-        package_config_path = os.path.join('/etc', 'portage', 'package.env', *package.split('/'))
-        os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
-        with open(package_config_path, 'w') as f:
-            package_environments = ' '.join(env)
-            f.write('{} {}{}'.format(package, package_environments, os.linesep))
-    if keywords:
-        package_config_path = os.path.join('/etc', 'portage', 'package.accept_keywords', *package.split('/'))
-        os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
-        with open(package_config_path, 'w') as f:
-            package_keywords = ' '.join(keywords)
-            f.write('{} {}{}'.format(package, package_keywords, os.linesep))
-    if use:
-        package_config_path = os.path.join('/etc', 'portage', 'package.use', *package.split('/'))
-        os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
-        with open(package_config_path, 'w') as f:
-            package_use_flags = ' '.join(use)
-            f.write('{} {}{}'.format(package, package_use_flags, os.linesep))
-
-
 def _copy_stdlib(rootfs_path: str, copy_libstdcpp: bool):
     libgcc = 'libgcc_s.so.1'
     libstdcpp = 'libstdc++.so.6'
@@ -170,6 +149,26 @@ class BuildEnvironment:
             subprocess.run(['eselect', 'repository', 'enable', name], stderr=subprocess.PIPE)
         subprocess.run(['emaint', 'sync', '--repo', name], stderr=subprocess.PIPE)
 
+    def write_package_config(self, package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
+        if env:
+            package_config_path = os.path.join('/etc', 'portage', 'package.env', *package.split('/'))
+            os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
+            with open(package_config_path, 'w') as f:
+                package_environments = ' '.join(env)
+                f.write('{} {}{}'.format(package, package_environments, os.linesep))
+        if keywords:
+            package_config_path = os.path.join('/etc', 'portage', 'package.accept_keywords', *package.split('/'))
+            os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
+            with open(package_config_path, 'w') as f:
+                package_keywords = ' '.join(keywords)
+                f.write('{} {}{}'.format(package, package_keywords, os.linesep))
+        if use:
+            package_config_path = os.path.join('/etc', 'portage', 'package.use', *package.split('/'))
+            os.makedirs(os.path.dirname(package_config_path), exist_ok=True)
+            with open(package_config_path, 'w') as f:
+                package_use_flags = ' '.join(use)
+                f.write('{} {}{}'.format(package, package_use_flags, os.linesep))
+
 
 def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
@@ -180,12 +179,12 @@ def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: Muta
         specialized_envs = {k: v for k, v in env.items() if k not in make_conf_vars}
         for env_name, env in specialized_envs.items():
             _write_env(name=env_name, env_vars=env)
+    build_env = BuildEnvironment()
     if repositories:
-        build_env = BuildEnvironment()
         for repository in repositories:
             build_env.add_repository(repository.name, repository.sync_type, repository.uri)
     for package, package_config in package_configs.items():
-        _write_package_config(package, **package_config)
+        build_env.write_package_config(package, **package_config)
     if libc:
         packages.append(libc_to_package_name(libc))
     if libc != Libc.musl:
