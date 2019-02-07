@@ -155,13 +155,18 @@ def libc_to_package_name(libc: Libc) -> str:
         raise ValueError(f'Unsupported value for libc: {libc}')
 
 
+class Locale(NamedTuple):
+    name: str
+    charset: str
+
+
 class Repository(NamedTuple):
     name: str
     sync_type: Optional[str]=None
     uri: Optional[str]=None
 
 
-def build(locale: Mapping[str, str], package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
+def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
           env: Optional[Mapping]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None):
     if env:
@@ -196,7 +201,7 @@ def build(locale: Mapping[str, str], package_configs: Mapping[str, Mapping], pac
     _copy_stdlib(root_path, copy_libstdcpp=stdlib)
     if libc == Libc.glibc:
         with open(os.path.join('/etc', 'locale.gen'), 'a') as locale_conf:
-            locale_conf.writelines('{} {}'.format(locale['name'], locale['charset']))
+            locale_conf.writelines('{} {}'.format(locale.name, locale.charset))
             subprocess.run('locale-gen')
         _copy_to_rootfs(root_path, '/usr/lib/locale/locale-archive')
     if create_builder:

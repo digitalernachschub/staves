@@ -2,7 +2,7 @@ from typing import Any, IO, MutableMapping, Sequence
 
 import toml
 
-from staves.builders.gentoo import build, Repository
+from staves.builders.gentoo import build, Locale, Repository
 from staves.types import Libc, StavesError
 
 
@@ -19,7 +19,7 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
         name = config['name']
     env = config.pop('env') if 'env' in config else None
     repositories = _parse_repositories(config)
-    locale = config.pop('locale') if 'locale' in config else {'name': 'C', 'charset': 'UTF-8'}
+    locale = _parse_locale(config)
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     packages_to_be_installed = [*config.get('packages', [])]
     build(locale, package_configs, packages_to_be_installed, libc, root_path, create_builder, stdlib, env=env,
@@ -34,3 +34,10 @@ def _parse_repositories(config: MutableMapping[str, Any]) -> Sequence[Repository
         return []
     repos = config.pop('repositories')
     return [Repository(r['name'], sync_type=r.get('type'), uri=r.get('uri')) for r in repos]
+
+
+def _parse_locale(config: MutableMapping[str, Any]) -> Locale:
+    if 'locale' not in config:
+        return Locale('C', 'UTF-8')
+    l = config.pop('locale')
+    return Locale[l['name'], l['charset']]
