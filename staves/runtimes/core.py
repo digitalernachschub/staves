@@ -30,7 +30,7 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
 
 
 def _parse_repositories(config: MutableMapping[str, Any]) -> Sequence[Repository]:
-    if 'respositories' not in config:
+    if 'repositories' not in config:
         return []
     repos = config.pop('repositories')
     return [Repository(r['name'], sync_type=r.get('type'), uri=r.get('uri')) for r in repos]
