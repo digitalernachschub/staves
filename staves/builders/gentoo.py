@@ -130,8 +130,8 @@ def _fix_portage_tree_permissions():
             shutil.chown(os.path.join(directory_path, f), user='portage', group='portage')
 
 
-def _copy_to_rootfs(rootfs, path):
-    globs = glob.iglob(path)
+def _copy_to_rootfs(rootfs: str, path_glob: str):
+    globs = glob.iglob(path_glob)
     for host_path in globs:
         rootfs_path = os.path.join(rootfs, os.path.relpath(host_path, '/'))
         os.makedirs(os.path.dirname(rootfs_path), exist_ok=True)
@@ -143,7 +143,7 @@ def _copy_to_rootfs(rootfs, path):
         elif os.path.isfile(host_path):
             shutil.copy(host_path, rootfs_path)
         else:
-            raise StavesError('Copying {} to rootfs is not supported.'.format(path))
+            raise StavesError('Copying {} to rootfs is not supported.'.format(path_glob))
 
 
 def libc_to_package_name(libc: Libc) -> str:
