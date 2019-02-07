@@ -47,16 +47,6 @@ def _max_concurrent_jobs() -> int:
     return _max_cpu_load() + 1
 
 
-def _write_env(env_vars, name=None):
-    os.makedirs('/etc/portage/env', exist_ok=True)
-    if name:
-        conf_path = os.path.join('/etc', 'portage', 'env', name)
-    else:
-        conf_path = os.path.join('/etc', 'portage', 'make.conf')
-    with open(conf_path, 'a') as make_conf:
-        make_conf.writelines(('{}="{}"{}'.format(k, v, os.linesep) for k, v in env_vars.items()))
-
-
 def _copy_stdlib(rootfs_path: str, copy_libstdcpp: bool):
     libgcc = 'libgcc_s.so.1'
     libstdcpp = 'libstdc++.so.6'
@@ -169,17 +159,26 @@ class BuildEnvironment:
                 package_use_flags = ' '.join(use)
                 f.write('{} {}{}'.format(package, package_use_flags, os.linesep))
 
+    def write_env(self, env_vars, name=None):
+        os.makedirs('/etc/portage/env', exist_ok=True)
+        if name:
+            conf_path = os.path.join('/etc', 'portage', 'env', name)
+        else:
+            conf_path = os.path.join('/etc', 'portage', 'make.conf')
+        with open(conf_path, 'a') as make_conf:
+            make_conf.writelines(('{}="{}"{}'.format(k, v, os.linesep) for k, v in env_vars.items()))
+
 
 def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
           env: Optional[Mapping[str, str]]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None):
+    build_env = BuildEnvironment()
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
-        _write_env(make_conf_vars)
+        build_env.write_env(make_conf_vars)
         specialized_envs = {k: v for k, v in env.items() if k not in make_conf_vars}
         for env_name, env in specialized_envs.items():
-            _write_env(name=env_name, env_vars=env)
-    build_env = BuildEnvironment()
+            build_env.write_env(name=env_name, env_vars=env)
     if repositories:
         for repository in repositories:
             build_env.add_repository(repository.name, repository.sync_type, repository.uri)
