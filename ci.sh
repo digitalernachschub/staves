@@ -52,7 +52,6 @@ poetry install
 
 #run_unit_tests
 
-portage_snapshot="20190127"
 #musl_stage3_date="20190104"
 #create_stage3_image ${musl_stage3_date}
 #full_version="${version}.${musl_stage3_date}"
