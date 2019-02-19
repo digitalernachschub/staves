@@ -56,7 +56,7 @@ poetry install
 #create_stage3_image ${musl_stage3_date}
 #full_version="${version}.${musl_stage3_date}"
 #builder_name=$(staves init --staves-version "${full_version}" --libc musl --stage3 "${musl_stage3_date}")
-#staves build --runtime-docker-build-cache staves-x86_64-musl-cache \
+#staves build --build-cache staves-x86_64-musl-cache \
 #    --builder "${builder_name}" --create-builder --libc "musl" \
 #    --config x86_64-musl.toml "${full_version}"
 #if [[ $(git tag --list ${project_name}-${version}) ]]; then
@@ -68,7 +68,7 @@ poetry install
 glibc_stage3_date="20190104"
 full_version="${version}.${glibc_stage3_date}"
 builder_name=$(staves init --staves-version "${full_version}" --stage3 "${glibc_stage3_date}")
-staves build --runtime-docker-build-cache staves-x86_64-glibc-cache  \
+staves build --build-cache staves-x86_64-glibc-cache  \
     --builder "${builder_name}" --create-builder --config x86_64-glibc.toml "${full_version}"
 
 if [[ $(git tag --list ${project_name}-${version}) ]]; then
