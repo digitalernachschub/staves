@@ -171,7 +171,12 @@ class BuildEnvironment:
 
 def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
-          env: Optional[Mapping[str, str]]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None):
+          env: Optional[Mapping[str, str]]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None,
+          update_repos: Sequence[str]=None):
+    if update_repos:
+        for repo_name in update_repos:
+            print(f'Updating repository "{repo_name}"…')
+            subprocess.run(['emaint', '--repo', repo_name, 'sync'], check=True)
     build_env = BuildEnvironment()
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}

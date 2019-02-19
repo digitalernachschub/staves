@@ -55,8 +55,9 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 @click.option('--ssh/--no-ssh', is_flag=True, default=True, help='Use this user\'s ssh identity for the builder')
 @click.option('--netrc/--no-netrc', is_flag=True, default=True, help='Use this user\'s netrc configuration in the builder')
 @click.option('--locale', default='en_US.UTF-8', help='Specifies the locale (LANG env var) to be set in the builder')
+@click.option('--update', multiple=True, help='Repositories to be updated')
 def build(version, config, libc, name, rootfs_path, packaging, create_builder, stdlib, jobs, runtime,
-          builder, build_cache, ssh, netrc, locale):
+          builder, build_cache, ssh, netrc, locale, update):
     config_path = Path(str(config)) if config else Path('staves.toml')
     if not config_path.exists():
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
@@ -73,12 +74,16 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
             args += ['--jobs', str(jobs)]
         args += ['--runtime', 'none']
         args.append(version)
+        if update:
+            for repo_name in update:
+                args += ['--update', repo_name]
         run_docker.run(builder, args, build_cache, config_path, ssh=ssh, netrc=netrc, env={'LANG': locale})
     else:
         from staves.runtimes.core import run
         libc_enum = Libc.musl if 'musl' in libc else Libc.glibc
         with config_path.open(mode='r') as config_file:
-            run(config_file, libc_enum, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs)
+            run(config_file, libc_enum, rootfs_path, packaging, version, create_builder, stdlib, name=name, jobs=jobs,
+                update_repos=update)
 
 
 if __name__ == '__main__':
