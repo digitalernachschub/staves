@@ -87,4 +87,4 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
 
 
 if __name__ == '__main__':
-    main()
+    main.main(standalone_mode=False)

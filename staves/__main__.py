@@ -1,4 +1,4 @@
 from staves.cli import main
 
 
-main()
+main.main(standalone_mode=False)
