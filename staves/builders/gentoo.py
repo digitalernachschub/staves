@@ -10,6 +10,9 @@ from typing import Mapping, MutableSequence, Optional, Sequence, NamedTuple
 from staves.types import Libc, StavesError
 
 
+logger = logging.getLogger(__name__)
+
+
 class RootfsError(StavesError):
     pass
 
@@ -133,11 +136,12 @@ class BuildEnvironment:
         subprocess.run(['eselect', 'repository', 'list', '-i'], stderr=subprocess.PIPE)
 
     def add_repository(self, name: str, sync_type: str = None, uri: str = None):
+        logger.info(f'Adding repository {name}')
         if uri and sync_type:
-            subprocess.run(['eselect', 'repository', 'add', name, sync_type, uri], stderr=subprocess.PIPE)
+            subprocess.run(['eselect', 'repository', 'add', name, sync_type, uri], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
-            subprocess.run(['eselect', 'repository', 'enable', name], stderr=subprocess.PIPE)
-        subprocess.run(['emaint', 'sync', '--repo', name], stderr=subprocess.PIPE)
+            subprocess.run(['eselect', 'repository', 'enable', name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(['emaint', 'sync', '--repo', name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def write_package_config(self, package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
         if env:
