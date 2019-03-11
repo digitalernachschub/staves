@@ -73,10 +73,10 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
         if jobs:
             args += ['--jobs', str(jobs)]
         args += ['--runtime', 'none']
-        args.append(version)
         if update:
             for repo_name in update:
                 args += ['--update', repo_name]
+        args.append(version)
         run_docker.run(builder, args, build_cache, config_path, ssh=ssh, netrc=netrc, env={'LANG': locale})
     else:
         from staves.runtimes.core import run
