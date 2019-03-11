@@ -6,7 +6,7 @@ from pathlib import Path
 
 import click
 
-from staves.types import Libc, StavesError
+from staves.core import Libc, StavesError
 
 
 logger = logging.getLogger(__name__)

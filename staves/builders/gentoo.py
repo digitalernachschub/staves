@@ -7,7 +7,7 @@ import subprocess
 
 from typing import Mapping, MutableSequence, Optional, Sequence, NamedTuple
 
-from staves.types import Libc, StavesError
+from staves.core import Libc, StavesError
 
 
 logger = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ from typing import Any, IO, MutableMapping, Sequence
 import toml
 
 from staves.builders.gentoo import build, Locale, Repository
-from staves.types import Libc, StavesError
+from staves.core import Libc, StavesError
 
 
 def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: str, create_builder: bool, stdlib: bool,
