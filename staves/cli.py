@@ -9,20 +9,19 @@ import click
 from staves.core import Libc, StavesError
 
 
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)
-
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-root_logger.addHandler(console_handler)
-
-
 logger = logging.getLogger(__name__)
 
 
 @click.group(name='staves')
-def cli():
-    pass
+@click.option('--log-level', type=click.Choice(['error', 'warning', 'info', 'debug']), default='info')
+def cli(log_level: str):
+    log_level = logging.getLevelName(log_level.upper())
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(log_level)
+    root_logger.addHandler(console_handler)
 
 
 @cli.command(help='Initializes a builder for the specified runtime')
