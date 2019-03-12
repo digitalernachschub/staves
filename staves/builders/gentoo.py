@@ -184,8 +184,8 @@ def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: Muta
           update_repos: Sequence[str]=None):
     if update_repos:
         for repo_name in update_repos:
-            print(f'Updating repository "{repo_name}"…')
-            subprocess.run(['emaint', '--repo', repo_name, 'sync'], check=True)
+            logger.info(f'Updating repository "{repo_name}"…')
+            subprocess.run(['emaint', '--repo', repo_name, 'sync'], check=True, stdout=subprocess.DEVNULL)
     build_env = BuildEnvironment()
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
