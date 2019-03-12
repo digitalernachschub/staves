@@ -134,8 +134,10 @@ class BuildEnvironment:
     def __init__(self):
         os.makedirs('/etc/portage/repos.conf', exist_ok=True)
         logger.info(f'Updating repository list')
-        subprocess.run(['eselect', 'repository', 'list', '-i'], check=True,
-                       stdout=subprocess.DEVNULL)
+        update_repos_cmd = subprocess.run(['eselect', 'repository', 'list', '-i'], universal_newlines=True,
+                                          stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        if update_repos_cmd.returncode != 0:
+            logger.error(update_repos_cmd.stderr)
 
     def add_repository(self, name: str, sync_type: str = None, uri: str = None):
         logger.info(f'Adding repository {name}')
