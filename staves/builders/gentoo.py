@@ -152,6 +152,9 @@ class BuildEnvironment:
         else:
             add_repo_command = ['eselect', 'repository', 'enable', name]
         run_and_log_error(add_repo_command)
+        self.update_repository(name)
+
+    def update_repository(self, name: str):
         run_and_log_error(['emaint', 'sync', '--repo', name])
 
     @property
@@ -168,7 +171,6 @@ class BuildEnvironment:
             if match:
                 repositories.append(match.group(1))
         return repositories
-
 
     def write_package_config(self, package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
         if env:
@@ -204,11 +206,11 @@ def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: Muta
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
           env: Optional[Mapping[str, str]]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None,
           update_repos: Sequence[str]=None):
+    build_env = BuildEnvironment()
     if update_repos:
         for repo_name in update_repos:
             logger.info(f'Updating repository "{repo_name}"…')
-            subprocess.run(['emaint', '--repo', repo_name, 'sync'], check=True, stdout=subprocess.DEVNULL)
-    build_env = BuildEnvironment()
+            build_env.update_repository(repo_name)
     if env:
         make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
         build_env.write_env(make_conf_vars)
