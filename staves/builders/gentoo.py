@@ -135,18 +135,18 @@ class BuildEnvironment:
         os.makedirs('/etc/portage/repos.conf', exist_ok=True)
         logger.info(f'Updating repository list')
         subprocess.run(['eselect', 'repository', 'list', '-i'], check=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                       stdout=subprocess.DEVNULL)
 
     def add_repository(self, name: str, sync_type: str = None, uri: str = None):
         logger.info(f'Adding repository {name}')
         if uri and sync_type:
             subprocess.run(['eselect', 'repository', 'add', name, sync_type, uri], check=True,
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                           stdout=subprocess.DEVNULL)
         else:
             subprocess.run(['eselect', 'repository', 'enable', name], check=True,
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                           stdout=subprocess.DEVNULL)
         subprocess.run(['emaint', 'sync', '--repo', name], check=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                       stdout=subprocess.DEVNULL)
 
     def write_package_config(self, package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
         if env:
