@@ -18,10 +18,10 @@ class RootfsError(StavesError):
 
 
 def _create_rootfs(rootfs_path, *packages, max_concurrent_jobs: int=1, max_cpu_load: int=1):
-    logging.info('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
-    logging.info(', '.join(packages))
+    logger.info('Creating rootfs at {} containing the following packages:'.format(rootfs_path))
+    logger.info(', '.join(packages))
 
-    logging.debug('Installing build-time dependencies to builder')
+    logger.debug('Installing build-time dependencies to builder')
     emerge_env = os.environ
     emerge_env['MAKEOPTS'] = '-j{} -l{}'.format(max_concurrent_jobs, max_cpu_load)
     # --emptytree is needed, because build dependencies of runtime dependencies are ignored by --root-deps=rdeps
@@ -30,15 +30,15 @@ def _create_rootfs(rootfs_path, *packages, max_concurrent_jobs: int=1, max_cpu_l
                             '--jobs', str(max_concurrent_jobs), '--load-average', str(max_cpu_load), *packages]
     emerge_bdeps_call = subprocess.run(emerge_bdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_bdeps_call.returncode != 0:
-        logging.error(emerge_bdeps_call.stderr)
+        logger.error(emerge_bdeps_call.stderr)
         raise RootfsError('Unable to install build-time dependencies.')
 
-    logging.debug('Installing runtime dependencies to rootfs')
+    logger.debug('Installing runtime dependencies to rootfs')
     emerge_rdeps_command = ['emerge', '--verbose', '--root={}'.format(rootfs_path), '--root-deps=rdeps', '--oneshot',
                             '--usepkg', '--jobs', str(max_concurrent_jobs), '--load-average', str(max_cpu_load), *packages]
     emerge_rdeps_call = subprocess.run(emerge_rdeps_command, stderr=subprocess.PIPE, env=emerge_env)
     if emerge_rdeps_call.returncode != 0:
-        logging.error(emerge_rdeps_call.stderr)
+        logger.error(emerge_rdeps_call.stderr)
         raise RootfsError('Unable to install runtime dependencies.')
 
 
@@ -74,7 +74,7 @@ def _update_builder(max_concurrent_jobs: int=1, max_cpu_load: int=1):
     # Register staves in /var/lib/portage/world
     register_staves = subprocess.run(['emerge', '--noreplace', 'dev-util/staves'], stderr=subprocess.PIPE)
     if register_staves.returncode != 0:
-        logging.error(register_staves.stderr)
+        logger.error(register_staves.stderr)
         raise RootfsError('Unable to register Staves as an installed package')
 
     emerge_env = os.environ
@@ -82,7 +82,7 @@ def _update_builder(max_concurrent_jobs: int=1, max_cpu_load: int=1):
     update_world = subprocess.run(['emerge', '--verbose', '--deep', '--usepkg', '--with-bdeps=y', '--jobs', str(max_concurrent_jobs),
                                    '--load-average', str(max_cpu_load), '@world'], stderr=subprocess.PIPE, env=emerge_env)
     if update_world.returncode != 0:
-        logging.error(update_world.stderr)
+        logger.error(update_world.stderr)
         raise RootfsError('Unable to update builder environment')
 
 
