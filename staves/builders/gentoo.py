@@ -220,6 +220,7 @@ def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: Muta
     if repositories:
         for repository in repositories:
             build_env.add_repository(repository.name, repository.sync_type, repository.uri)
+    logger.debug('The following repositories are available for the build: ' + ', '.join(build_env.repositories))
     for package, package_config in package_configs.items():
         build_env.write_package_config(package, **package_config)
     if libc:
