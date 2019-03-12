@@ -2,6 +2,7 @@ import glob
 import logging
 import multiprocessing
 import os
+import re
 import shutil
 import subprocess
 
@@ -152,6 +153,22 @@ class BuildEnvironment:
             add_repo_command = ['eselect', 'repository', 'enable', name]
         run_and_log_error(add_repo_command)
         run_and_log_error(['emaint', 'sync', '--repo', name])
+
+    @property
+    def repositories(self) -> Sequence[str]:
+        list_repos_call = subprocess.run(['eselect', 'repository', 'list', '-i'], universal_newlines=True,
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if list_repos_call.returncode != 0:
+            logger.error(list_repos_call.stderr)
+            raise StavesError('Failed to retrieve a list of available repositories')
+        repositories = []
+        repo_name_pattern = re.compile(r'\s*\[\d+\]\s*(\S+)')
+        for line in list_repos_call.stdout.splitlines()[1:]:
+            match = repo_name_pattern.match(line)
+            if match:
+                repositories.append(match.group(1))
+        return repositories
+
 
     def write_package_config(self, package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
         if env:
