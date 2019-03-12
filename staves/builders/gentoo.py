@@ -130,25 +130,28 @@ class Repository(NamedTuple):
     uri: Optional[str]=None
 
 
+def run_and_log_error(cmd: Sequence[str]) -> int:
+    update_repos_cmd = subprocess.run(cmd, universal_newlines=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    if update_repos_cmd.returncode != 0:
+        logger.error(update_repos_cmd.stderr)
+        raise StavesError(f'Command failed: {cmd}')
+    return update_repos_cmd.returncode
+
+
 class BuildEnvironment:
     def __init__(self):
         os.makedirs('/etc/portage/repos.conf', exist_ok=True)
         logger.info(f'Updating repository list')
-        update_repos_cmd = subprocess.run(['eselect', 'repository', 'list', '-i'], universal_newlines=True,
-                                          stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-        if update_repos_cmd.returncode != 0:
-            logger.error(update_repos_cmd.stderr)
+        run_and_log_error(['eselect', 'repository', 'list', '-i'])
 
     def add_repository(self, name: str, sync_type: str = None, uri: str = None):
         logger.info(f'Adding repository {name}')
         if uri and sync_type:
-            subprocess.run(['eselect', 'repository', 'add', name, sync_type, uri], check=True,
-                           stdout=subprocess.DEVNULL)
+            add_repo_command = ['eselect', 'repository', 'add', name, sync_type, uri]
         else:
-            subprocess.run(['eselect', 'repository', 'enable', name], check=True,
-                           stdout=subprocess.DEVNULL)
-        subprocess.run(['emaint', 'sync', '--repo', name], check=True,
-                       stdout=subprocess.DEVNULL)
+            add_repo_command = ['eselect', 'repository', 'enable', name]
+        run_and_log_error(add_repo_command)
+        run_and_log_error(['emaint', 'sync', '--repo', name])
 
     def write_package_config(self, package: str, env: Sequence[str]=None, keywords: Sequence[str]=None, use: Sequence[str]=None):
         if env:
