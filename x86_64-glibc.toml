@@ -37,8 +37,3 @@ use = ['git']
 
 ['=dev-util/staves-9999']
 env = ['no-cache']
-
-[[repositories]]
-name = 'digitalernachschub'
-type = 'git'
-uri = 'git://github.com/digitalernachschub/gentoo-overlay.git'

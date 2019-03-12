@@ -39,9 +39,4 @@ use = ['git']
 env = ['no-cache']
 
 [[repositories]]
-name = 'digitalernachschub'
-type = 'git'
-uri = 'git://github.com/digitalernachschub/gentoo-overlay.git'
-
-[[repositories]]
 name = 'musl'
