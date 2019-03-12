@@ -65,7 +65,7 @@ poetry install
 #  docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version%%.*}"
 #fi
 
-glibc_stage3_date="20190104"
+glibc_stage3_date="20190311"
 full_version="${version}.${glibc_stage3_date}"
 builder_name=$(staves init --staves-version "${full_version}" --stage3 "${glibc_stage3_date}")
 staves build --build-cache staves-x86_64-glibc-cache  \
