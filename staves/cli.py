@@ -18,11 +18,11 @@ logger.addHandler(console_handler)
 
 
 @click.group(name='staves')
-def main():
+def cli():
     pass
 
 
-@main.command(help='Initializes a builder for the specified runtime')
+@cli.command(help='Initializes a builder for the specified runtime')
 @click.option('--staves-version')
 @click.option('--runtime', type=click.Choice(['docker']), default='docker')
 @click.option('--stage3')
@@ -35,7 +35,7 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
         click.echo(builder_name)
 
 
-@main.command(help='Installs the specified packages into to the desired location.')
+@cli.command(help='Installs the specified packages into to the desired location.')
 @click.argument('version')
 @click.option('--config', type=click.Path(dir_okay=False, exists=True))
 @click.option('--libc', type=click.Choice(['glibc', 'musl']), default='glibc', help='Libc to be installed into rootfs')
@@ -86,5 +86,9 @@ def build(version, config, libc, name, rootfs_path, packaging, create_builder, s
                 update_repos=update)
 
 
+def main():
+    cli.main(standalone_mode=False)
+
+
 if __name__ == '__main__':
-    main.main(standalone_mode=False)
+    main()

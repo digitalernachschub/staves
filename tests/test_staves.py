@@ -2,7 +2,7 @@ import os
 
 import toml
 from click.testing import CliRunner
-from staves.cli import main
+from staves.cli import cli
 
 
 def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
@@ -18,9 +18,9 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
     mocker.patch('staves.builders.gentoo._fix_portage_tree_permissions')
     mocker.patch('staves.builders.gentoo._update_builder')
     mocker.patch('staves.builders.gentoo._create_rootfs')
-    cli = CliRunner()
+    runner = CliRunner()
 
-    result = cli.invoke(main, args=['build', '--rootfs_path', str(rootfs_path), '--packaging', 'none', '--config', str(config_file), 'latest'])
+    result = runner.invoke(cli, args=['build', '--rootfs_path', str(rootfs_path), '--packaging', 'none', '--config', str(config_file), 'latest'])
 
     assert result.exit_code == 0, result.output
     assert os.path.islink(os.path.join(rootfs_path, 'lib'))
@@ -41,9 +41,9 @@ def test_copies_libgcc(tmpdir, monkeypatch, mocker):
     mocker.patch('staves.builders.gentoo._fix_portage_tree_permissions')
     mocker.patch('staves.builders.gentoo._update_builder')
     mocker.patch('staves.builders.gentoo._create_rootfs')
-    cli = CliRunner()
+    runner = CliRunner()
 
-    result = cli.invoke(main, args=['build', '--rootfs_path', str(rootfs_path), '--packaging', 'none', '--config', str(config_file), 'latest'])
+    result = runner.invoke(cli, args=['build', '--rootfs_path', str(rootfs_path), '--packaging', 'none', '--config', str(config_file), 'latest'])
 
     assert result.exit_code == 0, result.output
     assert os.path.exists(os.path.join(rootfs_path, 'usr', 'lib64', 'libgcc_s.so.1'))
