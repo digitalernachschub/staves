@@ -9,12 +9,15 @@ import click
 from staves.core import Libc, StavesError
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)
 
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
-logger.addHandler(console_handler)
+root_logger.addHandler(console_handler)
+
+
+logger = logging.getLogger(__name__)
 
 
 @click.group(name='staves')
