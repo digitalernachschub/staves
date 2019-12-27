@@ -6,9 +6,9 @@ import re
 import shutil
 import subprocess
 
-from typing import Mapping, MutableSequence, NewType, Optional, Sequence, NamedTuple
+from typing import Mapping, NewType, Optional, Sequence, NamedTuple
 
-from staves.core import Libc, StavesError
+from staves.core import ImageSpec, Libc, StavesError
 
 
 logger = logging.getLogger(__name__)
@@ -280,26 +280,21 @@ class BuildEnvironment:
 
 
 def build(
-    locale: Locale,
-    package_configs: Mapping[str, Mapping],
-    packages: MutableSequence[str],
+    image_spec: ImageSpec,
     libc: Libc,
     root_path: str,
     create_builder: bool,
     stdlib: bool,
-    global_env: Optional[Environment] = None,
-    package_envs: Optional[Mapping[str, Environment]] = None,
-    repositories: Sequence[Repository] = None,
     max_concurrent_jobs: int = None,
 ):
     build_env = BuildEnvironment()
-    if global_env:
-        build_env.write_env(global_env)
-    if package_envs:
-        for env_name, env in package_envs.items():
+    if image_spec.global_env:
+        build_env.write_env(image_spec.global_env)
+    if image_spec.package_envs:
+        for env_name, env in image_spec.package_envs.items():
             build_env.write_env(name=env_name, env_vars=env)
-    if repositories:
-        for repository in repositories:
+    if image_spec.repositories:
+        for repository in image_spec.repositories:
             build_env.add_repository(
                 repository.name, repository.sync_type, repository.uri
             )
@@ -307,8 +302,9 @@ def build(
         "The following repositories are available for the build: "
         + ", ".join(build_env.repositories)
     )
-    for package, package_config in package_configs.items():
+    for package, package_config in image_spec.package_configs.items():
         build_env.write_package_config(package, **package_config)
+    packages = list(image_spec.packages_to_be_installed)
     if libc:
         packages.append(libc_to_package_name(libc))
     if libc != Libc.musl:
@@ -337,7 +333,9 @@ def build(
     _copy_stdlib(root_path, copy_libstdcpp=stdlib)
     if libc == Libc.glibc:
         with open(os.path.join("/etc", "locale.gen"), "a") as locale_conf:
-            locale_conf.writelines("{} {}".format(locale.name, locale.charset))
+            locale_conf.writelines(
+                "{} {}".format(image_spec.locale.name, image_spec.locale.charset)
+            )
             subprocess.run("locale-gen")
         _copy_to_rootfs(root_path, "/usr/lib/locale/locale-archive")
     if create_builder:

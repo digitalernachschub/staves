@@ -26,17 +26,7 @@ def run(
         )
 
     build(
-        image_spec.locale,
-        image_spec.package_configs,
-        list(image_spec.packages_to_be_installed),
-        libc,
-        root_path,
-        create_builder,
-        stdlib,
-        global_env=image_spec.global_env,
-        package_envs=image_spec.package_envs,
-        repositories=image_spec.repositories,
-        max_concurrent_jobs=jobs,
+        image_spec, libc, root_path, create_builder, stdlib, max_concurrent_jobs=jobs,
     )
     if packaging == "docker":
         from staves.packagers.docker import package
