@@ -48,7 +48,6 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 
 
 @cli.command(help="Installs the specified packages into to the desired location.")
-@click.argument("version")
 @click.option("--config", type=click.Path(dir_okay=False, exists=True))
 @click.option(
     "--libc",
@@ -57,17 +56,10 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
     help="Libc to be installed into rootfs",
 )
 @click.option("--stdlib", is_flag=True, help="Copy libstdc++ into rootfs")
-@click.option("--name", help="Overrides the image name specified in the configuration")
 @click.option(
     "--rootfs_path",
     default=os.path.join("/tmp", "rootfs"),
     help="Directory where the root filesystem will be installed. Defaults to /tmp/rootfs",
-)
-@click.option(
-    "--packaging",
-    type=click.Choice(["none", "docker"]),
-    default="docker",
-    help="Packaging format of the resulting image",
 )
 @click.option(
     "--create-builder",
@@ -106,12 +98,9 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
     help="Specifies the locale (LANG env var) to be set in the builder",
 )
 def build(
-    version,
     config,
     libc,
-    name,
     rootfs_path,
-    packaging,
     create_builder,
     stdlib,
     jobs,
@@ -133,19 +122,12 @@ def build(
     if runtime == "docker":
         import staves.runtimes.docker as run_docker
 
-        args = [
-            "build",
-            "--packaging",
-            packaging,
-        ]
+        args = ["build"]
         if stdlib:
             args += ["--stdlib"]
         if create_builder:
             args += ["--create-builder"]
-        if name:
-            args += ["--name", name]
         args += ["--runtime", "none"]
-        args.append(version)
         run_docker.run(
             builder,
             builder_config,
@@ -161,15 +143,38 @@ def build(
 
         with config_path.open(mode="r") as config_file:
             config = _read_image_spec(config_file)
-        if name:
-            config.name = name
         run(config, builder_config, create_builder, stdlib)
-        if packaging == "docker":
-            from staves.packagers.docker import package
 
-            package(
-                rootfs_path, config.name, version, config.command, config.annotations,
-            )
+
+@cli.command("package", help="Creates a container image from a directory")
+@click.argument(
+    "rootfs_path", help="Directory where the root filesystem can be found",
+)
+@click.argument("version")
+@click.option("--config", type=click.Path(dir_okay=False, exists=True))
+@click.option(
+    "--packaging",
+    type=click.Choice(["none", "docker"]),
+    default="docker",
+    help="Packaging format of the resulting image",
+)
+def package(rootfs_path, version, config, packaging):
+    config_path = Path(str(config)) if config else Path("staves.toml")
+    if not config_path.exists():
+        raise StavesError(f'No configuration file found at path "{str(config_path)}"')
+    with config_path.open(mode="r") as config_file:
+        image_spec = _read_image_spec(config_file)
+
+    if packaging == "docker":
+        from staves.packagers.docker import package
+
+        package(
+            rootfs_path,
+            image_spec.name,
+            version,
+            image_spec.command,
+            image_spec.annotations,
+        )
 
 
 def main():
