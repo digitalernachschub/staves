@@ -1,9 +1,23 @@
-from typing import Any, IO, MutableMapping, Sequence
+from typing import Any, IO, Mapping, MutableMapping, Sequence
 
 import toml
+from dataclasses import dataclass
 
 from staves.builders.gentoo import build, Environment, Locale, Repository
 from staves.core import Libc, StavesError
+
+
+@dataclass
+class ImageSpec:
+    name: str
+    command: str
+    annotations: Mapping[str, str]
+    global_env: Environment
+    package_envs: Mapping[str, Environment]
+    repositories: Sequence[Repository]
+    locale: Locale
+    package_configs: Mapping[str, Mapping]
+    packages_to_be_installed: Sequence[str]
 
 
 def run(
@@ -31,36 +45,47 @@ def run(
             "to use the user's netrc configuration"
         )
 
-    config = toml.load(config_file)
+    config = _read_image_spec(config_file)
     if not name:
-        name = config["name"]
-    env = config.pop("env") if "env" in config else None
-    global_env = Environment({k: v for k, v in env.items() if not isinstance(v, dict)})
-    package_envs = Environment({k: v for k, v in env.items() if k not in global_env})
-    repositories = _parse_repositories(config)
-    locale = _parse_locale(config)
-    package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
-    packages_to_be_installed = [*config.get("packages", [])]
+        name = config.name
     build(
-        locale,
-        package_configs,
-        packages_to_be_installed,
+        config.locale,
+        config.package_configs,
+        list(config.packages_to_be_installed),
         libc,
         root_path,
         create_builder,
         stdlib,
-        global_env=global_env,
-        package_envs=package_envs,
-        repositories=repositories,
+        global_env=config.global_env,
+        package_envs=config.package_envs,
+        repositories=config.repositories,
         max_concurrent_jobs=jobs,
         update_repos=update_repos,
     )
     if packaging == "docker":
         from staves.packagers.docker import package
 
-        package(
-            root_path, name, version, config["command"], config.get("annotations", {})
-        )
+        package(root_path, name, version, config.command, config.annotations)
+
+
+def _read_image_spec(config_file: IO) -> ImageSpec:
+    config = toml.load(config_file)
+    env = config.pop("env") if "env" in config else None
+    package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
+    packages_to_be_installed = [*config.get("packages", [])]
+    return ImageSpec(
+        name=config["name"],
+        command=config["command"],
+        annotations=config.get("annotations", {}),
+        global_env=Environment(
+            {k: v for k, v in env.items() if not isinstance(v, dict)}
+        ),
+        package_envs={k: Environment(v) for k, v in env.items() if isinstance(k, dict)},
+        repositories=_parse_repositories(config),
+        locale=_parse_locale(config),
+        package_configs=package_configs,
+        packages_to_be_installed=packages_to_be_installed,
+    )
 
 
 def _parse_repositories(config: MutableMapping[str, Any]) -> Sequence[Repository]:
