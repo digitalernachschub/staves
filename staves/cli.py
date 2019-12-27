@@ -58,11 +58,6 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 )
 @click.option("--stdlib", is_flag=True, help="Copy libstdc++ into rootfs")
 @click.option(
-    "--rootfs_path",
-    default=os.path.join("/tmp", "rootfs"),
-    help="Directory where the root filesystem will be installed. Defaults to /tmp/rootfs",
-)
-@click.option(
     "--create-builder",
     is_flag=True,
     default=False,
@@ -101,7 +96,6 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
 def build(
     config,
     libc,
-    rootfs_path,
     create_builder,
     stdlib,
     jobs,
@@ -113,9 +107,7 @@ def build(
     locale,
 ):
     libc_enum = Libc.musl if "musl" in libc else Libc.glibc
-    builder_config = BuilderConfig(
-        image_path=rootfs_path, concurrent_jobs=jobs, libc=libc_enum
-    )
+    builder_config = BuilderConfig(concurrent_jobs=jobs, libc=libc_enum)
 
     config_path = Path(str(config)) if config else Path("staves.toml")
     if not config_path.exists():

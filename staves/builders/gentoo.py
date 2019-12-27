@@ -20,7 +20,6 @@ Environment = NewType("Environment", Mapping[str, str])
 
 @dataclass
 class BuilderConfig:
-    image_path: str
     libc: Libc
     concurrent_jobs: int = None
 
@@ -290,6 +289,7 @@ class BuildEnvironment:
 def build(
     image_spec: ImageSpec, config: BuilderConfig, create_builder: bool, stdlib: bool,
 ):
+    rootfs_path = "/tmp/rootfs"
     build_env = BuildEnvironment()
     if image_spec.global_env:
         build_env.write_env(image_spec.global_env)
@@ -314,7 +314,7 @@ def build(
         # This value should depend on the selected profile, but there is currently no musl profile with
         # links to lib directories.
         for prefix in ["", "usr", "usr/local"]:
-            lib_prefix = os.path.join(config.image_path, prefix)
+            lib_prefix = os.path.join(rootfs_path, prefix)
             lib_path = os.path.join(lib_prefix, "lib64")
             os.makedirs(lib_path, exist_ok=True)
             os.symlink("lib64", os.path.join(lib_prefix, "lib"))
@@ -326,19 +326,19 @@ def build(
             max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load()
         )
     _create_rootfs(
-        config.image_path,
+        rootfs_path,
         *packages,
         max_concurrent_jobs=concurrent_jobs,
         max_cpu_load=_max_cpu_load(),
     )
-    _copy_stdlib(config.image_path, copy_libstdcpp=stdlib)
+    _copy_stdlib(rootfs_path, copy_libstdcpp=stdlib)
     if config.libc == Libc.glibc:
         with open(os.path.join("/etc", "locale.gen"), "a") as locale_conf:
             locale_conf.writelines(
                 "{} {}".format(image_spec.locale.name, image_spec.locale.charset)
             )
             subprocess.run("locale-gen")
-        _copy_to_rootfs(config.image_path, "/usr/lib/locale/locale-archive")
+        _copy_to_rootfs(rootfs_path, "/usr/lib/locale/locale-archive")
     if create_builder:
         builder_files = [
             "/usr/portage",
@@ -352,4 +352,4 @@ def build(
             "/var/db/repos/*",
         ]
         for f in builder_files:
-            _copy_to_rootfs(config.image_path, f)
+            _copy_to_rootfs(rootfs_path, f)
