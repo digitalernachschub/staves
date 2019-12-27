@@ -32,8 +32,8 @@ def cli(log_level: str):
 @click.option('--libc', type=click.Choice(['glibc', 'musl']), default='glibc', show_default=True)
 def init(staves_version, runtime, stage3, portage_snapshot, libc):
     if runtime == 'docker':
-        from staves.runtimes.docker import init
-        builder_name = init(staves_version, stage3, portage_snapshot, libc)
+        from staves.runtimes.docker import bootstrap
+        builder_name = bootstrap(staves_version, stage3, portage_snapshot, libc)
         click.echo(builder_name)
 
 
