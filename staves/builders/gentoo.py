@@ -21,6 +21,7 @@ Environment = NewType("Environment", Mapping[str, str])
 @dataclass
 class BuilderConfig:
     image_path: str
+    libc: Libc
     concurrent_jobs: int = None
 
 
@@ -287,11 +288,7 @@ class BuildEnvironment:
 
 
 def build(
-    image_spec: ImageSpec,
-    config: BuilderConfig,
-    libc: Libc,
-    create_builder: bool,
-    stdlib: bool,
+    image_spec: ImageSpec, config: BuilderConfig, create_builder: bool, stdlib: bool,
 ):
     build_env = BuildEnvironment()
     if image_spec.global_env:
@@ -311,9 +308,9 @@ def build(
     for package, package_config in image_spec.package_configs.items():
         build_env.write_package_config(package, **package_config)
     packages = list(image_spec.packages_to_be_installed)
-    if libc:
-        packages.append(libc_to_package_name(libc))
-    if libc != Libc.musl:
+    if config.libc:
+        packages.append(libc_to_package_name(config.libc))
+    if config.libc != Libc.musl:
         # This value should depend on the selected profile, but there is currently no musl profile with
         # links to lib directories.
         for prefix in ["", "usr", "usr/local"]:
@@ -335,7 +332,7 @@ def build(
         max_cpu_load=_max_cpu_load(),
     )
     _copy_stdlib(config.image_path, copy_libstdcpp=stdlib)
-    if libc == Libc.glibc:
+    if config.libc == Libc.glibc:
         with open(os.path.join("/etc", "locale.gen"), "a") as locale_conf:
             locale_conf.writelines(
                 "{} {}".format(image_spec.locale.name, image_spec.locale.charset)

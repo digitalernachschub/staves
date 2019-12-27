@@ -23,7 +23,9 @@ def run(
             "to use the user's netrc configuration"
         )
 
-    builder_config = BuilderConfig(image_path=root_path, concurrent_jobs=jobs)
+    builder_config = BuilderConfig(
+        image_path=root_path, concurrent_jobs=jobs, libc=libc
+    )
     build(
-        image_spec, builder_config, libc, create_builder, stdlib,
+        image_spec, builder_config, create_builder, stdlib,
     )
