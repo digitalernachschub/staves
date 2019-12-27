@@ -122,15 +122,11 @@ def build(
     if runtime == "docker":
         import staves.runtimes.docker as run_docker
 
-        args = ["build"]
-        if stdlib:
-            args += ["--stdlib"]
-        if create_builder:
-            args += ["--create-builder"]
         run_docker.run(
             builder,
             builder_config,
-            args,
+            stdlib,
+            create_builder,
             build_cache,
             config_path,
             ssh=ssh,

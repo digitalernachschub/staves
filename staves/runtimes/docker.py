@@ -42,7 +42,8 @@ def bootstrap(version: str, stage3: str, portage_snapshot: str, libc: str) -> st
 def run(
     builder: str,
     builder_config: BuilderConfig,
-    args: MutableSequence[str],
+    stdlib: bool,
+    create_builder: bool,
     build_cache: str,
     config: Path,
     ssh: bool = False,
@@ -50,6 +51,11 @@ def run(
     env: Mapping[str, str] = None,
 ):
     docker_client = docker.from_env()
+    args = ["build"]
+    if stdlib:
+        args += ["--stdlib"]
+    if create_builder:
+        args += ["--create-builder"]
     args += ["--config", "/staves.toml"]
     args += ["--rootfs_path", builder_config.image_path]
     args += ["--libc", "musl" if builder_config.libc == Libc.musl else "glibc"]
