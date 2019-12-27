@@ -17,6 +17,6 @@ RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf &
   eselect repository enable musl && \
   emaint sync --repo musl && \
   USE="-bindist" emerge --oneshot dev-libs/openssl net-misc/openssh && \
-  emerge =dev-util/staves-${STAVES_VERSION}
+  ACCEPT_LICENSE="*" ACCEPT_KEYWORDS="**" emerge =dev-util/staves-${STAVES_VERSION}
 ENV LANG en_US.UTF-8
 ENTRYPOINT ["python", "-m", "staves"]
