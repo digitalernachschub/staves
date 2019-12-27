@@ -1,14 +1,14 @@
 """Installs Gentoo portage packages into a specified directory."""
 
 import logging
-import os
 from pathlib import Path
 
 import click
 
 from staves.builders.gentoo import BuilderConfig
-from staves.core import _read_image_spec, Libc, StavesError
-from staves.packagers.config import read_packaging_config, PackagingConfig
+from staves.core import Libc, StavesError
+from staves.builders.gentoo import _read_image_spec
+from staves.packagers.config import read_packaging_config
 
 
 logger = logging.getLogger(__name__)
@@ -131,9 +131,7 @@ def build(
 
 
 @cli.command("package", help="Creates a container image from a directory")
-@click.argument(
-    "rootfs_path", help="Directory where the root filesystem can be found",
-)
+@click.argument("rootfs_path")
 @click.option("--version", help="Version number of the packaged artifact")
 @click.option("--config", type=click.Path(dir_okay=False, exists=True))
 @click.option(
