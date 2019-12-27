@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 
+from dataclasses import dataclass
 from typing import Mapping, NewType, Optional, Sequence, NamedTuple
 
 from staves.core import ImageSpec, Libc, StavesError
@@ -15,6 +16,11 @@ logger = logging.getLogger(__name__)
 
 
 Environment = NewType("Environment", Mapping[str, str])
+
+
+@dataclass
+class BuilderConfig:
+    image_path: str
 
 
 class RootfsError(StavesError):
@@ -281,8 +287,8 @@ class BuildEnvironment:
 
 def build(
     image_spec: ImageSpec,
+    config: BuilderConfig,
     libc: Libc,
-    root_path: str,
     create_builder: bool,
     stdlib: bool,
     max_concurrent_jobs: int = None,
@@ -311,7 +317,7 @@ def build(
         # This value should depend on the selected profile, but there is currently no musl profile with
         # links to lib directories.
         for prefix in ["", "usr", "usr/local"]:
-            lib_prefix = os.path.join(root_path, prefix)
+            lib_prefix = os.path.join(config.image_path, prefix)
             lib_path = os.path.join(lib_prefix, "lib64")
             os.makedirs(lib_path, exist_ok=True)
             os.symlink("lib64", os.path.join(lib_prefix, "lib"))
@@ -325,19 +331,19 @@ def build(
             max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load()
         )
     _create_rootfs(
-        root_path,
+        config.image_path,
         *packages,
         max_concurrent_jobs=concurrent_jobs,
         max_cpu_load=_max_cpu_load(),
     )
-    _copy_stdlib(root_path, copy_libstdcpp=stdlib)
+    _copy_stdlib(config.image_path, copy_libstdcpp=stdlib)
     if libc == Libc.glibc:
         with open(os.path.join("/etc", "locale.gen"), "a") as locale_conf:
             locale_conf.writelines(
                 "{} {}".format(image_spec.locale.name, image_spec.locale.charset)
             )
             subprocess.run("locale-gen")
-        _copy_to_rootfs(root_path, "/usr/lib/locale/locale-archive")
+        _copy_to_rootfs(config.image_path, "/usr/lib/locale/locale-archive")
     if create_builder:
         builder_files = [
             "/usr/portage",
@@ -351,4 +357,4 @@ def build(
             "/var/db/repos/*",
         ]
         for f in builder_files:
-            _copy_to_rootfs(root_path, f)
+            _copy_to_rootfs(config.image_path, f)

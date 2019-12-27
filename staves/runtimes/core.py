@@ -1,4 +1,4 @@
-from staves.builders.gentoo import build
+from staves.builders.gentoo import build, BuilderConfig
 from staves.core import ImageSpec, Libc, StavesError
 
 
@@ -23,6 +23,12 @@ def run(
             "to use the user's netrc configuration"
         )
 
+    builder_config = BuilderConfig(image_path=root_path)
     build(
-        image_spec, libc, root_path, create_builder, stdlib, max_concurrent_jobs=jobs,
+        image_spec,
+        builder_config,
+        libc,
+        create_builder,
+        stdlib,
+        max_concurrent_jobs=jobs,
     )
