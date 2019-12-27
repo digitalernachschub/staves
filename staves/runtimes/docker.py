@@ -65,7 +65,6 @@ def run(
 
     mounts = [
         Mount(type="volume", source=build_cache, target="/usr/portage/packages",),
-        Mount(type="bind", source="/run/docker.sock", target="/var/run/docker.sock"),
         Mount(
             type="bind",
             source=str(config.resolve()),
