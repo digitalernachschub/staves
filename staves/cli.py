@@ -27,7 +27,7 @@ def cli(log_level: str):
 @cli.command(help='Initializes a builder for the specified runtime')
 @click.option('--staves-version')
 @click.option('--runtime', type=click.Choice(['docker']), default='docker')
-@click.option('--stage3')
+@click.option('--stage3', default='latest')
 @click.option('--portage-snapshot', default='latest')
 @click.option('--libc', type=click.Choice(['glibc', 'musl']), default='glibc')
 def init(staves_version, runtime, stage3, portage_snapshot, libc):
