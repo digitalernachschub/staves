@@ -122,6 +122,11 @@ def build(
     netrc,
     locale,
 ):
+    libc_enum = Libc.musl if "musl" in libc else Libc.glibc
+    builder_config = BuilderConfig(
+        image_path=rootfs_path, concurrent_jobs=jobs, libc=libc_enum
+    )
+
     config_path = Path(str(config)) if config else Path("staves.toml")
     if not config_path.exists():
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
@@ -130,10 +135,6 @@ def build(
 
         args = [
             "build",
-            "--libc",
-            libc,
-            "--rootfs_path",
-            rootfs_path,
             "--packaging",
             packaging,
         ]
@@ -143,12 +144,11 @@ def build(
             args += ["--create-builder"]
         if name:
             args += ["--name", name]
-        if jobs:
-            args += ["--jobs", str(jobs)]
         args += ["--runtime", "none"]
         args.append(version)
         run_docker.run(
             builder,
+            builder_config,
             args,
             build_cache,
             config_path,
@@ -159,14 +159,10 @@ def build(
     else:
         from staves.runtimes.core import run
 
-        libc_enum = Libc.musl if "musl" in libc else Libc.glibc
         with config_path.open(mode="r") as config_file:
             config = _read_image_spec(config_file)
         if name:
             config.name = name
-        builder_config = BuilderConfig(
-            image_path=rootfs_path, concurrent_jobs=jobs, libc=libc_enum
-        )
         run(config, builder_config, create_builder, stdlib)
         if packaging == "docker":
             from staves.packagers.docker import package

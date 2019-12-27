@@ -7,6 +7,9 @@ from typing import Mapping, MutableSequence
 import docker
 from docker.types import Mount
 
+from staves.core import Libc
+from staves.builders.gentoo import BuilderConfig
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -38,6 +41,7 @@ def bootstrap(version: str, stage3: str, portage_snapshot: str, libc: str) -> st
 
 def run(
     builder: str,
+    builder_config: BuilderConfig,
     args: MutableSequence[str],
     build_cache: str,
     config: Path,
@@ -48,6 +52,15 @@ def run(
     docker_client = docker.from_env()
     args.insert(-1, "--config")
     args.insert(-1, "/staves.toml")
+
+    args.insert(-1, "--rootfs_path")
+    args.insert(-1, builder_config.image_path)
+    args.insert(-1, "--libc")
+    args.insert(-1, "musl" if builder_config.libc == Libc.musl else "glibc")
+    if builder_config.concurrent_jobs:
+        args.insert(-1, "--jobs")
+        args.insert(-1, str(builder_config.concurrent_jobs))
+
     mounts = [
         Mount(type="volume", source=build_cache, target="/usr/portage/packages",),
         Mount(type="bind", source="/run/docker.sock", target="/var/run/docker.sock"),
