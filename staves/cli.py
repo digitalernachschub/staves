@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 
+from staves.builders.gentoo import BuilderConfig
 from staves.core import _read_image_spec, Libc, StavesError
 
 
@@ -163,9 +164,10 @@ def build(
             config = _read_image_spec(config_file)
         if name:
             config.name = name
-        run(
-            config, libc_enum, rootfs_path, create_builder, stdlib, jobs=jobs,
+        builder_config = BuilderConfig(
+            image_path=rootfs_path, concurrent_jobs=jobs, libc=libc_enum
         )
+        run(config, builder_config, create_builder, stdlib)
         if packaging == "docker":
             from staves.packagers.docker import package
 
