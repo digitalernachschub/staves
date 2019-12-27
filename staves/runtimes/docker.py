@@ -50,16 +50,11 @@ def run(
     env: Mapping[str, str] = None,
 ):
     docker_client = docker.from_env()
-    args.insert(-1, "--config")
-    args.insert(-1, "/staves.toml")
-
-    args.insert(-1, "--rootfs_path")
-    args.insert(-1, builder_config.image_path)
-    args.insert(-1, "--libc")
-    args.insert(-1, "musl" if builder_config.libc == Libc.musl else "glibc")
+    args += ["--config", "/staves.toml"]
+    args += ["--rootfs_path", builder_config.image_path]
+    args += ["--libc", "musl" if builder_config.libc == Libc.musl else "glibc"]
     if builder_config.concurrent_jobs:
-        args.insert(-1, "--jobs")
-        args.insert(-1, str(builder_config.concurrent_jobs))
+        args += ["--jobs", str(builder_config.concurrent_jobs)]
 
     mounts = [
         Mount(type="volume", source=build_cache, target="/usr/portage/packages",),
