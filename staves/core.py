@@ -2,7 +2,7 @@ from enum import auto, Enum
 from typing import Mapping, Sequence, IO, MutableMapping, Any
 
 import toml
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from builders.gentoo import Environment, Repository, Locale
 
@@ -18,12 +18,12 @@ class StavesError(Exception):
 
 @dataclass
 class ImageSpec:
-    global_env: Environment
-    package_envs: Mapping[str, Environment]
-    repositories: Sequence[Repository]
     locale: Locale
-    package_configs: Mapping[str, Mapping]
-    packages_to_be_installed: Sequence[str]
+    global_env: Environment = field(default_factory=lambda: Environment({}))
+    package_envs: Mapping[str, Environment] = field(default_factory=dict)
+    repositories: Sequence[Repository] = field(default_factory=list)
+    package_configs: Mapping[str, Mapping] = field(default_factory=dict)
+    packages_to_be_installed: Sequence[str] = field(default_factory=list)
 
 
 def _read_image_spec(config_file: IO) -> ImageSpec:
