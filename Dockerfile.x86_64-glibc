@@ -6,6 +6,7 @@ ARG STAVES_VERSION="9999"
 COPY --from=portage --chown=portage:portage / /
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
   mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
+  eselect profile set default/linux/amd64/17.1/no-multilib/hardened && \
   USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
   mkdir /etc/portage/repos.conf && \
   eselect repository list -i && \
