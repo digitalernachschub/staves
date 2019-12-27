@@ -204,18 +204,18 @@ class BuildEnvironment:
 
 def build(locale: Locale, package_configs: Mapping[str, Mapping], packages: MutableSequence[str],
           libc: Libc, root_path: str, create_builder: bool, stdlib: bool,
-          env: Optional[Mapping[str, str]]=None, repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None,
+          global_env: Optional[Mapping[str, str]]=None, package_envs: Optional[Mapping[str, Mapping[str, str]]]=None,
+          repositories: Sequence[Repository]=None, max_concurrent_jobs: int=None,
           update_repos: Sequence[str]=None):
     build_env = BuildEnvironment()
     if update_repos:
         for repo_name in update_repos:
             logger.info(f'Updating repository "{repo_name}"…')
             build_env.update_repository(repo_name)
-    if env:
-        make_conf_vars = {k: v for k, v in env.items() if not isinstance(v, dict)}
-        build_env.write_env(make_conf_vars)
-        specialized_envs = {k: v for k, v in env.items() if k not in make_conf_vars}
-        for env_name, env in specialized_envs.items():
+    if global_env:
+        build_env.write_env(global_env)
+    if package_envs:
+        for env_name, env in package_envs.items():
             build_env.write_env(name=env_name, env_vars=env)
     if repositories:
         for repository in repositories:

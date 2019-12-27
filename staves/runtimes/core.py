@@ -19,11 +19,14 @@ def run(config_file: IO, libc: Libc, root_path: str, packaging: str, version: st
     if not name:
         name = config['name']
     env = config.pop('env') if 'env' in config else None
+    global_env = {k: v for k, v in env.items() if not isinstance(v, dict)}
+    package_envs = {k: v for k, v in env.items() if k not in global_env}
     repositories = _parse_repositories(config)
     locale = _parse_locale(config)
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     packages_to_be_installed = [*config.get('packages', [])]
-    build(locale, package_configs, packages_to_be_installed, libc, root_path, create_builder, stdlib, env=env,
+    build(locale, package_configs, packages_to_be_installed, libc, root_path, create_builder, stdlib,
+          global_env=global_env, package_envs=package_envs,
           repositories=repositories, max_concurrent_jobs=jobs, update_repos=update_repos)
     if packaging == 'docker':
         from staves.packagers.docker import package
