@@ -21,7 +21,7 @@ class ImageSpec:
 
 
 def run(
-    config_file: IO,
+    image_spec: ImageSpec,
     libc: Libc,
     root_path: str,
     packaging: str,
@@ -45,27 +45,25 @@ def run(
             "to use the user's netrc configuration"
         )
 
-    config = _read_image_spec(config_file)
-    if not name:
-        name = config.name
+    name = name or image_spec.name
     build(
-        config.locale,
-        config.package_configs,
-        list(config.packages_to_be_installed),
+        image_spec.locale,
+        image_spec.package_configs,
+        list(image_spec.packages_to_be_installed),
         libc,
         root_path,
         create_builder,
         stdlib,
-        global_env=config.global_env,
-        package_envs=config.package_envs,
-        repositories=config.repositories,
+        global_env=image_spec.global_env,
+        package_envs=image_spec.package_envs,
+        repositories=image_spec.repositories,
         max_concurrent_jobs=jobs,
         update_repos=update_repos,
     )
     if packaging == "docker":
         from staves.packagers.docker import package
 
-        package(root_path, name, version, config.command, config.annotations)
+        package(root_path, name, version, image_spec.command, image_spec.annotations)
 
 
 def _read_image_spec(config_file: IO) -> ImageSpec:

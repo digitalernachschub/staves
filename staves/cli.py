@@ -161,22 +161,23 @@ def build(
             env={"LANG": locale},
         )
     else:
-        from staves.runtimes.core import run
+        from staves.runtimes.core import run, _read_image_spec
 
         libc_enum = Libc.musl if "musl" in libc else Libc.glibc
         with config_path.open(mode="r") as config_file:
-            run(
-                config_file,
-                libc_enum,
-                rootfs_path,
-                packaging,
-                version,
-                create_builder,
-                stdlib,
-                name=name,
-                jobs=jobs,
-                update_repos=update,
-            )
+            config = _read_image_spec(config_file)
+        run(
+            config,
+            libc_enum,
+            rootfs_path,
+            packaging,
+            version,
+            create_builder,
+            stdlib,
+            name=name,
+            jobs=jobs,
+            update_repos=update,
+        )
 
 
 def main():
