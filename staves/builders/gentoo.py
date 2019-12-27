@@ -291,13 +291,8 @@ def build(
     package_envs: Optional[Mapping[str, Environment]] = None,
     repositories: Sequence[Repository] = None,
     max_concurrent_jobs: int = None,
-    update_repos: Sequence[str] = None,
 ):
     build_env = BuildEnvironment()
-    if update_repos:
-        for repo_name in update_repos:
-            logger.info(f'Updating repository "{repo_name}"…')
-            build_env.update_repository(repo_name)
     if global_env:
         build_env.write_env(global_env)
     if package_envs:

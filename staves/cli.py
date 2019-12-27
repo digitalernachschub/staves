@@ -104,7 +104,6 @@ def init(staves_version, runtime, stage3, portage_snapshot, libc):
     default="en_US.UTF-8",
     help="Specifies the locale (LANG env var) to be set in the builder",
 )
-@click.option("--update", multiple=True, help="Repositories to be updated")
 def build(
     version,
     config,
@@ -121,7 +120,6 @@ def build(
     ssh,
     netrc,
     locale,
-    update,
 ):
     config_path = Path(str(config)) if config else Path("staves.toml")
     if not config_path.exists():
@@ -147,9 +145,6 @@ def build(
         if jobs:
             args += ["--jobs", str(jobs)]
         args += ["--runtime", "none"]
-        if update:
-            for repo_name in update:
-                args += ["--update", repo_name]
         args.append(version)
         run_docker.run(
             builder,
@@ -177,7 +172,6 @@ def build(
             create_builder,
             stdlib,
             jobs=jobs,
-            update_repos=update,
         )
 
 

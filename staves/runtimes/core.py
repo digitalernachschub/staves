@@ -31,7 +31,6 @@ def run(
     jobs: int = None,
     ssh: bool = True,
     netrc: bool = True,
-    update_repos: Sequence[str] = None,
 ):
     if not ssh:
         raise StavesError(
@@ -56,7 +55,6 @@ def run(
         package_envs=image_spec.package_envs,
         repositories=image_spec.repositories,
         max_concurrent_jobs=jobs,
-        update_repos=update_repos,
     )
     if packaging == "docker":
         from staves.packagers.docker import package
