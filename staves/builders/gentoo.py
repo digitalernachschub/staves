@@ -21,6 +21,7 @@ Environment = NewType("Environment", Mapping[str, str])
 @dataclass
 class BuilderConfig:
     image_path: str
+    concurrent_jobs: int = None
 
 
 class RootfsError(StavesError):
@@ -291,7 +292,6 @@ def build(
     libc: Libc,
     create_builder: bool,
     stdlib: bool,
-    max_concurrent_jobs: int = None,
 ):
     build_env = BuildEnvironment()
     if image_spec.global_env:
@@ -323,9 +323,7 @@ def build(
             os.symlink("lib64", os.path.join(lib_prefix, "lib"))
     if os.path.exists(os.path.join("/usr", "portage")):
         _fix_portage_tree_permissions()
-    concurrent_jobs = (
-        max_concurrent_jobs if max_concurrent_jobs else _max_concurrent_jobs()
-    )
+    concurrent_jobs = config.concurrent_jobs or _max_concurrent_jobs()
     if create_builder:
         _update_builder(
             max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load()
