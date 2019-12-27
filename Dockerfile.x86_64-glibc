@@ -3,7 +3,7 @@ ARG STAGE3=latest
 FROM gentoo/portage:${PORTAGE_SNAPSHOT} as portage
 FROM gentoo/stage3-amd64-hardened-nomultilib:${STAGE3}
 ARG STAVES_VERSION="9999"
-COPY --from=portage --chown=portage:portage /usr/portage /usr/portage
+COPY --from=portage --chown=portage:portage / /
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
   mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
   USE="-gpg -perl -python" emerge --oneshot --verbose --quiet=y dev-vcs/git app-eselect/eselect-repository && \
