@@ -2,7 +2,7 @@ from typing import Any, IO, MutableMapping, Sequence
 
 import toml
 
-from staves.builders.gentoo import build, Locale, Repository
+from staves.builders.gentoo import build, Environment, Locale, Repository
 from staves.core import Libc, StavesError
 
 
@@ -35,8 +35,8 @@ def run(
     if not name:
         name = config["name"]
     env = config.pop("env") if "env" in config else None
-    global_env = {k: v for k, v in env.items() if not isinstance(v, dict)}
-    package_envs = {k: v for k, v in env.items() if k not in global_env}
+    global_env = Environment({k: v for k, v in env.items() if not isinstance(v, dict)})
+    package_envs = Environment({k: v for k, v in env.items() if k not in global_env})
     repositories = _parse_repositories(config)
     locale = _parse_locale(config)
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}

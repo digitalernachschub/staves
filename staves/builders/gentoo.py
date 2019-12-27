@@ -6,12 +6,15 @@ import re
 import shutil
 import subprocess
 
-from typing import Mapping, MutableSequence, Optional, Sequence, NamedTuple
+from typing import Mapping, MutableSequence, NewType, Optional, Sequence, NamedTuple
 
 from staves.core import Libc, StavesError
 
 
 logger = logging.getLogger(__name__)
+
+
+Environment = NewType("Environment", Mapping[str, str])
 
 
 class RootfsError(StavesError):
@@ -284,8 +287,8 @@ def build(
     root_path: str,
     create_builder: bool,
     stdlib: bool,
-    global_env: Optional[Mapping[str, str]] = None,
-    package_envs: Optional[Mapping[str, Mapping[str, str]]] = None,
+    global_env: Optional[Environment] = None,
+    package_envs: Optional[Mapping[str, Environment]] = None,
     repositories: Sequence[Repository] = None,
     max_concurrent_jobs: int = None,
     update_repos: Sequence[str] = None,
