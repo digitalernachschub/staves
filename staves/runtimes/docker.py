@@ -53,6 +53,7 @@ def run(
     args += ["--config", "/staves.toml"]
     args += ["--rootfs_path", builder_config.image_path]
     args += ["--libc", "musl" if builder_config.libc == Libc.musl else "glibc"]
+    args += ["--runtime", "none"]
     if builder_config.concurrent_jobs:
         args += ["--jobs", str(builder_config.concurrent_jobs)]
 

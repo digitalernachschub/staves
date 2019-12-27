@@ -127,7 +127,6 @@ def build(
             args += ["--stdlib"]
         if create_builder:
             args += ["--create-builder"]
-        args += ["--runtime", "none"]
         run_docker.run(
             builder,
             builder_config,
