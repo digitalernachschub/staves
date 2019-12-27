@@ -28,13 +28,3 @@ def run(
     build(
         image_spec, libc, root_path, create_builder, stdlib, max_concurrent_jobs=jobs,
     )
-    if packaging == "docker":
-        from staves.packagers.docker import package
-
-        package(
-            root_path,
-            image_spec.name,
-            version,
-            image_spec.command,
-            image_spec.annotations,
-        )

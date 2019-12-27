@@ -173,6 +173,12 @@ def build(
             stdlib,
             jobs=jobs,
         )
+        if packaging == "docker":
+            from staves.packagers.docker import package
+
+            package(
+                rootfs_path, config.name, version, config.command, config.annotations,
+            )
 
 
 def main():
