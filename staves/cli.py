@@ -164,14 +164,7 @@ def build(
         if name:
             config.name = name
         run(
-            config,
-            libc_enum,
-            rootfs_path,
-            packaging,
-            version,
-            create_builder,
-            stdlib,
-            jobs=jobs,
+            config, libc_enum, rootfs_path, create_builder, stdlib, jobs=jobs,
         )
         if packaging == "docker":
             from staves.packagers.docker import package

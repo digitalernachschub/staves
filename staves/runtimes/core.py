@@ -6,8 +6,6 @@ def run(
     image_spec: ImageSpec,
     libc: Libc,
     root_path: str,
-    packaging: str,
-    version: str,
     create_builder: bool,
     stdlib: bool,
     jobs: int = None,
