@@ -6,7 +6,7 @@ from pathlib import Path
 
 import click
 
-from staves.core import Libc, StavesError
+from staves.core import _read_image_spec, Libc, StavesError
 
 
 logger = logging.getLogger(__name__)
@@ -156,7 +156,7 @@ def build(
             env={"LANG": locale},
         )
     else:
-        from staves.runtimes.core import run, _read_image_spec
+        from staves.runtimes.core import run
 
         libc_enum = Libc.musl if "musl" in libc else Libc.glibc
         with config_path.open(mode="r") as config_file:
