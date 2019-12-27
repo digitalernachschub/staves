@@ -31,16 +31,16 @@ def cli(log_level: str):
 
 
 @cli.command(help="Initializes a builder for the specified runtime")
-@click.option("--staves-version")
+@click.option("--version")
 @click.option("--stage3", default="latest", show_default=True)
 @click.option("--portage-snapshot", default="latest", show_default=True)
 @click.option(
     "--libc", type=click.Choice(["glibc", "musl"]), default="glibc", show_default=True
 )
-def init(staves_version, stage3, portage_snapshot, libc):
+def init(version, stage3, portage_snapshot, libc):
     from staves.runtimes.docker import bootstrap
 
-    builder_name = bootstrap(staves_version, stage3, portage_snapshot, libc)
+    builder_name = bootstrap(version, stage3, portage_snapshot, libc)
     click.echo(builder_name)
 
 
