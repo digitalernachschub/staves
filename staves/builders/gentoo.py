@@ -189,13 +189,13 @@ class Repository(NamedTuple):
 
 
 def run_and_log_error(cmd: Sequence[str]) -> int:
-    update_repos_cmd = subprocess.run(
+    cmd = subprocess.run(
         cmd, universal_newlines=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
     )
-    if update_repos_cmd.returncode != 0:
-        logger.error(update_repos_cmd.stderr)
+    if cmd.returncode != 0:
+        logger.error(cmd.stderr)
         raise StavesError(f"Command failed: {cmd}")
-    return update_repos_cmd.returncode
+    return cmd.returncode
 
 
 class BuildEnvironment:
