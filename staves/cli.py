@@ -8,6 +8,7 @@ import click
 
 from staves.builders.gentoo import BuilderConfig
 from staves.core import _read_image_spec, Libc, StavesError
+from staves.packagers.config import read_packaging_config, PackagingConfig
 
 
 logger = logging.getLogger(__name__)
@@ -145,7 +146,7 @@ def build(
 @click.argument(
     "rootfs_path", help="Directory where the root filesystem can be found",
 )
-@click.argument("version")
+@click.option("--version", help="Version number of the packaged artifact")
 @click.option("--config", type=click.Path(dir_okay=False, exists=True))
 @click.option(
     "--packaging",
@@ -158,17 +159,19 @@ def package(rootfs_path, version, config, packaging):
     if not config_path.exists():
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
     with config_path.open(mode="r") as config_file:
-        image_spec = _read_image_spec(config_file)
+        packaging_config = read_packaging_config(config_file)
+    if version:
+        packaging_config.version = version
 
     if packaging == "docker":
         from staves.packagers.docker import package
 
         package(
             rootfs_path,
-            image_spec.name,
-            version,
-            image_spec.command,
-            image_spec.annotations,
+            packaging_config.name,
+            packaging_config.version,
+            packaging_config.command,
+            packaging_config.annotations,
         )
 
 

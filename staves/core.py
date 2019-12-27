@@ -18,9 +18,6 @@ class StavesError(Exception):
 
 @dataclass
 class ImageSpec:
-    name: str
-    command: str
-    annotations: Mapping[str, str]
     global_env: Environment
     package_envs: Mapping[str, Environment]
     repositories: Sequence[Repository]
@@ -35,9 +32,6 @@ def _read_image_spec(config_file: IO) -> ImageSpec:
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     packages_to_be_installed = [*config.get("packages", [])]
     return ImageSpec(
-        name=config["name"],
-        command=config["command"],
-        annotations=config.get("annotations", {}),
         global_env=Environment(
             {k: v for k, v in env.items() if not isinstance(v, dict)}
         ),
