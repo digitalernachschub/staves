@@ -166,6 +166,8 @@ def build(
         libc_enum = Libc.musl if "musl" in libc else Libc.glibc
         with config_path.open(mode="r") as config_file:
             config = _read_image_spec(config_file)
+        if name:
+            config.name = name
         run(
             config,
             libc_enum,
@@ -174,7 +176,6 @@ def build(
             version,
             create_builder,
             stdlib,
-            name=name,
             jobs=jobs,
             update_repos=update,
         )

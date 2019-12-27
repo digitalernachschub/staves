@@ -28,7 +28,6 @@ def run(
     version: str,
     create_builder: bool,
     stdlib: bool,
-    name: str = None,
     jobs: int = None,
     ssh: bool = True,
     netrc: bool = True,
@@ -45,7 +44,6 @@ def run(
             "to use the user's netrc configuration"
         )
 
-    name = name or image_spec.name
     build(
         image_spec.locale,
         image_spec.package_configs,
@@ -63,7 +61,13 @@ def run(
     if packaging == "docker":
         from staves.packagers.docker import package
 
-        package(root_path, name, version, image_spec.command, image_spec.annotations)
+        package(
+            root_path,
+            image_spec.name,
+            version,
+            image_spec.command,
+            image_spec.annotations,
+        )
 
 
 def _read_image_spec(config_file: IO) -> ImageSpec:
