@@ -143,18 +143,6 @@ def _update_builder(max_concurrent_jobs: int = 1, max_cpu_load: int = 1):
         raise RootfsError("Unable to update builder environment")
 
 
-def _fix_portage_tree_permissions():
-    for directory_path, subdirs, files in os.walk(os.path.join("/usr", "portage")):
-        for subdir in subdirs:
-            shutil.chown(
-                os.path.join(directory_path, subdir), user="portage", group="portage"
-            )
-        for f in files:
-            shutil.chown(
-                os.path.join(directory_path, f), user="portage", group="portage"
-            )
-
-
 def _copy_to_rootfs(rootfs: str, path_glob: str):
     globs = glob.iglob(path_glob)
     for host_path in globs:
@@ -318,8 +306,6 @@ def build(
             lib_path = os.path.join(lib_prefix, "lib64")
             os.makedirs(lib_path, exist_ok=True)
             os.symlink("lib64", os.path.join(lib_prefix, "lib"))
-    if os.path.exists(os.path.join("/usr", "portage")):
-        _fix_portage_tree_permissions()
     concurrent_jobs = config.concurrent_jobs or _max_concurrent_jobs()
     if create_builder:
         _update_builder(
