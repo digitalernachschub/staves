@@ -6,7 +6,7 @@ FROM staves/gentoo-stage3-amd64-musl-hardened:${STAGE3}
 COPY --from=portage --chown=portage:portage / /
 RUN echo "MAKEOPTS=\"-j$(($(nproc)+1)) -l$(nproc)\"" >> /etc/portage/make.conf && \
   echo "EMERGE_DEFAULT_OPTS=\"--quiet=y --verbose --autounmask-continue=y\"" >> /etc/portage/make.conf && \
-  echo "FEATURES=\"-userpriv -usersandbox -sandbox\"" >> /etc/portage/make.conf && \
+  echo "FEATURES=\"-userpriv -usersandbox -pid-sandbox -sandbox\"" >> /etc/portage/make.conf && \
   mkdir --parents /etc/portage/package.{use,accept_keywords,env} && \
   eselect profile set default/linux/amd64/17.0/musl/hardened && \
   USE="-gpg -perl -python" emerge --oneshot dev-vcs/git app-eselect/eselect-repository && \
