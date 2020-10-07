@@ -363,7 +363,7 @@ def build(
 
 def _read_image_spec(config_file: IO) -> ImageSpec:
     config = toml.load(config_file)
-    env = config.pop("env") if "env" in config else None
+    env = config.pop("env") if "env" in config else {}
     package_configs = {k: v for k, v in config.items() if isinstance(v, dict)}
     packages_to_be_installed = [*config.get("packages", [])]
     return ImageSpec(
