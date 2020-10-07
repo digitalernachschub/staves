@@ -87,7 +87,7 @@ def init(version, stage3, portage_snapshot, libc):
 )
 @click.option(
     "--locale",
-    default="en_US.UTF-8",
+    default="C.UTF-8",
     help="Specifies the locale (LANG env var) to be set in the builder",
 )
 def build(
