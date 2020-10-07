@@ -32,7 +32,7 @@ def cli(log_level: str):
 
 
 @cli.command(help="Initializes a builder for the specified runtime")
-@click.option("--version")
+@click.option("--version", default="latest")
 @click.option("--stage3", default="latest", show_default=True)
 @click.option("--portage-snapshot", default="latest", show_default=True)
 @click.option(
