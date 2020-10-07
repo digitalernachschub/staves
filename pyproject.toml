@@ -10,7 +10,6 @@ click = "^6.7"
 dataclasses = { version = "^0.7", python = "~3.6" }
 docker= "^3.6"
 toml = "^0.9"
-halo = "^0.0.30"
 
 [tool.poetry.dev-dependencies]
 hypothesis = "^3.37"
