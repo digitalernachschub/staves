@@ -1,6 +1,6 @@
 from staves.builders.gentoo import build, BuilderConfig
 from staves.core import StavesError
-from builders.gentoo import ImageSpec
+from staves.builders.gentoo import ImageSpec
 
 
 def run(
