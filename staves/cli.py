@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 
 import click
+from halo import Halo
 
 from staves.builders.gentoo import BuilderConfig
 from staves.core import Libc, StavesError
@@ -40,7 +41,8 @@ def cli(log_level: str):
 def init(version, stage3, portage_snapshot, libc):
     from staves.runtimes.docker import bootstrap
 
-    builder_name = bootstrap(version, stage3, portage_snapshot, libc)
+    with Halo(text="Bootstrapping builder images", spinner="dots"):
+        builder_name = bootstrap(version, stage3, portage_snapshot, libc)
     click.echo(builder_name)
 
 
