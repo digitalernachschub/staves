@@ -8,6 +8,7 @@ import click
 import toml
 
 from staves.builders.gentoo import (
+    build,
     BuilderConfig,
     Environment,
     ImageSpec,
@@ -135,11 +136,24 @@ def build(
             env={"LANG": locale},
         )
     else:
-        from staves.runtimes.core import run
-
         with config_path.open(mode="r") as config_file:
             config = _read_image_spec(config_file)
-        run(config, builder_config, create_builder, stdlib)
+        if not ssh:
+            raise StavesError(
+                "Default runtime does not have any filesystem isolation. Therefore, it is not possible not "
+                "to use the user's ssh keys"
+            )
+        if not netrc:
+            raise StavesError(
+                "Default runtime does not have any filesystem isolation. Therefore, it is not possible not "
+                "to use the user's netrc configuration"
+            )
+        build(
+            config,
+            builder_config,
+            create_builder,
+            stdlib,
+        )
 
 
 def _read_image_spec(config_file: IO) -> ImageSpec:
