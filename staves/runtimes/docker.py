@@ -7,8 +7,7 @@ from typing import Mapping, MutableSequence
 import docker
 from docker.types import Mount
 
-from staves.core import Libc
-from staves.builders.gentoo import BuilderConfig
+from staves.builders.gentoo import BuilderConfig, Libc
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -63,7 +62,11 @@ def run(
         args += ["--jobs", str(builder_config.concurrent_jobs)]
 
     mounts = [
-        Mount(type="volume", source=build_cache, target="/usr/portage/packages",),
+        Mount(
+            type="volume",
+            source=build_cache,
+            target="/usr/portage/packages",
+        ),
         Mount(
             type="bind",
             source=str(config.resolve()),

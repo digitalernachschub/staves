@@ -5,8 +5,8 @@ from pathlib import Path
 
 import click
 
-from staves.builders.gentoo import BuilderConfig
-from staves.core import Libc, StavesError
+from staves.builders.gentoo import BuilderConfig, Libc
+from staves.core import StavesError
 from staves.builders.gentoo import _read_image_spec
 from staves.packagers.config import read_packaging_config
 

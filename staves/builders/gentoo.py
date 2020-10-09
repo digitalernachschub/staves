@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import subprocess
+from enum import Enum, auto
 
 import toml
 from dataclasses import dataclass, field
@@ -19,13 +20,18 @@ from typing import (
     Any,
 )
 
-from staves.core import Libc, StavesError
+from staves.core import StavesError
 
 
 logger = logging.getLogger(__name__)
 
 
 Environment = NewType("Environment", Mapping[str, str])
+
+
+class Libc(Enum):
+    glibc = auto()
+    musl = auto()
 
 
 @dataclass
@@ -295,7 +301,10 @@ class ImageSpec:
 
 
 def build(
-    image_spec: ImageSpec, config: BuilderConfig, create_builder: bool, stdlib: bool,
+    image_spec: ImageSpec,
+    config: BuilderConfig,
+    create_builder: bool,
+    stdlib: bool,
 ):
     rootfs_path = "/tmp/rootfs"
     build_env = BuildEnvironment()
