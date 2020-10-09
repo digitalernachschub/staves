@@ -20,8 +20,6 @@ from typing import (
     Any,
 )
 
-from staves.core import StavesError
-
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +36,10 @@ class Libc(Enum):
 class BuilderConfig:
     libc: Libc
     concurrent_jobs: int = None
+
+
+class StavesError(Exception):
+    pass
 
 
 class RootfsError(StavesError):

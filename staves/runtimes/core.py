@@ -1,6 +1,9 @@
 from staves.builders.gentoo import build, BuilderConfig
-from staves.core import StavesError
 from staves.builders.gentoo import ImageSpec
+
+
+class StavesError(Exception):
+    pass
 
 
 def run(
@@ -23,5 +26,8 @@ def run(
         )
 
     build(
-        image_spec, builder_config, create_builder, stdlib,
+        image_spec,
+        builder_config,
+        create_builder,
+        stdlib,
     )

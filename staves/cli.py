@@ -6,12 +6,15 @@ from pathlib import Path
 import click
 
 from staves.builders.gentoo import BuilderConfig, Libc
-from staves.core import StavesError
 from staves.builders.gentoo import _read_image_spec
 from staves.packagers.config import read_packaging_config
 
 
 logger = logging.getLogger(__name__)
+
+
+class StavesError(Exception):
+    pass
 
 
 @click.group(name="staves")

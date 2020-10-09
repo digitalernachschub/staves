@@ -1,2 +1,0 @@
-class StavesError(Exception):
-    pass
