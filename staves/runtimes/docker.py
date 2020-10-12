@@ -101,7 +101,7 @@ def run(
     logger.debug("Starting docker container with the following mounts:")
     for mount in mounts:
         logger.debug(str(mount))
-    container = docker_client.containers.run(
+    container = docker_client.containers.create(
         builder,
         command=args,
         auto_remove=True,
@@ -109,5 +109,6 @@ def run(
         detach=True,
         environment=env,
     )
+    container.start()
     for line in container.logs(stream=True):
         print(line.decode(), end="")
