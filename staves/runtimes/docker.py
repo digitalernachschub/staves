@@ -5,7 +5,7 @@ import struct
 import subprocess
 import sys
 from pathlib import Path
-from typing import Mapping, MutableSequence
+from typing import Mapping
 
 import docker
 from docker.types import Mount
