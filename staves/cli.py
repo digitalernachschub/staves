@@ -1,12 +1,15 @@
 """Installs Gentoo portage packages into a specified directory."""
 
 import logging
+import pickle
+import struct
 from pathlib import Path
 from typing import IO, MutableMapping, Any, Sequence
 
 import click
 import toml
 
+import staves.builders.gentoo as gentoo_builder
 from staves.builders.gentoo import (
     build,
     BuilderConfig,
@@ -58,7 +61,7 @@ def init(version, stage3, portage_snapshot, libc):
 
 
 @cli.command(help="Installs the specified packages into to the desired location.")
-@click.option("--config", type=click.Path(dir_okay=False, exists=True))
+@click.option("--config", type=click.File(), default="staves.toml")
 @click.option(
     "--libc",
     type=click.Choice(["glibc", "musl"]),
@@ -117,11 +120,8 @@ def build(
 ):
     libc_enum = Libc.musl if "musl" in libc else Libc.glibc
     builder_config = BuilderConfig(concurrent_jobs=jobs, libc=libc_enum)
-
-    config_path = Path(str(config)) if config else Path("staves.toml")
-    if not config_path.exists():
-        raise StavesError(f'No configuration file found at path "{str(config_path)}"')
     if runtime == "docker":
+        image_spec = _read_image_spec(config)
         import staves.runtimes.docker as run_docker
 
         run_docker.run(
@@ -130,14 +130,16 @@ def build(
             stdlib,
             create_builder,
             build_cache,
-            config_path,
+            image_spec,
             ssh=ssh,
             netrc=netrc,
             env={"LANG": locale},
         )
     else:
-        with config_path.open(mode="r") as config_file:
-            config = _read_image_spec(config_file)
+        stdin = click.get_binary_stream("stdin")
+        content_length = struct.unpack(">Q", stdin.read(8))[0]
+        content = stdin.read(content_length)
+        image_spec = pickle.load(content)
         if not ssh:
             raise StavesError(
                 "Default runtime does not have any filesystem isolation. Therefore, it is not possible not "
@@ -148,8 +150,8 @@ def build(
                 "Default runtime does not have any filesystem isolation. Therefore, it is not possible not "
                 "to use the user's netrc configuration"
             )
-        build(
-            config,
+        gentoo_builder.build(
+            image_spec,
             builder_config,
             create_builder,
             stdlib,
