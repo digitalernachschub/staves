@@ -100,7 +100,7 @@ def run(
         logger.debug(str(mount))
     container = docker_client.containers.create(
         builder,
-        command=args,
+        entrypoint=["/usr/bin/python", "-m", "staves.builders.gentoo"],
         auto_remove=True,
         mounts=mounts,
         detach=True,
@@ -113,7 +113,7 @@ def run(
     serialized_image_spec = pickle.dumps(image_spec)
     content_length = struct.pack(">Q", len(serialized_image_spec))
     content = content_length + serialized_image_spec
-    container_input._sock.sendall(content)
+    container_input._sock.send(content)
     container_input._sock.shutdown(socket.SHUT_RDWR)
     container_input.close()
     for line in container.logs(stream=True):

@@ -3,7 +3,9 @@ import logging
 import multiprocessing
 import os
 import re
+import pickle
 import shutil
+import struct
 import subprocess
 from enum import Enum, auto
 
@@ -366,3 +368,19 @@ def build(
         ]
         for f in builder_files:
             _copy_to_rootfs(rootfs_path, f)
+
+
+if __name__ == "__main__":
+    import sys
+
+    content_length = struct.unpack(">Q", sys.stdin.buffer.read(8))[0]
+    print(f"Reading {content_length} bytes…")
+    content = sys.stdin.buffer.read(content_length)
+    print(f"Deserializing content")
+    image_spec = pickle.loads(content)
+    build(
+        image_spec,
+        config=BuilderConfig(libc=Libc.glibc),
+        create_builder=False,
+        stdlib=True,
+    )

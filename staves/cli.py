@@ -1,17 +1,14 @@
 """Installs Gentoo portage packages into a specified directory."""
 
 import logging
-import pickle
-import struct
 from pathlib import Path
 from typing import IO, MutableMapping, Any, Sequence
 
 import click
 import toml
 
-import staves.builders.gentoo as gentoo_builder
+import staves.runtimes.docker as run_docker
 from staves.builders.gentoo import (
-    build,
     BuilderConfig,
     Environment,
     ImageSpec,
@@ -78,12 +75,6 @@ def init(version, stage3, portage_snapshot, libc):
 @click.option(
     "--jobs", type=int, help="Number of concurrent jobs executed by the builder"
 )
-@click.option(
-    "--runtime",
-    type=click.Choice(["none", "docker"]),
-    default="docker",
-    help="Which environment staves will be executed in",
-)
 @click.option("--builder", help="The name of the builder to be used")
 @click.option(
     "--build-cache", help="The name of the cache volume for the Docker runtime"
@@ -111,7 +102,6 @@ def build(
     create_builder,
     stdlib,
     jobs,
-    runtime,
     builder,
     build_cache,
     ssh,
@@ -120,42 +110,19 @@ def build(
 ):
     libc_enum = Libc.musl if "musl" in libc else Libc.glibc
     builder_config = BuilderConfig(concurrent_jobs=jobs, libc=libc_enum)
-    if runtime == "docker":
-        image_spec = _read_image_spec(config)
-        import staves.runtimes.docker as run_docker
+    image_spec = _read_image_spec(config)
 
-        run_docker.run(
-            builder,
-            builder_config,
-            stdlib,
-            create_builder,
-            build_cache,
-            image_spec,
-            ssh=ssh,
-            netrc=netrc,
-            env={"LANG": locale},
-        )
-    else:
-        stdin = click.get_binary_stream("stdin")
-        content_length = struct.unpack(">Q", stdin.read(8))[0]
-        content = stdin.read(content_length)
-        image_spec = pickle.load(content)
-        if not ssh:
-            raise StavesError(
-                "Default runtime does not have any filesystem isolation. Therefore, it is not possible not "
-                "to use the user's ssh keys"
-            )
-        if not netrc:
-            raise StavesError(
-                "Default runtime does not have any filesystem isolation. Therefore, it is not possible not "
-                "to use the user's netrc configuration"
-            )
-        gentoo_builder.build(
-            image_spec,
-            builder_config,
-            create_builder,
-            stdlib,
-        )
+    run_docker.run(
+        builder,
+        builder_config,
+        stdlib,
+        create_builder,
+        build_cache,
+        image_spec,
+        ssh=ssh,
+        netrc=netrc,
+        env={"LANG": locale},
+    )
 
 
 def _read_image_spec(config_file: IO) -> ImageSpec:
