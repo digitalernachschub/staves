@@ -15,7 +15,6 @@ from typing import (
     NewType,
     Optional,
     Sequence,
-    NamedTuple,
 )
 
 
@@ -188,12 +187,14 @@ def libc_to_package_name(libc: Libc) -> str:
         raise ValueError(f"Unsupported value for libc: {libc}")
 
 
-class Locale(NamedTuple):
+@dataclass
+class Locale:
     name: str
     charset: str
 
 
-class Repository(NamedTuple):
+@dataclass
+class Repository:
     name: str
     sync_type: Optional[str] = None
     uri: Optional[str] = None
