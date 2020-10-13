@@ -1,9 +1,12 @@
+import io
 import json
 import logging
+import os
 import socket
 import struct
 import subprocess
 import sys
+import tarfile
 from dataclasses import asdict
 from pathlib import Path
 from typing import Mapping
@@ -11,6 +14,7 @@ from typing import Mapping
 import docker
 from docker.types import Mount
 
+import staves.builders.gentoo as gentoo_builder
 from staves.builders.gentoo import BuilderConfig, Libc, ImageSpec
 
 logger = logging.getLogger(__name__)
@@ -101,13 +105,20 @@ def run(
         logger.debug(str(mount))
     container = docker_client.containers.create(
         builder,
-        entrypoint=["/usr/bin/python", "-m", "staves.builders.gentoo"],
+        entrypoint=["/usr/bin/python", "/staves.py"],
         auto_remove=True,
         mounts=mounts,
         detach=True,
         environment=env,
         stdin_open=True,
     )
+    bundle_file = io.BytesIO()
+    with tarfile.TarFile(fileobj=bundle_file, mode="x") as archive:
+        builder_runtime_path = os.path.abspath(gentoo_builder.__file__)
+        archive.add(builder_runtime_path, arcname="staves.py")
+    bundle_file.seek(0)
+    bundle_content = bundle_file.read()
+    container.put_archive("/", bundle_content)
     container.start()
     container_input = container.attach_socket(params={"stdin": 1, "stream": 1})
     serialized_image_spec = json.dumps(
