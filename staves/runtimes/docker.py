@@ -106,7 +106,6 @@ def run(
         detach=True,
         environment=env,
         stdin_open=True,
-        tty=True,
     )
     container.start()
     container_input = container.attach_socket(params={"stdin": 1, "stream": 1})
@@ -117,5 +116,4 @@ def run(
     container_input._sock.shutdown(socket.SHUT_RDWR)
     container_input.close()
     for line in container.logs(stream=True):
-        # print(line.decode(), end="")
-        print(line, end="")
+        print(line.decode(), end="")
