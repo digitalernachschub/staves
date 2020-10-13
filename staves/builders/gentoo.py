@@ -1,9 +1,9 @@
 import glob
+import json
 import logging
 import multiprocessing
 import os
 import re
-import pickle
 import shutil
 import struct
 import subprocess
@@ -378,7 +378,17 @@ if __name__ == "__main__":
     print(f"Reading {content_length} bytes…")
     content = sys.stdin.buffer.read(content_length)
     print(f"Deserializing content")
-    image_spec = pickle.loads(content)
+    image_spec_json = json.loads(content)
+    image_spec = ImageSpec(
+        locale=Locale(**image_spec_json["locale"]),
+        global_env=image_spec_json["global_env"],
+        package_envs=image_spec_json["package_envs"],
+        repositories=[
+            Repository(**repository) for repository in image_spec_json["repositories"]
+        ],
+        package_configs=image_spec_json["package_configs"],
+        packages_to_be_installed=image_spec_json["packages_to_be_installed"],
+    )
     build(
         image_spec,
         config=BuilderConfig(libc=Libc.glibc),

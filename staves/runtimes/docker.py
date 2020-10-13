@@ -1,9 +1,10 @@
+import json
 import logging
-import pickle
 import socket
 import struct
 import subprocess
 import sys
+from dataclasses import asdict
 from pathlib import Path
 from typing import Mapping
 
@@ -109,7 +110,16 @@ def run(
     )
     container.start()
     container_input = container.attach_socket(params={"stdin": 1, "stream": 1})
-    serialized_image_spec = pickle.dumps(image_spec)
+    serialized_image_spec = json.dumps(
+        dict(
+            locale=asdict(image_spec.locale),
+            global_env=image_spec.global_env,
+            package_envs=image_spec.package_envs,
+            repositories=[asdict(repository) for repository in image_spec.repositories],
+            package_configs=image_spec.package_configs,
+            packages_to_be_installed=image_spec.packages_to_be_installed,
+        )
+    ).encode()
     content_length = struct.pack(">Q", len(serialized_image_spec))
     content = content_length + serialized_image_spec
     container_input._sock.send(content)
