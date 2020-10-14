@@ -14,7 +14,6 @@ def test_creates_lib_symlink(tmpdir, monkeypatch, mocker):
         toml.dumps(dict(name="staves_test", packages=["virtual/libintl"], command=""))
     )
     mocker.patch("staves.builders.gentoo._fix_portage_tree_permissions")
-    mocker.patch("staves.builders.gentoo._update_builder")
     mocker.patch("staves.builders.gentoo._create_rootfs")
     runner = CliRunner()
 
@@ -47,7 +46,6 @@ def test_copies_libgcc(tmpdir, monkeypatch, mocker):
         toml.dumps(dict(name="staves_test", packages=["virtual/libintl"], command=""))
     )
     mocker.patch("staves.builders.gentoo._fix_portage_tree_permissions")
-    mocker.patch("staves.builders.gentoo._update_builder")
     mocker.patch("staves.builders.gentoo._create_rootfs")
     runner = CliRunner()
 

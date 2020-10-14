@@ -126,38 +126,6 @@ def _copy_stdlib(rootfs_path: str, copy_libstdcpp: bool):
         shutil.copy(libstdcpp_path, os.path.join(rootfs_path, "usr", "lib"))
 
 
-def _update_builder(max_concurrent_jobs: int = 1, max_cpu_load: int = 1):
-    # Register staves in /var/lib/portage/world
-    register_staves = subprocess.run(
-        ["emerge", "--noreplace", "dev-util/staves"], stderr=subprocess.PIPE
-    )
-    if register_staves.returncode != 0:
-        logger.error(register_staves.stderr)
-        raise RootfsError("Unable to register Staves as an installed package")
-
-    emerge_env = os.environ
-    emerge_env["MAKEOPTS"] = "-j{} -l{}".format(max_concurrent_jobs, max_cpu_load)
-    update_world = subprocess.run(
-        [
-            "emerge",
-            "--verbose",
-            "--deep",
-            "--usepkg",
-            "--with-bdeps=y",
-            "--jobs",
-            str(max_concurrent_jobs),
-            "--load-average",
-            str(max_cpu_load),
-            "@world",
-        ],
-        stderr=subprocess.PIPE,
-        env=emerge_env,
-    )
-    if update_world.returncode != 0:
-        logger.error(update_world.stderr)
-        raise RootfsError("Unable to update builder environment")
-
-
 def _copy_to_rootfs(rootfs: str, path_glob: str):
     globs = glob.iglob(path_glob)
     for host_path in globs:
