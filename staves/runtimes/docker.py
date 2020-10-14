@@ -36,7 +36,7 @@ def run(
         Mount(
             type="volume",
             source=build_cache,
-            target="/usr/portage/packages",
+            target="/var/cache/binpkgs",
         ),
     ]
     if ssh:
