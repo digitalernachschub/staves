@@ -304,7 +304,6 @@ class ImageSpec:
 def build(
     image_spec: ImageSpec,
     config: BuilderConfig,
-    create_builder: bool,
     stdlib: bool,
 ):
     rootfs_path = "/tmp/rootfs"
@@ -337,10 +336,6 @@ def build(
             os.makedirs(lib_path, exist_ok=True)
             os.symlink("lib64", os.path.join(lib_prefix, "lib"))
     concurrent_jobs = config.concurrent_jobs or _max_concurrent_jobs()
-    if create_builder:
-        _update_builder(
-            max_concurrent_jobs=concurrent_jobs, max_cpu_load=_max_cpu_load()
-        )
     _create_rootfs(
         rootfs_path,
         *packages,
@@ -355,20 +350,6 @@ def build(
             )
             subprocess.run("locale-gen")
         _copy_to_rootfs(rootfs_path, "/usr/lib/locale/locale-archive")
-    if create_builder:
-        builder_files = [
-            "/usr/portage",
-            "/etc/portage/make.conf",
-            "/etc/portage/make.profile",
-            "/etc/portage/repos.conf",
-            "/etc/portage/env",
-            "/etc/portage/package.env",
-            "/etc/portage/package.use",
-            "/etc/portage/package.accept_keywords",
-            "/var/db/repos/*",
-        ]
-        for f in builder_files:
-            _copy_to_rootfs(rootfs_path, f)
 
 
 if __name__ == "__main__":
@@ -392,6 +373,5 @@ if __name__ == "__main__":
     build(
         image_spec,
         config=BuilderConfig(libc=Libc.glibc),
-        create_builder=False,
         stdlib=True,
     )

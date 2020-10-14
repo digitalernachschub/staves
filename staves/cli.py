@@ -68,12 +68,6 @@ def init(version, stage3, portage_snapshot, libc):
 )
 @click.option("--stdlib", is_flag=True, help="Copy libstdc++ into rootfs")
 @click.option(
-    "--create-builder",
-    is_flag=True,
-    default=False,
-    help="When a builder is created, Staves will copy files such as the Portage tree, make.conf and make.profile.",
-)
-@click.option(
     "--jobs", type=int, help="Number of concurrent jobs executed by the builder"
 )
 @click.option("--builder", help="The name of the builder to be used")
@@ -100,7 +94,6 @@ def init(version, stage3, portage_snapshot, libc):
 def build(
     config,
     libc,
-    create_builder,
     stdlib,
     jobs,
     builder,
@@ -117,7 +110,6 @@ def build(
         builder,
         builder_config,
         stdlib,
-        create_builder,
         build_cache,
         image_spec,
         ssh=ssh,

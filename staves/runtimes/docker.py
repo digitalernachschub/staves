@@ -50,7 +50,6 @@ def run(
     builder: str,
     builder_config: BuilderConfig,
     stdlib: bool,
-    create_builder: bool,
     build_cache: str,
     image_spec: ImageSpec,
     ssh: bool = False,
@@ -61,8 +60,6 @@ def run(
     args = ["build"]
     if stdlib:
         args += ["--stdlib"]
-    if create_builder:
-        args += ["--create-builder"]
     args += ["--config", "-"]
     args += ["--libc", "musl" if builder_config.libc == Libc.musl else "glibc"]
     args += ["--runtime", "none"]
