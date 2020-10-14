@@ -21,31 +21,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def bootstrap(version: str, stage3: str, portage_snapshot: str, libc: str) -> str:
-    image_name = f"staves/bootstrap-x86_64-{libc}:{version}"
-    command = [
-        "docker",
-        "build",
-        "--pull",
-        "--tag",
-        image_name,
-        "--no-cache",
-        "-f",
-        f"Dockerfile.x86_64-{libc}",
-        "--build-arg",
-        f"STAGE3={stage3}",
-        "--build-arg",
-        f"PORTAGE_SNAPSHOT={portage_snapshot}",
-        ".",
-    ]
-    docker_call = subprocess.run(
-        command, stdout=subprocess.PIPE, universal_newlines=True
-    )
-    print(docker_call.stdout, file=sys.stderr, flush=True)
-    docker_call.check_returncode()
-    return image_name
-
-
 def run(
     builder: str,
     portage: str,
