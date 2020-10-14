@@ -94,15 +94,11 @@ def build(
     netrc,
     locale,
 ):
-    libc_enum = Libc.musl if "musl" in libc else Libc.glibc
-    builder_config = BuilderConfig(concurrent_jobs=jobs, libc=libc_enum)
     image_spec = _read_image_spec(config)
 
     run_docker.run(
         builder,
         portage,
-        builder_config,
-        stdlib,
         build_cache,
         image_spec,
         ssh=ssh,

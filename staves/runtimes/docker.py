@@ -24,8 +24,6 @@ logger.setLevel(logging.DEBUG)
 def run(
     builder: str,
     portage: str,
-    builder_config: BuilderConfig,
-    stdlib: bool,
     build_cache: str,
     image_spec: ImageSpec,
     ssh: bool = False,
