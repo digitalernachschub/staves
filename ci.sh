@@ -28,18 +28,6 @@ pep440_version() {
     fi
 }
 
-create_stage3_image() {
-    local build_date="$1"
-    stage3_filename=stage3-amd64-musl-hardened-${build_date}.tar.bz2
-    stage3_path=/tmp/${stage3_filename}
-    if [ ! -f ${stage3_path} ]; then
-        wget -O ${stage3_path} http://distfiles.gentoo.org/experimental/amd64/musl/${stage3_filename}
-    fi
-    mkdir gentoo
-    fakeroot tar xpjf ${stage3_path} -C gentoo
-    docker build --tag staves/gentoo-stage3-amd64-musl-hardened:${build_date} --tag staves/gentoo-stage3-amd64-musl-hardened:latest -f Dockerfile.stage3 .
-}
-
 project_name=$(basename $(pwd))
 version=$(git describe --tags --always --dirty)
 version=${version#${project_name}-}
@@ -51,19 +39,6 @@ poetry build
 poetry install
 
 #run_unit_tests
-
-#musl_stage3_date="20190104"
-#create_stage3_image ${musl_stage3_date}
-#full_version="${version}.${musl_stage3_date}"
-#builder_name=$(staves init --staves-version "${full_version}" --libc musl --stage3 "${musl_stage3_date}")
-#staves build --build-cache staves-x86_64-musl-cache \
-#    --builder "${builder_name}" --create-builder --libc "musl" \
-#    --config x86_64-musl.toml "${full_version}"
-#if [[ $(git tag --list ${project_name}-${version}) ]]; then
-#  docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version}"
-#  docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version%.*}"
-#  docker tag "staves/x86_64-musl:${full_version}" "staves/x86_64-musl:${version%%.*}"
-#fi
 
 glibc_stage3_date="20190311"
 full_version="${version}.${glibc_stage3_date}"
