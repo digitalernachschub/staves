@@ -156,7 +156,7 @@ def _parse_locale(config: MutableMapping[str, Any]) -> Locale:
     if "locale" not in config:
         return Locale("C", "UTF-8")
     l = config.pop("locale")
-    return Locale[l["name"], l["charset"]]
+    return Locale(l["name"], l["charset"])
 
 
 @cli.command("package", help="Creates a container image from a directory")
