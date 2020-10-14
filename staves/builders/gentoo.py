@@ -338,6 +338,7 @@ if __name__ == "__main__":
         package_configs=image_spec_json["package_configs"],
         packages_to_be_installed=image_spec_json["packages_to_be_installed"],
     )
+    subprocess.run(["emerge", "eselect-repository"])
     build(
         image_spec,
         config=BuilderConfig(libc=Libc.glibc),
