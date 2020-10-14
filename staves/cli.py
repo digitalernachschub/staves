@@ -17,6 +17,7 @@ from staves.builders.gentoo import (
     Repository,
 )
 from staves.packagers.config import read_packaging_config
+from staves.packagers.docker import package
 
 
 logger = logging.getLogger(__name__)
@@ -178,8 +179,6 @@ def package(rootfs_path, version, config, packaging):
         packaging_config.version = version
 
     if packaging == "docker":
-        from staves.packagers.docker import package
-
         package(
             rootfs_path,
             packaging_config.name,
