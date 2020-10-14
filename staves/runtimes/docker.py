@@ -33,14 +33,6 @@ def run(
     env: Mapping[str, str] = None,
 ):
     docker_client = docker.from_env()
-    args = ["build"]
-    if stdlib:
-        args += ["--stdlib"]
-    args += ["--config", "-"]
-    args += ["--libc", "musl" if builder_config.libc == Libc.musl else "glibc"]
-    args += ["--runtime", "none"]
-    if builder_config.concurrent_jobs:
-        args += ["--jobs", str(builder_config.concurrent_jobs)]
 
     mounts = [
         Mount(
