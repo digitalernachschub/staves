@@ -276,6 +276,12 @@ def build(
 ):
     rootfs_path = "/tmp/rootfs"
     build_env = BuildEnvironment()
+    build_env.write_env(
+        {
+            "FEATURES": "${FEATURES} -userpriv -usersandbox "
+            "-ipc-sandbox -network-sandbox -pid-sandbox -sandbox"
+        }
+    )
     if image_spec.global_env:
         build_env.write_env(image_spec.global_env)
     if image_spec.package_envs:
