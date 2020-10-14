@@ -72,6 +72,12 @@ def init(version, stage3, portage_snapshot, libc):
 )
 @click.option("--builder", help="The name of the builder to be used")
 @click.option(
+    "--portage",
+    default="gentoo/portage",
+    show_default=True,
+    help="The Portage image to be used",
+)
+@click.option(
     "--build-cache", help="The name of the cache volume for the Docker runtime"
 )
 @click.option(
@@ -97,6 +103,7 @@ def build(
     stdlib,
     jobs,
     builder,
+    portage,
     build_cache,
     ssh,
     netrc,
@@ -108,6 +115,7 @@ def build(
 
     run_docker.run(
         builder,
+        portage,
         builder_config,
         stdlib,
         build_cache,

@@ -48,6 +48,7 @@ def bootstrap(version: str, stage3: str, portage_snapshot: str, libc: str) -> st
 
 def run(
     builder: str,
+    portage: str,
     builder_config: BuilderConfig,
     stdlib: bool,
     build_cache: str,
@@ -100,6 +101,10 @@ def run(
     logger.debug("Starting docker container with the following mounts:")
     for mount in mounts:
         logger.debug(str(mount))
+    portage_container = docker_client.containers.create(
+        portage,
+        auto_remove=True,
+    )
     container = docker_client.containers.create(
         builder,
         entrypoint=["/usr/bin/python", "/staves.py"],
@@ -108,6 +113,7 @@ def run(
         detach=True,
         environment=env,
         stdin_open=True,
+        volumes_from=[portage_container.id + ":ro"],
     )
     bundle_file = io.BytesIO()
     with tarfile.TarFile(fileobj=bundle_file, mode="x") as archive:
