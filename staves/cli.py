@@ -43,21 +43,6 @@ def cli(log_level: str):
     root_logger.addHandler(console_handler)
 
 
-@cli.command(help="Initializes a builder for the specified runtime")
-@click.option("--version", default="latest")
-@click.option("--stage3", default="latest", show_default=True)
-@click.option("--portage-snapshot", default="latest", show_default=True)
-@click.option(
-    "--libc", type=click.Choice(["glibc", "musl"]), default="glibc", show_default=True
-)
-def init(version, stage3, portage_snapshot, libc):
-    from staves.runtimes.docker import bootstrap
-
-    click.echo("Bootstrapping builder images…")
-    builder_name = bootstrap(version, stage3, portage_snapshot, libc)
-    click.echo(builder_name)
-
-
 @cli.command(help="Installs the specified packages into to the desired location.")
 @click.option("--config", type=click.File(), default="staves.toml")
 @click.option(
