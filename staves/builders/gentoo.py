@@ -303,14 +303,6 @@ def build(
     packages = list(image_spec.packages_to_be_installed)
     if config.libc:
         packages.append(libc_to_package_name(config.libc))
-    if config.libc != Libc.musl:
-        # This value should depend on the selected profile, but there is currently no musl profile with
-        # links to lib directories.
-        for prefix in ["", "usr", "usr/local"]:
-            lib_prefix = os.path.join(rootfs_path, prefix)
-            lib_path = os.path.join(lib_prefix, "lib64")
-            os.makedirs(lib_path, exist_ok=True)
-            os.symlink("lib64", os.path.join(lib_prefix, "lib"))
     concurrent_jobs = config.concurrent_jobs or _max_concurrent_jobs()
     _create_rootfs(
         rootfs_path,
