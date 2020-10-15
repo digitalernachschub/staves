@@ -279,7 +279,8 @@ def build(
     build_env.write_env(
         {
             "FEATURES": "${FEATURES} -userpriv -usersandbox "
-            "-ipc-sandbox -network-sandbox -pid-sandbox -sandbox"
+            "-ipc-sandbox -network-sandbox -pid-sandbox -sandbox "
+            "buildpkg binpkg-multi-instance -binpkg-logs"
         }
     )
     if image_spec.global_env:
