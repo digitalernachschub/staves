@@ -280,7 +280,8 @@ def build(
         {
             "FEATURES": "${FEATURES} -userpriv -usersandbox "
             "-ipc-sandbox -network-sandbox -pid-sandbox -sandbox "
-            "buildpkg binpkg-multi-instance -binpkg-logs"
+            "buildpkg binpkg-multi-instance -binpkg-logs "
+            "-news nodoc noinfo noman"
         }
     )
     if image_spec.global_env:
