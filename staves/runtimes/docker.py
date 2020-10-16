@@ -26,6 +26,7 @@ def run(
     portage: str,
     build_cache: str,
     image_spec: ImageSpec,
+    image_path: Path,
     stdlib: bool = False,
     ssh: bool = False,
     netrc: bool = False,
@@ -38,7 +39,7 @@ def run(
             type="volume",
             source=build_cache,
             target="/var/cache/binpkgs",
-        ),
+        )
     ]
     if ssh:
         ssh_dir = str(Path.home().joinpath(".ssh"))
@@ -78,7 +79,6 @@ def run(
         builder,
         entrypoint=["/usr/bin/python", "/staves.py"],
         command=args,
-        auto_remove=True,
         mounts=mounts,
         detach=True,
         environment=env,
@@ -111,3 +111,10 @@ def run(
     container_input.close()
     for line in container.logs(stream=True):
         print(line.decode(), end="")
+    container.stop()
+    container.wait()
+    image_chunks, _ = container.get_archive("/tmp/rootfs")
+    with image_path.open(mode="wb") as image_archive:
+        for chunk in image_chunks:
+            image_archive.write(chunk)
+    container.remove()

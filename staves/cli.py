@@ -1,6 +1,7 @@
 """Installs Gentoo portage packages into a specified directory."""
 
 import logging
+import os
 from pathlib import Path
 from typing import IO, MutableMapping, Any, Sequence
 
@@ -82,6 +83,11 @@ def cli(log_level: str):
     default="C.UTF-8",
     help="Specifies the locale (LANG env var) to be set in the builder",
 )
+@click.option(
+    "--image-path",
+    default=os.path.join(os.getcwd(), "staves_root.tar"),
+    help="Path to the image archive",
+)
 def build(
     config,
     libc,
@@ -93,14 +99,21 @@ def build(
     ssh,
     netrc,
     locale,
+    image_path,
 ):
     image_spec = _read_image_spec(config)
-
+    image_path = Path(image_path)
+    if image_path.exists():
+        raise click.Abort(
+            "The path to the image root already exists. For safety reasons, please remove "
+            + str(image_path)
+        )
     run_docker.run(
         builder,
         portage,
         build_cache,
         image_spec,
+        image_path,
         stdlib=stdlib,
         ssh=ssh,
         netrc=netrc,
