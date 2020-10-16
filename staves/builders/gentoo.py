@@ -320,15 +320,9 @@ def build(
         _copy_to_rootfs(rootfs_path, "/usr/lib/locale/locale-archive")
 
 
-if __name__ == "__main__":
-    import sys
-
-    content_length = struct.unpack(">Q", sys.stdin.buffer.read(8))[0]
-    print(f"Reading {content_length} bytes…")
-    content = sys.stdin.buffer.read(content_length)
-    print(f"Deserializing content")
-    image_spec_json = json.loads(content)
-    image_spec = ImageSpec(
+def _deserialize_image_spec(data: bytes) -> ImageSpec:
+    image_spec_json = json.loads(data)
+    return ImageSpec(
         locale=Locale(**image_spec_json["locale"]),
         global_env=image_spec_json["global_env"],
         package_envs=image_spec_json["package_envs"],
@@ -338,6 +332,16 @@ if __name__ == "__main__":
         package_configs=image_spec_json["package_configs"],
         packages_to_be_installed=image_spec_json["packages_to_be_installed"],
     )
+
+
+if __name__ == "__main__":
+    import sys
+
+    content_length = struct.unpack(">Q", sys.stdin.buffer.read(8))[0]
+    print(f"Reading {content_length} bytes…")
+    content = sys.stdin.buffer.read(content_length)
+    print(f"Deserializing content")
+    image_spec = _deserialize_image_spec(content)
     subprocess.run(["emerge", "eselect-repository"])
     build(
         image_spec,
