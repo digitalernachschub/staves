@@ -1,4 +1,5 @@
 import io
+import os
 import tarfile
 from typing import Mapping, Sequence
 
