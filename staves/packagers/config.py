@@ -1,15 +1,8 @@
-from dataclasses import dataclass
-from typing import IO, Mapping, Optional
+from typing import IO
 
 import toml
 
-
-@dataclass
-class PackagingConfig:
-    name: str
-    command: str
-    annotations: Mapping[str, str]
-    version: Optional[str]
+from staves.builders.gentoo import PackagingConfig
 
 
 def read_packaging_config(config_file: IO) -> PackagingConfig:

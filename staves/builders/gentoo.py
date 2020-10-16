@@ -43,6 +43,14 @@ class RootfsError(StavesError):
     pass
 
 
+@dataclass
+class PackagingConfig:
+    name: str
+    command: str
+    annotations: Mapping[str, str]
+    version: Optional[str]
+
+
 def _create_rootfs(
     rootfs_path, *packages, max_concurrent_jobs: int = 1, max_cpu_load: int = 1
 ):
