@@ -343,7 +343,24 @@ def _deserialize_image_spec(data: bytes) -> ImageSpec:
 
 
 if __name__ == "__main__":
+    import argparse
     import sys
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--stdlib",
+        dest="stdlib",
+        action="store_true",
+        help="Copy stdlib into target image",
+    )
+    parser.add_argument(
+        "--no-stdlib",
+        dest="stdlib",
+        action="store_false",
+        help="Do not copy stdlib into target image",
+    )
+    parser.set_defaults(stdlib=False)
+    args = parser.parse_args()
 
     content_length = struct.unpack(">Q", sys.stdin.buffer.read(8))[0]
     print(f"Reading {content_length} bytes…")
@@ -354,5 +371,5 @@ if __name__ == "__main__":
     build(
         image_spec,
         config=BuilderConfig(libc=Libc.glibc),
-        stdlib=True,
+        stdlib=args.stdlib,
     )

@@ -101,6 +101,7 @@ def build(
         portage,
         build_cache,
         image_spec,
+        stdlib=stdlib,
         ssh=ssh,
         netrc=netrc,
         env={"LANG": locale},

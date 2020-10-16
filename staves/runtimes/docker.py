@@ -26,6 +26,7 @@ def run(
     portage: str,
     build_cache: str,
     image_spec: ImageSpec,
+    stdlib: bool = False,
     ssh: bool = False,
     netrc: bool = False,
     env: Mapping[str, str] = None,
@@ -70,9 +71,13 @@ def run(
         portage,
         auto_remove=True,
     )
+    args = []
+    if stdlib:
+        args += ["--stdlib"]
     container = docker_client.containers.create(
         builder,
         entrypoint=["/usr/bin/python", "/staves.py"],
+        command=args,
         auto_remove=True,
         mounts=mounts,
         detach=True,
