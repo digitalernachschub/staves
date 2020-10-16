@@ -14,9 +14,9 @@ from staves.builders.gentoo import (
     ImageSpec,
     Libc,
     Locale,
+    PackagingConfig,
     Repository,
 )
-from staves.packagers.config import read_packaging_config
 from staves.packagers.docker import package
 
 
@@ -167,6 +167,16 @@ def package(rootfs_path, version, config, packaging):
             packaging_config.command,
             packaging_config.annotations,
         )
+
+
+def read_packaging_config(config_file: IO) -> PackagingConfig:
+    data = toml.load(config_file)
+    return PackagingConfig(
+        name=data["name"],
+        command=data["command"],
+        annotations=data.get("annotations", {}),
+        version=data.get("version"),
+    )
 
 
 def main():
