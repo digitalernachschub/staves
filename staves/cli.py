@@ -155,7 +155,7 @@ def package(rootfs_path, version, config, packaging):
     if not config_path.exists():
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
     with config_path.open(mode="r") as config_file:
-        packaging_config = read_packaging_config(config_file)
+        packaging_config = _read_packaging_config(config_file)
     if version:
         packaging_config.version = version
 
@@ -169,7 +169,7 @@ def package(rootfs_path, version, config, packaging):
         )
 
 
-def read_packaging_config(config_file: IO) -> PackagingConfig:
+def _read_packaging_config(config_file: IO) -> PackagingConfig:
     data = toml.load(config_file)
     return PackagingConfig(
         name=data["name"],
