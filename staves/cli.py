@@ -143,7 +143,12 @@ def _parse_locale(config: MutableMapping[str, Any]) -> Locale:
 
 @cli.command("package", help="Creates a container image from a directory")
 @click.argument("rootfs_path")
-@click.option("--version", help="Version number of the packaged artifact")
+@click.option(
+    "--version",
+    default="latest",
+    show_default=True,
+    help="Version number of the packaged artifact",
+)
 @click.option("--config", type=click.Path(dir_okay=False, exists=True))
 @click.option(
     "--packaging",
@@ -157,8 +162,7 @@ def package_(rootfs_path, version, config, packaging):
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
     with config_path.open(mode="r") as config_file:
         packaging_config = _read_packaging_config(config_file)
-    if version:
-        packaging_config.version = version
+    packaging_config.version = packaging_config.version or version
 
     if packaging == "docker":
         package(
