@@ -150,7 +150,7 @@ def _parse_locale(config: MutableMapping[str, Any]) -> Locale:
     default="docker",
     help="Packaging format of the resulting image",
 )
-def package(rootfs_path, version, config, packaging):
+def package_(rootfs_path, version, config, packaging):
     config_path = Path(str(config)) if config else Path("staves.toml")
     if not config_path.exists():
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
