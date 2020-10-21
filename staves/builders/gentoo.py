@@ -355,7 +355,6 @@ if __name__ == "__main__":
         libc = Libc.musl
     else:
         raise StavesError(f"Unsupported ELIBC: {elibc}")
-    subprocess.run(["emerge", "eselect-repository"])
     build(
         image_spec,
         config=BuilderConfig(libc=libc),
