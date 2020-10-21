@@ -160,9 +160,7 @@ def _parse_repositories(config: MutableMapping[str, Any]) -> Sequence[Repository
     if "repositories" not in config:
         return []
     repos = config.pop("repositories")
-    return [
-        Repository(r["name"], sync_type=r.get("type"), uri=r.get("uri")) for r in repos
-    ]
+    return [Repository(r["name"], r["uri"], r["type"]) for r in repos]
 
 
 def _parse_locale(config: MutableMapping[str, Any]) -> Locale:

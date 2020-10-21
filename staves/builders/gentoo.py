@@ -172,8 +172,8 @@ class Locale:
 @dataclass
 class Repository:
     name: str
-    sync_type: Optional[str] = None
-    uri: Optional[str] = None
+    uri: str
+    sync_type: str
 
 
 def run_and_log_error(cmd: Sequence[str]) -> int:
