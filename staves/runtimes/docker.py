@@ -4,8 +4,6 @@ import logging
 import os
 import socket
 import struct
-import subprocess
-import sys
 import tarfile
 from dataclasses import asdict
 from pathlib import Path
@@ -15,7 +13,7 @@ import docker
 from docker.types import Mount
 
 import staves.builders.gentoo as gentoo_builder
-from staves.builders.gentoo import BuilderConfig, Libc, ImageSpec
+from staves.builders.gentoo import ImageSpec
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
