@@ -192,14 +192,21 @@ class BuildEnvironment:
         logger.info(f"Updating repository list")
         run_and_log_error(["eselect", "repository", "list", "-i"])
 
-    def add_repository(self, name: str, sync_type: str = None, uri: str = None):
-        logger.info(f"Adding repository {name}")
-        if uri and sync_type:
-            add_repo_command = ["eselect", "repository", "add", name, sync_type, uri]
+    def add_repository(self, repository: Repository):
+        logger.info(f"Adding repository {repository.name}")
+        if repository.uri and repository.sync_type:
+            add_repo_command = [
+                "eselect",
+                "repository",
+                "add",
+                repository.name,
+                repository.sync_type,
+                repository.uri,
+            ]
         else:
-            add_repo_command = ["eselect", "repository", "enable", name]
+            add_repo_command = ["eselect", "repository", "enable", repository.name]
         run_and_log_error(add_repo_command)
-        self.update_repository(name)
+        self.update_repository(repository.name)
 
     def update_repository(self, name: str):
         run_and_log_error(["emaint", "sync", "--repo", name])
@@ -299,9 +306,7 @@ def build(
             build_env.write_env(name=env_name, env_vars=env)
     if image_spec.repositories:
         for repository in image_spec.repositories:
-            build_env.add_repository(
-                repository.name, repository.sync_type, repository.uri
-            )
+            build_env.add_repository(repository)
     logger.debug(
         "The following repositories are available for the build: "
         + ", ".join(build_env.repositories)
