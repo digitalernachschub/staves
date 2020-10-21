@@ -190,8 +190,6 @@ def run_and_log_error(cmd: Sequence[str]) -> int:
 class BuildEnvironment:
     def __init__(self):
         os.makedirs("/etc/portage/repos.conf", exist_ok=True)
-        logger.info(f"Updating repository list")
-        run_and_log_error(["eselect", "repository", "list", "-i"])
 
     def add_repository(self, repository: Repository):
         logger.info(f"Adding repository {repository.name}")
