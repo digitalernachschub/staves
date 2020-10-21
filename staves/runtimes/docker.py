@@ -66,6 +66,8 @@ def run(
     logger.debug("Starting docker container with the following mounts:")
     for mount in mounts:
         logger.debug(str(mount))
+    for log_output in docker_client.api.pull(portage, stream=True, decode=True):
+        print(log_output)
     portage_container = docker_client.containers.create(
         portage,
         auto_remove=True,
