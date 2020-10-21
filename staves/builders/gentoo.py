@@ -208,25 +208,6 @@ class BuildEnvironment:
     def update_repository(self, name: str):
         run_and_log_error(["emaint", "sync", "--repo", name])
 
-    @property
-    def repositories(self) -> Sequence[str]:
-        list_repos_call = subprocess.run(
-            ["eselect", "repository", "list", "-i"],
-            universal_newlines=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        if list_repos_call.returncode != 0:
-            logger.error(list_repos_call.stderr)
-            raise StavesError("Failed to retrieve a list of available repositories")
-        repositories = []
-        repo_name_pattern = re.compile(r"\s*\[\d+\]\s*(\S+)")
-        for line in list_repos_call.stdout.splitlines()[1:]:
-            match = repo_name_pattern.match(line)
-            if match:
-                repositories.append(match.group(1))
-        return repositories
-
     def write_package_config(
         self,
         package: str,
