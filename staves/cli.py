@@ -21,7 +21,7 @@ from staves.builders.gentoo import (
     PackagingConfig,
     Repository,
 )
-from staves.packagers.docker import package, _create_dockerfile
+from staves.packagers.docker import _create_dockerfile
 
 
 logger = logging.getLogger(__name__)
@@ -173,32 +173,6 @@ def _parse_locale(config: MutableMapping[str, Any]) -> Locale:
         return Locale("C", "UTF-8")
     l = config.pop("locale")
     return Locale(l["name"], l["charset"])
-
-
-@cli.command("package", help="Creates a container image from a directory")
-@click.argument("rootfs_path")
-@click.option(
-    "--version",
-    default="latest",
-    show_default=True,
-    help="Version number of the packaged artifact",
-)
-@click.option("--config", type=click.Path(dir_okay=False, exists=True))
-def package_(rootfs_path, version, config):
-    config_path = Path(str(config)) if config else Path("staves.toml")
-    if not config_path.exists():
-        raise StavesError(f'No configuration file found at path "{str(config_path)}"')
-    with config_path.open(mode="r") as config_file:
-        packaging_config = _read_packaging_config(config_file)
-    packaging_config.version = packaging_config.version or version
-
-    package(
-        rootfs_path,
-        packaging_config.name,
-        packaging_config.version,
-        packaging_config.command,
-        packaging_config.annotations,
-    )
 
 
 def _read_packaging_config(config_file: IO) -> PackagingConfig:
