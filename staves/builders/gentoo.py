@@ -10,6 +10,7 @@ import subprocess
 from enum import Enum, auto
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import (
     Mapping,
     NewType,
@@ -194,15 +195,14 @@ class BuildEnvironment:
 
     def add_repository(self, repository: Repository):
         logger.info(f"Adding repository {repository.name}")
-        add_repo_command = [
-            "eselect",
-            "repository",
-            "add",
-            repository.name,
-            repository.sync_type,
-            repository.uri,
-        ]
-        run_and_log_error(add_repo_command)
+        repository_config_path = Path("/etc/portage/repos.conf") / repository.name
+        repository_config = f"""\
+        [{repository.name}]
+        location = /var/db/repos/{repository.name}
+        sync-type = {repository.sync_type}
+        sync-uri = {repository.uri}
+        """
+        repository_config_path.write_text(repository_config)
         self.update_repository(repository.name)
 
     def update_repository(self, name: str):
