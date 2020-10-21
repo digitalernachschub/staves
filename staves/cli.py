@@ -59,9 +59,9 @@ def cli(log_level: str):
 @click.option("--builder", help="The name of the builder to be used")
 @click.option(
     "--portage",
-    default="gentoo/portage",
+    default="gentoo/portage:latest",
     show_default=True,
-    help="The Portage image to be used",
+    help="Image of a Portage snapshot",
 )
 @click.option(
     "--build-cache", help="The name of the cache volume for the Docker runtime"
