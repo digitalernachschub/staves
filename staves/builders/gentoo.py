@@ -194,17 +194,14 @@ class BuildEnvironment:
 
     def add_repository(self, repository: Repository):
         logger.info(f"Adding repository {repository.name}")
-        if repository.uri and repository.sync_type:
-            add_repo_command = [
-                "eselect",
-                "repository",
-                "add",
-                repository.name,
-                repository.sync_type,
-                repository.uri,
-            ]
-        else:
-            add_repo_command = ["eselect", "repository", "enable", repository.name]
+        add_repo_command = [
+            "eselect",
+            "repository",
+            "add",
+            repository.name,
+            repository.sync_type,
+            repository.uri,
+        ]
         run_and_log_error(add_repo_command)
         self.update_repository(repository.name)
 
