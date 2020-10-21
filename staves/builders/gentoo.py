@@ -367,9 +367,20 @@ if __name__ == "__main__":
     content = sys.stdin.buffer.read(content_length)
     print(f"Deserializing content")
     image_spec = _deserialize_image_spec(content)
+    emerge_info = subprocess.run(
+        ["emerge", "--info"], stdout=subprocess.PIPE, check=True
+    )
+    elibc_match = re.search(rb'ELIBC="([^"]+)"', emerge_info.stdout)
+    elibc = elibc_match.group(1).decode()
+    if elibc == "glibc":
+        libc = Libc.glibc
+    elif elibc == "musl":
+        libc = Libc.musl
+    else:
+        raise StavesError(f"Unsupported ELIBC: {elibc}")
     subprocess.run(["emerge", "eselect-repository"])
     build(
         image_spec,
-        config=BuilderConfig(libc=Libc.glibc),
+        config=BuilderConfig(libc=libc),
         stdlib=args.stdlib,
     )
