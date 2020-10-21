@@ -163,13 +163,7 @@ def _parse_locale(config: MutableMapping[str, Any]) -> Locale:
     help="Version number of the packaged artifact",
 )
 @click.option("--config", type=click.Path(dir_okay=False, exists=True))
-@click.option(
-    "--packaging",
-    type=click.Choice(["none", "docker"]),
-    default="docker",
-    help="Packaging format of the resulting image",
-)
-def package_(rootfs_path, version, config, packaging):
+def package_(rootfs_path, version, config):
     config_path = Path(str(config)) if config else Path("staves.toml")
     if not config_path.exists():
         raise StavesError(f'No configuration file found at path "{str(config_path)}"')
@@ -177,14 +171,13 @@ def package_(rootfs_path, version, config, packaging):
         packaging_config = _read_packaging_config(config_file)
     packaging_config.version = packaging_config.version or version
 
-    if packaging == "docker":
-        package(
-            rootfs_path,
-            packaging_config.name,
-            packaging_config.version,
-            packaging_config.command,
-            packaging_config.annotations,
-        )
+    package(
+        rootfs_path,
+        packaging_config.name,
+        packaging_config.version,
+        packaging_config.command,
+        packaging_config.annotations,
+    )
 
 
 def _read_packaging_config(config_file: IO) -> PackagingConfig:
