@@ -35,14 +35,3 @@ def _docker_image_from_rootfs(
         tar.add(name=rootfs_path, arcname="rootfs")
     context.seek(0)
     client.images.build(fileobj=context, tag=tag, custom_context=True)
-
-
-def package(
-    path: str,
-    name: str,
-    version: str,
-    command: Sequence,
-    annotations: Mapping[str, str],
-):
-    tag = "{}:{}".format(name, version)
-    _docker_image_from_rootfs(path, tag, command, annotations)
