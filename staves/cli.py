@@ -113,22 +113,18 @@ def build(
 ):
     image_spec = _read_image_spec(config)
     image_path = Path(image_path)
-    if image_path.exists():
-        raise click.Abort(
-            "The path to the image root already exists. For safety reasons, please remove "
-            + str(image_path)
+    if not image_path.exists():
+        run_docker.run(
+            builder,
+            portage,
+            build_cache,
+            image_spec,
+            image_path,
+            stdlib=stdlib,
+            ssh=ssh,
+            netrc=netrc,
+            env={"LANG": locale},
         )
-    run_docker.run(
-        builder,
-        portage,
-        build_cache,
-        image_spec,
-        image_path,
-        stdlib=stdlib,
-        ssh=ssh,
-        netrc=netrc,
-        env={"LANG": locale},
-    )
     config.seek(0)
     packaging_config = _read_packaging_config(config)
     packaging_config.version = packaging_config.version or version
