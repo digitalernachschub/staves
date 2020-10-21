@@ -304,10 +304,6 @@ def build(
     if image_spec.repositories:
         for repository in image_spec.repositories:
             build_env.add_repository(repository)
-    logger.debug(
-        "The following repositories are available for the build: "
-        + ", ".join(build_env.repositories)
-    )
     for package, package_config in image_spec.package_configs.items():
         build_env.write_package_config(package, **package_config)
     packages = list(image_spec.packages_to_be_installed)
