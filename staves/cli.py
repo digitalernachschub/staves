@@ -1,11 +1,14 @@
 """Installs Gentoo portage packages into a specified directory."""
 
+import io
 import logging
 import os
+import tarfile
 from pathlib import Path
 from typing import IO, MutableMapping, Any, Sequence
 
 import click
+import docker
 import toml
 
 import staves.runtimes.docker as run_docker
@@ -18,7 +21,7 @@ from staves.builders.gentoo import (
     PackagingConfig,
     Repository,
 )
-from staves.packagers.docker import package
+from staves.packagers.docker import package, _create_dockerfile
 
 
 logger = logging.getLogger(__name__)
@@ -88,6 +91,12 @@ def cli(log_level: str):
     default=os.path.join(os.getcwd(), "staves_root.tar"),
     help="Path to the image archive",
 )
+@click.option(
+    "--version",
+    default="latest",
+    show_default=True,
+    help="Version number of the packaged artifact",
+)
 def build(
     config,
     libc,
@@ -100,6 +109,7 @@ def build(
     netrc,
     locale,
     image_path,
+    version,
 ):
     image_spec = _read_image_spec(config)
     image_path = Path(image_path)
@@ -119,6 +129,21 @@ def build(
         netrc=netrc,
         env={"LANG": locale},
     )
+    config.seek(0)
+    packaging_config = _read_packaging_config(config)
+    packaging_config.version = packaging_config.version or version
+    tag = "{}:{}".format(packaging_config.name, packaging_config.version)
+
+    client = docker.from_env()
+    dockerfile = _create_dockerfile(
+        packaging_config.annotations, *packaging_config.command
+    ).encode("utf-8")
+    with tarfile.open(str(image_path), mode="a") as tar:
+        dockerfile_info = tarfile.TarInfo(name="Dockerfile")
+        dockerfile_info.size = len(dockerfile)
+        tar.addfile(dockerfile_info, fileobj=io.BytesIO(dockerfile))
+    with open(str(image_path), "rb") as context:
+        client.images.build(fileobj=context, tag=tag, custom_context=True)
 
 
 def _read_image_spec(config_file: IO) -> ImageSpec:
