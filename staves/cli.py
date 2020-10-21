@@ -13,10 +13,8 @@ import toml
 
 import staves.runtimes.docker as run_docker
 from staves.builders.gentoo import (
-    BuilderConfig,
     Environment,
     ImageSpec,
-    Libc,
     Locale,
     PackagingConfig,
     Repository,
