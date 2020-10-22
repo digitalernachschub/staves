@@ -15,7 +15,6 @@ toml = "^0.9"
 hypothesis = "^3.37"
 pytest = "^3.2"
 pytest-mock= "^1.6"
-black = "^19.10b0"
 
 [tool.poetry.scripts]
 staves = "staves.cli:main"
