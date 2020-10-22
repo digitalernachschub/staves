@@ -118,3 +118,4 @@ def run(
         for chunk in image_chunks:
             image_archive.write(chunk)
     container.remove()
+    portage_container.remove()
