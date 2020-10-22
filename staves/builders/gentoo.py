@@ -3,7 +3,6 @@ import json
 import logging
 import multiprocessing
 import os
-import re
 import shutil
 import struct
 import subprocess
@@ -335,11 +334,10 @@ if __name__ == "__main__":
     content = sys.stdin.buffer.read(content_length)
     print(f"Deserializing content")
     image_spec = _deserialize_image_spec(content)
-    emerge_info = subprocess.run(
-        ["emerge", "--info"], stdout=subprocess.PIPE, check=True
+    portageq_call = subprocess.run(
+        ["portageq", "envvar", "ELIBC"], stdout=subprocess.PIPE, check=True
     )
-    elibc_match = re.search(rb'ELIBC="([^"]+)"', emerge_info.stdout)
-    elibc = elibc_match.group(1).decode()
+    elibc = portageq_call.stdout.decode()
     if elibc == "glibc":
         libc = Libc.glibc
     elif elibc == "musl":
