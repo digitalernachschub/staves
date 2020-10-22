@@ -348,3 +348,5 @@ if __name__ == "__main__":
         config=BuilderConfig(libc=libc),
         stdlib=args.stdlib,
     )
+    vdb_metadata_cache_path = Path("/tmp/rootfs") / "var" / "db" / "pkg"
+    shutil.rmtree(vdb_metadata_cache_path)
