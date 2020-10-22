@@ -47,3 +47,34 @@ Once the command is finished, we can test the newly created image:
 ```sh
 $ docker run --rm staves/bash "echo Hello World!"
 ```
+
+### Customizing the image
+The previous example uses only the most basic `staves.toml`, but there are several ways to customize the resulting image.
+
+#### Package-specific configuration
+A Staves image specification can control individual feature toggles of a package. In Gentoo Linux, these are called _USE flags_. The `app-shells/bash` package, for example, can also be compiled without Native Language Support. We do this by specifying a TOML table with the package name as the identifier and the USE flags as an array:
+```toml
+['app-shells/bash']
+use = ['-nls']
+```
+For one, this will shave off a couple of megabytes from the resulting image. For another, there are cases where disabling functionality will reduce the attack surface of the resulting image.
+
+#### Build environment customization
+Staves allows adjusting the global build environment. For example, we can enable aggressive compiler optimizations via `CFLAGS` or enable support for the AVX instruction set:
+```toml
+[env]
+CFLAGS="${CFLAGS} -O3"
+CPU_FLAGS_X86="${CPU_FLAGS_X86} avx"
+```
+Values in the `env` section of a `staves.toml` will be appended to the [make.conf](https://wiki.gentoo.org/wiki//etc/portage/make.conf) of the builder and are applied to all packages. See the [make.conf.example](https://github.com/gentoo/portage/blob/master/cnf/make.conf.example) file for a documentation of allowed values.
+
+However, it is also possible to apply package-specific configurations to the build environment. The _env_ table can have custom attributes that represent environment configurations themselves. These environments can be applied to individual packages using the _env_ attribute of a package configuration:
+```toml
+[env.nocache]
+FEATURES="-buildpkg"
+
+['=dev-utils/mylibrary-9999']
+env = ['nocache']
+```
+
+Technically, the _env.nocache_ section will create the file `/etc/portage/env/nocache`. This environment is then applied to the specified package using a corresponding entry in `/etc/portage/package.env`.
