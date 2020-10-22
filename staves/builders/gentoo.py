@@ -155,15 +155,6 @@ def _copy_to_rootfs(rootfs: str, path_glob: str):
             )
 
 
-def libc_to_package_name(libc: Libc) -> str:
-    if libc == Libc.glibc:
-        return "sys-libs/glibc"
-    elif libc == Libc.musl:
-        return "sys-libs/musl"
-    else:
-        raise ValueError(f"Unsupported value for libc: {libc}")
-
-
 @dataclass
 class Locale:
     name: str
@@ -287,7 +278,7 @@ def build(
         build_env.write_package_config(package, **package_config)
     packages = list(image_spec.packages_to_be_installed)
     if config.libc:
-        packages.append(libc_to_package_name(config.libc))
+        packages.append("virtual/libc")
     concurrent_jobs = config.concurrent_jobs or _max_concurrent_jobs()
     _create_rootfs(
         rootfs_path,
