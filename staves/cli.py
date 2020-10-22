@@ -47,9 +47,6 @@ def cli(log_level: str):
 @cli.command(help="Installs the specified packages into to the desired location.")
 @click.option("--config", type=click.File(), default="staves.toml")
 @click.option("--stdlib", is_flag=True, help="Copy libstdc++ into rootfs")
-@click.option(
-    "--jobs", type=int, help="Number of concurrent jobs executed by the builder"
-)
 @click.option("--builder", help="The name of the builder to be used")
 @click.option(
     "--portage",
@@ -91,7 +88,6 @@ def cli(log_level: str):
 def build(
     config,
     stdlib,
-    jobs,
     builder,
     portage,
     build_cache,
