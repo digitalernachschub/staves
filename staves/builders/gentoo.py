@@ -276,8 +276,7 @@ def build(
     for package, package_config in image_spec.package_configs.items():
         build_env.write_package_config(package, **package_config)
     packages = list(image_spec.packages_to_be_installed)
-    if config.libc:
-        packages.append("virtual/libc")
+    packages.append("virtual/libc")
     concurrent_jobs = config.concurrent_jobs or _max_concurrent_jobs()
     _create_rootfs(
         rootfs_path,
