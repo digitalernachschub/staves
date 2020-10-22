@@ -46,12 +46,6 @@ def cli(log_level: str):
 
 @cli.command(help="Installs the specified packages into to the desired location.")
 @click.option("--config", type=click.File(), default="staves.toml")
-@click.option(
-    "--libc",
-    type=click.Choice(["glibc", "musl"]),
-    default="glibc",
-    help="Libc to be installed into rootfs",
-)
 @click.option("--stdlib", is_flag=True, help="Copy libstdc++ into rootfs")
 @click.option(
     "--jobs", type=int, help="Number of concurrent jobs executed by the builder"
@@ -96,7 +90,6 @@ def cli(log_level: str):
 )
 def build(
     config,
-    libc,
     stdlib,
     jobs,
     builder,
