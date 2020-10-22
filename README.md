@@ -1,14 +1,15 @@
+# Staves
 Staves is a container image builder based on the _[Portage](https://wiki.gentoo.org/wiki/Portage)_ package manager for Gentoo Linux. Staves leverages Gentoo's infrastructure to build highly customized images optimized for image size, speed, and security.
 
 _Staves is in alpha status and is not recommended for production use_
 
-# Features
+## Features
 * Minimal dependencies result in small image sizes and reduced attack surface
 * [Feature toggles](https://wiki.gentoo.org/wiki/USE_flag) provide even more fine-grained control over image size and attack surface
 * Full control over the build process (e.g. [compiler settings](https://wiki.gentoo.org/wiki/GCC_optimization) allows for images customized to a specific Platform or CPU
 * Access to [hardened build toolchains](https://wiki.gentoo.org/wiki/Project:Hardened) with things like PIC (Position Independent Code) and SSP (Stack Smashing Protection)
 
-# Installation
+## Installation
 Staves is not available via PyPI at the moment. The following instructions will guide you through the installation from source.
 
 Make sure you have [Docker](https://www.docker.com) and the [Poetry](https://python-poetry.org) package manager installed. Then clone the repository and use poetry to set up the project:
@@ -18,7 +19,7 @@ $ cd staves
 $ poetry install
 ```
 
-# Getting started
+## Getting started
 Staves images are defined declaratively using [TOML](https://toml.io/en/) markup. Store the following image specification in a file called `staves.toml`:
 ```toml
 name = 'staves/bash'
