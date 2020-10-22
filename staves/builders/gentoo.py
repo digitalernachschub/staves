@@ -336,7 +336,7 @@ if __name__ == "__main__":
     portageq_call = subprocess.run(
         ["portageq", "envvar", "ELIBC"], stdout=subprocess.PIPE, check=True
     )
-    elibc = portageq_call.stdout.decode()
+    elibc = portageq_call.stdout.decode().strip()
     if elibc == "glibc":
         libc = Libc.glibc
     elif elibc == "musl":
