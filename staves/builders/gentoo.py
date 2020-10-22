@@ -262,7 +262,8 @@ def build(
             "FEATURES": "${FEATURES} -userpriv -usersandbox "
             "-ipc-sandbox -network-sandbox -pid-sandbox -sandbox "
             "buildpkg binpkg-multi-instance -binpkg-logs "
-            "-news nodoc noinfo noman"
+            "-news nodoc noinfo noman",
+            "PORTAGE_ELOG_SYSTEM": "echo:warn,error",
         }
     )
     if image_spec.global_env:
