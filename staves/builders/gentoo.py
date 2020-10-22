@@ -350,3 +350,5 @@ if __name__ == "__main__":
     )
     vdb_metadata_cache_path = Path("/tmp/rootfs") / "var" / "db" / "pkg"
     shutil.rmtree(vdb_metadata_cache_path)
+    var_cache = Path("/tmp/rootfs") / "var" / "cache"
+    shutil.rmtree(var_cache)
