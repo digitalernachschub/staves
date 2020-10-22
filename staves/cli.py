@@ -111,6 +111,10 @@ def build(
             netrc=netrc,
             env={"LANG": locale},
         )
+    else:
+        click.echo(
+            f"Found existing image tarball at {str(image_path)}. Skipping build."
+        )
     config.seek(0)
     packaging_config = _read_packaging_config(config)
     packaging_config.version = packaging_config.version or version
