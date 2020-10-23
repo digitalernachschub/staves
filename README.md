@@ -109,8 +109,12 @@ Multistage builds operate on the same principle as Staves in that both separate 
 
 Staves is limited to Gentoo builders, but provides a declarative way to create images. The prerequisite is that there is a Gentoo ebuild for the installed packages. There is no need to parameterize for multiple platforms, because platform specific steps are performed in the ebuilds.
 
+### buildkit, buildctl, img, buildx
+Buildkit improves upon regular `docker build` invocations, because it can be executed without root privileges, has a pluggable frontend (i.e. "image format"), and a number of other goodies. Buildkit uses a library-first approach and is used by different command-line tools, such as _buildctl,_ _img_ and _buildx_.
+
+Staves currently depends on Docker and defines a custom image format. Buildkit and its descendants compare similarly to Staves as as Docker multistage builds. They are more flexible, becase you can depend on other base images and choose any suitable builder as an image. Staves makes use of Gentoo's Portage package manager and therefore it relies on Gentoo infrastructure and depends on a Gentoo stage3 builder image.
+
 TODO: Comparisons with:
-* buildkit, img, buildx
 * Kaniko, makisu
 * buildah
 * Bazel
