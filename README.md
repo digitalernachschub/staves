@@ -81,7 +81,7 @@ Technically, the _env.nocache_ section will create the file `/etc/portage/env/no
 
 
 ## How to build images based on MUSL libc
-Building images based on anything else than GLibc will require you to prepare a stage3 image with a corresponding toolchain. The official Gentoo docker images do not include a stage3 with a MUSL toochain at the time of writing (2020-10-23), but there are several other ways to achieve this. For example, you can use [Catalyst](https://wiki.gentoo.org/wiki/Catalyst) or [GRS](https://wiki.gentoo.org/wiki/Project:RelEng_GRS) to bootstrap the corresponding system. This how-to will use the Docker image generator _[gentoo-docker-images](https://github.com/gentoo/gentoo-docker-images)_ to create a MUSL stage3 for amd64.
+Building images based on anything else than GLibc will require you to prepare a stage3 image with a corresponding toolchain. The official Gentoo docker images do not include a stage3 with a MUSL toolchain at the time of writing (2020-10-23), but there are several other ways to achieve this. For example, you can use [Catalyst](https://wiki.gentoo.org/wiki/Catalyst) or [GRS](https://wiki.gentoo.org/wiki/Project:RelEng_GRS) to bootstrap the corresponding system. This how-to will use the Docker image generator _[gentoo-docker-images](https://github.com/gentoo/gentoo-docker-images)_ to create a MUSL stage3 for amd64.
 
 As a prerequisite, you need to have the [buildx](https://docs.docker.com/buildx/working-with-buildx/) Docker extension installed. If not, the following instructions will build and install the buildx command:
 ```sh
