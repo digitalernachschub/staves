@@ -98,3 +98,19 @@ $ cd gentoo-docker-images
 $ TARGET=stage3-amd64-musl-hardened ./build.sh
 ```
 This will create a docker image tagged as `gentoo/stage3:amd64-musl-hardened`. Since Staves works with any stage3, this image can simply be used as a builder to produce MUSL-based images.
+
+## Comparison to other tools
+OCI images are built around the idea of different layers that are merged together to create a container filesystem. This approach promotes reusability of layers and permits layer caching. The drawback is that the number of layers required for a single image adds up quickly. Since these layers typically come from different entities and organizations, you have to trust each of them to provide uncompromised images. If any of the layers are compromised, your final image will likely be compromised, too.
+
+Staves does not rely on layering to provide the final image. Every image is built from scratch. You need to trust the Gentoo builder image and the packages you are installing. From there, everything is built from the sources. The security of this process is arguably easier to verify than the layering approach involving many different parties.
+
+### Docker multistage builds
+Multistage builds operate on the same principle as Staves in that both separate build-time and run-time dependencies. In multistage builds, the installation steps need to be invoked manually, but you are free to choose any build image or package manager to perform the steps. This results in an imperative image definition with several `RUN` steps. For multi-platform builds, these need to be parameterized with build arguments.
+
+Staves is limited to Gentoo builders, but provides a declarative way to create images. The prerequisite is that there is a Gentoo ebuild for the installed packages. There is no need to parameterize for multiple platforms, because platform specific steps are performed in the ebuilds.
+
+TODO: Comparisons with:
+* buildkit, img, buildx
+* Kaniko, makisu
+* buildah
+* Bazel
