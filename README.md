@@ -57,7 +57,7 @@ A Staves image specification can control individual feature toggles of a package
 ['app-shells/bash']
 use = ['-nls']
 ```
-For one, this will shave off a couple of megabytes from the resulting image. For another, there are cases where disabling functionality will reduce the attack surface of the resulting image.
+For one, this will shave off a couple of megabytes from the resulting image. For another, there are cases where disabling functionality will reduce the attack surface of the resulting image. See [packages.gentoo.org](https://packages.gentoo.org/) for installable packages and their USE flags.
 
 #### Build environment customization
 Staves allows adjusting the global build environment. For example, we can enable aggressive compiler optimizations via `CFLAGS` or enable support for the AVX instruction set:
