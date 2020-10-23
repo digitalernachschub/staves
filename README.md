@@ -78,3 +78,23 @@ env = ['nocache']
 ```
 
 Technically, the _env.nocache_ section will create the file `/etc/portage/env/nocache`. This environment is then applied to the specified package using a corresponding entry in `/etc/portage/package.env`.
+
+
+## How to build images based on MUSL libc
+Building images based on anything else than GLibc will require you to prepare a stage3 image with a corresponding toolchain. The official Gentoo docker images do not include a stage3 with a MUSL toochain at the time of writing (2020-10-23), but there are several other ways to achieve this. For example, you can use [Catalyst](https://wiki.gentoo.org/wiki/Catalyst) or [GRS](https://wiki.gentoo.org/wiki/Project:RelEng_GRS) to bootstrap the corresponding system. This how-to will use the Docker image generator _[gentoo-docker-images](https://github.com/gentoo/gentoo-docker-images)_ to create a MUSL stage3 for amd64.
+
+As a prerequisite, you need to have the [buildx](https://docs.docker.com/buildx/working-with-buildx/) Docker extension installed. If not, the following instructions will build and install the buildx command:
+```sh
+$ export DOCKER_BUILDKIT=1
+$ docker build --platform=local -o . git://github.com/docker/buildx
+$ mkdir -p ~/.docker/cli-plugins
+$ mv buildx ~/.docker/cli-plugins/docker-buildx
+```
+
+Now we can clone the gentoo-docker-images repository and run _build.sh_ with the appropriate _TARGET_ environment.
+```sh
+$ git clone https://github.com/gentoo/gentoo-docker-images.git
+$ cd gentoo-docker-images
+$ TARGET=stage3-amd64-musl-hardened ./build.sh
+```
+This will create a docker image tagged as `gentoo/stage3:amd64-musl-hardened`. Since Staves works with any stage3, this image can simply be used as a builder to produce MUSL-based images.
