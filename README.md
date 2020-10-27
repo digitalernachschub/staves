@@ -15,6 +15,7 @@ _Staves is in alpha status and is not recommended for production use_
     * [Customizing the Image](#customizing-the-image)
     * [Package-specific configuration](#package-specific-configuration)
     * [Build environment customization](#build-environment-customization)
+* [How it works](#how-it-works)
 * [How to build images based on musl libc](#how-to-build-images-based-on-musl-libc)
 * [Comparison to other tools](#comparison-to-other-tools)
     * [Docker multistage builds](#docker-multistage-builds)
@@ -93,6 +94,10 @@ env = ['nocache']
 
 Technically, the _env.nocache_ section will create the file `/etc/portage/env/nocache`. This environment is then applied to the specified package using a corresponding entry in `/etc/portage/package.env`.
 
+## How it works
+Staves consists of two parts, a host part and a builder part. The host part provides the command-line interface and parses the `staves.toml` file. The builder part controls the process inside the build container. 
+
+When a user invokes the build command, Staves pulls the newest Docker image containing a Portage snapshot and creates a container from it. Staves creates a build container from the provided stage3 builder image where the Portage tree is mounted into. Staves copies the builder part into the container and runs it. The builder script reads the build configuration (USE flags, make.conf, …) from stdin, applies the changes to the build environment and runs a couple of `emerge` commands to generate the root filesystem of the application image. Once the builder has finished, the host part extracts a tar archive from the container and assembles a Docker image from it.
 
 ## How to build images based on MUSL libc
 Building images based on anything else than GLibc will require you to prepare a stage3 image with a corresponding toolchain. The official Gentoo docker images do not include a stage3 with a MUSL toolchain at the time of writing (2020-10-23), but there are several other ways to achieve this. For example, you can use [Catalyst](https://wiki.gentoo.org/wiki/Catalyst) or [GRS](https://wiki.gentoo.org/wiki/Project:RelEng_GRS) to bootstrap the corresponding system. This how-to will use the Docker image generator _[gentoo-docker-images](https://github.com/gentoo/gentoo-docker-images)_ to create a MUSL stage3 for amd64.
