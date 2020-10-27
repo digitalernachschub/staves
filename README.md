@@ -58,7 +58,7 @@ This will take some time. The command performs the following steps:
 * Create the file `staves_root.tar` in your working directory from the contents of `/tmp/rootfs`
 * Create and tag a Docker image with the contents of the tarball
 
-Once the command is finished, we can test the newly created image:
+Once the command has finished, we can test the newly created image:
 ```sh
 $ docker run --rm staves/bash "echo Hello World!"
 ```
