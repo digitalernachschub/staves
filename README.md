@@ -1,5 +1,5 @@
 # Staves
-Staves is a container image builder based on the _[Portage](https://wiki.gentoo.org/wiki/Portage)_ package manager for Gentoo Linux. Staves leverages Gentoo's infrastructure to build highly customized images optimized for image size, speed, and security.
+Staves is a container image builder based on the _[Portage](https://wiki.gentoo.org/wiki/Portage)_ package manager for Gentoo Linux. Staves leverages Gentoo's infrastructure to build highly customized application images optimized for image size, speed, and security.
 
 _Staves is in alpha status and is not recommended for production use_
 
