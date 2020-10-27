@@ -15,6 +15,7 @@ _Staves is in alpha status and is not recommended for production use_
     * [Customizing the Image](#customizing-the-image)
     * [Package-specific configuration](#package-specific-configuration)
     * [Build environment customization](#build-environment-customization)
+    * [Custom package repositories](#custom-package-repositories)
 * [How it works](#how-it-works)
 * [How to build images based on musl libc](#how-to-build-images-based-on-musl-libc)
 * [Comparison to other tools](#comparison-to-other-tools)
@@ -93,6 +94,18 @@ env = ['nocache']
 ```
 
 Technically, the _env.nocache_ section will create the file `/etc/portage/env/nocache`. This environment is then applied to the specified package using a corresponding entry in `/etc/portage/package.env`.
+
+
+#### Custom package repositories
+Staves supports custom repositories to be set up in the builder. For each repository, add the following section to your `staves.toml`:
+```toml
+[[repositories]]
+name = 'my-repo'
+type = 'git'
+uri = 'ssh://git@example.com/my-overlay.git'
+```
+
+This will create a corresponding file in `/etc/portage/repos.d/my-repo` and run `emaint sync --repo my-repo` to fetch the most recent package list. Note that `dev-vcs/git` is not included in an official Stage 3 tarball. It is your responsibility ensure that your builder image contains the dependencies necessary to fetch the repository. 
 
 ## How it works
 Staves consists of two parts, a host part and a builder part. The host part provides the command-line interface and parses the `staves.toml` file. The builder part controls the process inside the build container. 
