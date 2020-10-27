@@ -72,7 +72,7 @@ A Staves image specification can control individual feature toggles of a package
 ['app-shells/bash']
 use = ['-nls']
 ```
-For one, this will shave off a couple of megabytes from the resulting image. For another, there are cases where disabling functionality will reduce the attack surface of the resulting image. See [packages.gentoo.org](https://packages.gentoo.org/) for installable packages and their USE flags.
+For one, this will shave off a couple of megabytes from the resulting image: When using a [musl libc](#how-to-build-images-based-on-musl-libc) toolchain, the resulting image is 9.29 MB which is 29% smaller than the official Bash image (13.1 MB). For another, there are cases where disabling functionality will reduce the attack surface of the resulting image. See [packages.gentoo.org](https://packages.gentoo.org/) for installable packages and their USE flags.
 
 #### Build environment customization
 Staves allows adjusting the global build environment. For example, we can enable aggressive compiler optimizations via `CFLAGS` or enable support for the AVX instruction set:
