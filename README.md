@@ -9,6 +9,20 @@ _Staves is in alpha status and is not recommended for production use_
 * Full control over the build process (e.g. [compiler settings](https://wiki.gentoo.org/wiki/GCC_optimization) allows for images customized to a specific Platform or CPU
 * Access to [hardened build toolchains](https://wiki.gentoo.org/wiki/Project:Hardened) with things like PIC (Position Independent Code) and SSP (Stack Smashing Protection)
 
+## Table of Contents
+* [Installation](#installation)
+* [Getting Started](#getting-started)
+    * [Customizing the Image](#customizing-the-image)
+    * [Package-specific configuration](#package-specific-configuration)
+    * [Build environment customization](#build-environment-customization)
+* [How to build images based on musl libc](#how-to-build-images-based-on-musl-libc)
+* [Comparison to other tools](#comparison-to-other-tools)
+    * [Docker multistage builds](#docker-multistage-builds)
+    * [Buildkit, buildctl, img, buildx](#buildkit-buildctl-img-buildx)
+    * Kaniko, makisu
+    * buildah
+    * Bazel
+
 ## Installation
 Staves is not available via PyPI at the moment. The following instructions will guide you through the installation from source.
 
@@ -113,8 +127,3 @@ Staves is limited to Gentoo builders, but provides a declarative way to create i
 Buildkit improves upon regular `docker build` invocations, because it can be executed without root privileges, has a pluggable frontend (i.e. "image format"), and a number of other goodies. Buildkit uses a library-first approach and is used by different command-line tools, such as _buildctl,_ _img_ and _buildx_.
 
 Staves currently depends on Docker and defines a custom image format. Buildkit and its descendants compare similarly to Staves as as Docker multistage builds. They are more flexible, becase you can depend on other base images and choose any suitable builder as an image. Staves makes use of Gentoo's Portage package manager and therefore it relies on Gentoo infrastructure and depends on a Gentoo stage3 builder image.
-
-TODO: Comparisons with:
-* Kaniko, makisu
-* buildah
-* Bazel
